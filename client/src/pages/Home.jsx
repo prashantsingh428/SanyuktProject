@@ -594,10 +594,10 @@ const HomePage = () => {
                                 Sanyukt Parivaar & Rich Life Company
                             </h3>
                             <p className="text-sm">
-                                We are a direct Selling company founded by business professionals. At Ishaavia Global Marketing, we create dynamic entrepreneurs through the promotion of high quality wellness products, personal care products, Home care products.
+                                Sanyukt Parivaar & Rich Life Company was founded with a clear vision — to create financial independence through ethical direct selling. We believe in growing together as one family (“Parivaar”), where every member gets equal opportunity, proper training, and long-term support.
                             </p>
                             <p className="text-sm">
-                                Sanyukt Parivaar & Rich Life Company was founded with a clear vision  to create financial independence through ethical direct selling. We believe in growing together.
+                                Our company focuses on personal development, leadership growth, and community success while promoting reliable lifestyle, wellness, and personal care products.
                             </p>
                             <div className="flex items-center space-x-4 pt-3">
                                 <div className="flex -space-x-2">
