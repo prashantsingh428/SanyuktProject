@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from "../api"; // path check kar lena
+
 import { ChevronRight, Phone, Mail, User, MessageSquare, Send, AlertCircle, CheckCircle, ExternalLink, UserCircle, FileText, X, Ticket } from 'lucide-react';
 
 const GrievancePage = () => {
@@ -41,38 +43,46 @@ const GrievancePage = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate required fields
+        // Validation
         if (!formData.mobileNo || !formData.emailId || !formData.category || !formData.subject || !formData.message) {
             setError('Please fill in all required fields');
             return;
         }
 
-        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.emailId)) {
             setError('Please enter a valid email address');
             return;
         }
 
-        // Mobile validation (10 digits)
         const mobileRegex = /^\d{10}$/;
         if (!mobileRegex.test(formData.mobileNo)) {
             setError('Please enter a valid 10-digit mobile number');
             return;
         }
 
-        setError('');
-        setIsSubmitted(true);
+        try {
+            setError("");
 
-        // Here you would typically send the data to your backend
-        console.log('Grievance submitted:', formData);
+            const res = await api.post("/grievance/create", {
+                sellerId: formData.directSellerId,
+                name: formData.name,
+                mobile: formData.mobileNo,
+                email: formData.emailId,
+                category: formData.category,
+                subject: formData.subject,
+                message: formData.message
+            });
 
-        // Reset form after submission
-        setTimeout(() => {
-            setIsSubmitted(false);
+            // 🎫 Ticket show
+            alert("🎫 Please note Generated Ticket Number: " + res.data.ticket);
+
+            setIsSubmitted(true);
+
+            // reset form
             setFormData({
                 directSellerId: '',
                 name: '',
@@ -82,35 +92,40 @@ const GrievancePage = () => {
                 subject: '',
                 message: ''
             });
-        }, 5000);
-    };
 
-    const handleStatusCheck = (e) => {
+        } catch (err) {
+            setError("❌ Server error, try again");
+        }
+    };
+    const handleStatusCheck = async (e) => {
         e.preventDefault();
 
-        // Validate ticket number
         if (!statusFormData.ticketNumber) {
             setStatusError('Please enter your ticket number');
             return;
         }
 
-        setStatusError('');
+        try {
+            setStatusError("");
 
-        // Simulate API call to check status
-        // In real application, you would fetch from backend
-        setTimeout(() => {
-            // Mock status response
-            setStatusResult({
-                ticketNumber: statusFormData.ticketNumber,
-                status: 'In Progress',
-                submittedDate: '2024-03-15',
-                lastUpdated: '2024-03-16',
-                department: 'Customer Support',
-                description: 'Your grievance is being processed by our team.'
+            const res = await api.post("/grievance/track", {
+                ticket: statusFormData.ticketNumber
             });
-        }, 1000);
-    };
 
+            setStatusResult({
+                ticketNumber: res.data.ticketNumber,
+                status: res.data.status,
+                submittedDate: new Date(res.data.submittedDate).toLocaleDateString(),
+                lastUpdated: new Date(res.data.submittedDate).toLocaleDateString(),
+                department: "Support Team",
+                description: "Your grievance is being processed"
+            });
+
+        } catch (err) {
+            setStatusError("❌ Ticket not found");
+            setStatusResult(null);
+        }
+    };
     const closeModal = () => {
         setShowStatusModal(false);
         setStatusResult(null);
@@ -189,7 +204,7 @@ const GrievancePage = () => {
                                     <Phone className="w-5 h-5 text-[#B8FFB8] mt-0.5" />
                                     <div>
                                         <span className="font-bold text-[#222222]">Mobile Number:</span>
-                                        <span className="text-[#222222] ml-2">+91-9628145157</span>
+                                        <span className="text-[#222222] ml-2">+91 98765 43210</span>
                                     </div>
                                 </div>
 
@@ -197,7 +212,7 @@ const GrievancePage = () => {
                                     <Mail className="w-5 h-5 text-[#B8FFB8] mt-0.5" />
                                     <div>
                                         <span className="font-bold text-[#222222]">Email ID:</span>
-                                        <span className="text-[#222222] ml-2">info@sanyuktparivaar.com</span>
+                                        <span className="text-[#222222] ml-2">support@sanyuktparivaar.com</span>
                                     </div>
                                 </div>
                             </div>
