@@ -34,6 +34,7 @@ import AdminUsers from '../pages/admin/Users'
 import AdminProducts from '../pages/admin/Products'
 import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
+import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
 
 const MainRoutes = () => {
     return (
@@ -76,6 +77,7 @@ const MainRoutes = () => {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="franchise" element={<AdminFranchise />} />
+                <Route path="grievance" element={<AdminGrievance />} />
             </Route>
 
         </Routes>
