@@ -208,12 +208,48 @@ const HomePage = () => {
     ];
 
     const whyChoosePoints = [
-        { icon: <Shield className="w-5 h-5" />, text: "Transparent & legal MLM business model" },
-        { icon: <Package className="w-5 h-5" />, text: "High-quality, daily-use products" },
-        { icon: <TrendingUp className="w-5 h-5" />, text: "Unlimited income potential" },
-        { icon: <Users className="w-5 h-5" />, text: "Regular training & leadership programs" },
-        { icon: <Heart className="w-5 h-5" />, text: "Strong support system" },
-        { icon: <Award className="w-5 h-5" />, text: "Long-term vision with stable growth" }
+        {
+            icon: <Shield className="w-6 h-6" />,
+            title: "Ethical Business Model",
+            text: "A transparent, legal, and sustainable direct selling platform trusted by thousands.",
+            color: "bg-green-50 text-[#0A7A2F]",
+            shadow: "hover:shadow-green-500/10"
+        },
+        {
+            icon: <Package className="w-6 h-6" />,
+            title: "Premium Products",
+            text: "High-quality lifestyle and wellness products designed for repeat satisfaction.",
+            color: "bg-orange-50 text-[#F7931E]",
+            shadow: "hover:shadow-orange-500/10"
+        },
+        {
+            icon: <TrendingUp className="w-6 h-6" />,
+            title: "Financial Freedom",
+            text: "Unlock unlimited earning potential through a proven, reward-driven compensation plan.",
+            color: "bg-blue-50 text-blue-600",
+            shadow: "hover:shadow-blue-500/10"
+        },
+        {
+            icon: <Users className="w-6 h-6" />,
+            title: "Professional Training",
+            text: "Continuous mentorship and leadership development to build your business skills.",
+            color: "bg-purple-50 text-purple-600",
+            shadow: "hover:shadow-purple-500/10"
+        },
+        {
+            icon: <Heart className="w-6 h-6" />,
+            title: "Family Ecosystem",
+            text: "A strong 'Parivaar' support system providing guidance at every single step.",
+            color: "bg-red-50 text-red-600",
+            shadow: "hover:shadow-red-500/10"
+        },
+        {
+            icon: <Award className="w-6 h-6" />,
+            title: "Sustainable Vision",
+            text: "A long-term commitment to community prosperity and personal development.",
+            color: "bg-emerald-50 text-emerald-600",
+            shadow: "hover:shadow-emerald-500/10"
+        }
     ];
 
     const businessHighlights = [
@@ -628,30 +664,68 @@ const HomePage = () => {
             </section>
 
 
-            {/* Why Choose Us Section */}
-            <section className="py-12 md:py-16 bg-white">
+            {/* Why Choose Us Section - REDESIGNED PROFESSIONAL UI */}
+            <section className="py-20 bg-white">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-2xl md:text-3xl font-bold text-center text-[#0A7A2F] mb-2">
-                        Why Choose Sanyukt Parivaar?
-                    </h2>
-                    <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto text-xs md:text-sm">
-                        Discover what makes us the preferred choice for thousands of entrepreneurs
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                    <div className="max-w-3xl mx-auto text-center mb-16">
+                        <motion.span
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-[#F7931E] font-bold text-sm tracking-widest uppercase mb-3 block"
+                        >
+                            The Sanyukt Advantage
+                        </motion.span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="text-3xl md:text-5xl font-black text-[#0A7A2F] mb-6 leading-tight"
+                        >
+                            Why Choose Sanyukt Parivaar?
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                            className="text-gray-500 text-lg leading-relaxed"
+                        >
+                            Empowering individuals through a unified vision of entrepreneurship,
+                            ethical commerce, and lifelong community growth.
+                        </motion.p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {whyChoosePoints.map((point, index) => (
-                            <div
+                            <motion.div
                                 key={index}
-                                className="group p-3 bg-[#F8FAF5] rounded-lg hover:shadow-md transition-all duration-300"
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                                whileHover={{ y: -10 }}
+                                className={`group p-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm transition-all duration-500 ${point.shadow}`}
                             >
-                                <div className="w-8 h-8 bg-[#0A7A2F] rounded-lg flex items-center justify-center text-white mb-2 group-hover:bg-[#F7931E] transition-colors">
+                                <div className={`w-14 h-14 ${point.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-current/5`}>
                                     {point.icon}
                                 </div>
-                                <p className="text-gray-700 text-xs">{point.text}</p>
-                            </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#0A7A2F] transition-colors">
+                                    {point.title}
+                                </h3>
+                                <p className="text-gray-500 leading-relaxed text-sm">
+                                    {point.text}
+                                </p>
+                                <div className="mt-6 flex items-center text-[#0A7A2F] font-bold text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    <span>Learn More</span>
+                                    <ChevronRight className="w-4 h-4 ml-1" />
+                                </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* PRODUCTS SECTION - WITHOUT SORTING OPTIONS */}
             < section className="py-16 bg-gradient-to-b from-[#F8FAF5] to-white" >
