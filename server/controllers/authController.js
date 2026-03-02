@@ -69,8 +69,6 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        console.log("LOGIN DATA:", email, password);
-
         const user = await User.findOne({ email });
 
         if (!user)
@@ -79,18 +77,10 @@ exports.login = async (req, res) => {
         if (!user.isVerified)
             return res.status(400).json({ message: "Verify Email First" });
 
-        if (!user.password) {
-            return res.status(500).json({ message: "Password not found in DB" });
-        }
-
         const match = await bcrypt.compare(password, user.password);
 
         if (!match)
             return res.status(400).json({ message: "Wrong Password" });
-
-        if (!process.env.JWT_SECRET) {
-            return res.status(500).json({ message: "JWT_SECRET missing" });
-        }
 
         const token = jwt.sign(
             { id: user._id, role: user.role },
@@ -101,15 +91,10 @@ exports.login = async (req, res) => {
         res.json({
             message: "Login Success",
             token,
-            user: {
-                _id: user._id,
-                email: user.email,
-                role: user.role
-            }
+            user   // 🔥 FULL USER OBJECT
         });
 
     } catch (error) {
-        console.log("LOGIN ERROR:", error);
         res.status(500).json({ message: error.message });
     }
 };
