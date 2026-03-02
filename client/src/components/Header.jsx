@@ -1,0 +1,990 @@
+import React, { useState, useEffect } from 'react';
+import {
+    AppBar,
+    Toolbar,
+    Box,
+    Button,
+    IconButton,
+    Drawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Container,
+    Typography,
+    Collapse,
+    Menu,
+    MenuItem,
+    Avatar,
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+
+// Main Header Styling (Sticky, Full width, 80px desktop, 60px mobile)
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+    backgroundColor: '#FFFFFF',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+    borderBottom: '1px solid #E6E6E6',
+    height: '60px',
+    justifyContent: 'center',
+    position: 'fixed',
+    top: 0,
+    zIndex: 1100,
+    [theme.breakpoints.up('md')]: {
+        height: '80px',
+    },
+}));
+
+const LogoContainer = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+    maxWidth: '220px',
+    [theme.breakpoints.up('md')]: {
+        gap: '12px',
+        maxWidth: '350px',
+    },
+    [theme.breakpoints.up('lg')]: {
+        maxWidth: '400px',
+    },
+}));
+
+const LogoImage = styled('img')(({ theme }) => ({
+    height: '40px',
+    width: 'auto',
+    objectFit: 'contain',
+    [theme.breakpoints.up('md')]: {
+        height: '45px',
+    },
+    [theme.breakpoints.up('lg')]: {
+        height: '55px',
+    },
+}));
+
+const LogoMain = styled('span')(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontWeight: 700,
+    fontSize: '0.75rem',
+    color: '#0A7A2F',
+    whiteSpace: 'normal',
+    lineHeight: 1.2,
+    [theme.breakpoints.up('md')]: {
+        fontSize: '0.9rem',
+        whiteSpace: 'nowrap',
+    },
+    [theme.breakpoints.up('lg')]: {
+        fontSize: '1.1rem',
+    },
+}));
+
+const LogoTagline = styled('span')(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontSize: '0.55rem',
+    fontWeight: 500,
+    color: '#F7931E',
+    whiteSpace: 'normal',
+    [theme.breakpoints.up('md')]: {
+        fontSize: '0.65rem',
+        whiteSpace: 'nowrap',
+    },
+    [theme.breakpoints.up('lg')]: {
+        fontSize: '0.75rem',
+    },
+}));
+
+// NavButton with exact styling
+const NavButton = styled(Button)(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#2F7A32',
+    textTransform: 'none',
+    padding: '4px 6px',
+    minWidth: 'auto',
+    whiteSpace: 'nowrap',
+    '&:hover': {
+        color: '#F7931E',
+        backgroundColor: 'transparent',
+    },
+    '&.active': {
+        color: '#F7931E',
+    },
+    transition: 'color 0.2s ease-in-out',
+    [theme.breakpoints.up('xl')]: {
+        fontSize: '15px',
+        padding: '6px 10px',
+    },
+}));
+
+// Register Button (#F7931E, White text)
+const RegisterButton = styled(Button)(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontSize: '14px',
+    fontWeight: 600,
+    backgroundColor: '#F7931E',
+    color: '#FFFFFF',
+    padding: '6px 12px',
+    borderRadius: '4px',
+    textTransform: 'none',
+    whiteSpace: 'nowrap',
+    '&:hover': {
+        backgroundColor: '#e07d0b',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    },
+    transition: 'all 0.2s ease-in-out',
+    [theme.breakpoints.up('xl')]: {
+        fontSize: '15px',
+        padding: '8px 16px',
+    },
+}));
+
+// Login Button (Transparent, #F7931E Border)
+const LoginButton = styled(Button)(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontSize: '14px',
+    fontWeight: 600,
+    backgroundColor: 'transparent',
+    border: '1px solid #F7931E',
+    color: '#F7931E',
+    padding: '6px 12px',
+    borderRadius: '4px',
+    textTransform: 'none',
+    whiteSpace: 'nowrap',
+    '&:hover': {
+        backgroundColor: 'rgba(247, 147, 30, 0.04)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    },
+    transition: 'all 0.2s ease-in-out',
+    [theme.breakpoints.up('xl')]: {
+        fontSize: '15px',
+        padding: '8px 16px',
+    },
+}));
+
+// My Account Button (Green - for regular users)
+const MyAccountButton = styled(Button)(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontSize: '14px',
+    fontWeight: 600,
+    backgroundColor: '#0A7A2F',
+    color: '#FFFFFF',
+    padding: '6px 16px',
+    borderRadius: '4px',
+    textTransform: 'none',
+    whiteSpace: 'nowrap',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    '&:hover': {
+        backgroundColor: '#086b28',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    },
+    transition: 'all 0.2s ease-in-out',
+    [theme.breakpoints.up('xl')]: {
+        fontSize: '15px',
+        padding: '8px 20px',
+    },
+}));
+
+// Admin Dashboard Button (Orange/Different color - for admins)
+const AdminDashboardButton = styled(Button)(({ theme }) => ({
+    fontFamily: '"Poppins", "Roboto", sans-serif',
+    fontSize: '14px',
+    fontWeight: 600,
+    backgroundColor: '#F7931E',
+    color: '#FFFFFF',
+    padding: '6px 16px',
+    borderRadius: '4px',
+    textTransform: 'none',
+    whiteSpace: 'nowrap',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    '&:hover': {
+        backgroundColor: '#e07d0b',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    },
+    transition: 'all 0.2s ease-in-out',
+    [theme.breakpoints.up('xl')]: {
+        fontSize: '15px',
+        padding: '8px 20px',
+    },
+}));
+
+// Logout Menu Item
+const LogoutMenuItem = styled(MenuItem)({
+    color: '#d32f2f',
+    '&:hover': {
+        backgroundColor: 'rgba(211, 47, 47, 0.08)',
+    },
+});
+
+// Regular List item for mobile drawer
+const StyledListItemButton = styled(ListItemButton)({
+    '&:hover': {
+        backgroundColor: 'rgba(247, 147, 30, 0.08)',
+        '& .MuiListItemText-primary': {
+            color: '#F7931E',
+        },
+    },
+    transition: 'all 0.2s ease-in-out',
+});
+
+const Header = () => {
+    const navigate = useNavigate();
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [logoError, setLogoError] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userData, setUserData] = useState(null);
+    const [userRole, setUserRole] = useState(null);
+    const [anchorElUser, setAnchorElUser] = useState(null);
+
+    // Check authentication status on component mount and when localStorage changes
+    useEffect(() => {
+        checkAuthStatus();
+
+        // Listen for storage events (in case user logs in/out in another tab)
+        window.addEventListener('storage', checkAuthStatus);
+
+        return () => {
+            window.removeEventListener('storage', checkAuthStatus);
+        };
+    }, []);
+
+    // Also check when component mounts and after any navigation
+    useEffect(() => {
+        checkAuthStatus();
+    }, [navigate]);
+
+    const checkAuthStatus = () => {
+        console.log("Checking auth status..."); // Debug log
+
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+
+        console.log("Token:", token); // Debug log
+        console.log("User from localStorage:", user); // Debug log
+
+        if (token && user) {
+            try {
+                const parsedUser = JSON.parse(user);
+                console.log("Parsed user:", parsedUser); // Debug log
+
+                setIsLoggedIn(true);
+                setUserData(parsedUser);
+
+                // Check user role - adjust based on your actual user data structure
+                // Try different possible role field names
+                const role = parsedUser.role ||
+                    parsedUser.userType ||
+                    parsedUser.type ||
+                    (parsedUser.isAdmin ? 'admin' : 'user') ||
+                    'user';
+
+                setUserRole(role);
+                console.log("User role set to:", role); // Debug log
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+                setIsLoggedIn(false);
+                setUserData(null);
+                setUserRole(null);
+            }
+        } else {
+            console.log("No token or user found"); // Debug log
+            setIsLoggedIn(false);
+            setUserData(null);
+            setUserRole(null);
+        }
+    };
+
+    // Franchise Dropdown State (Desktop)
+    const [anchorElFranchise, setAnchorElFranchise] = useState(null);
+    const openFranchiseMenu = Boolean(anchorElFranchise);
+
+    // Franchise Collapse State (Mobile)
+    const [mobileFranchiseOpen, setMobileFranchiseOpen] = useState(false);
+
+    // Company Dropdown State (Desktop)
+    const [anchorElCompany, setAnchorElCompany] = useState(null);
+    const openCompanyMenu = Boolean(anchorElCompany);
+
+    // Company Collapse State (Mobile)
+    const [mobileCompanyOpen, setMobileCompanyOpen] = useState(false);
+
+    // User Menu State
+    const openUserMenu = Boolean(anchorElUser);
+
+    // Exact Menu Order
+    const menuItems = [
+        { name: 'Home', path: '/' },
+        { name: 'Recharge', path: '/recharge' },
+        { name: 'Grievance', path: '/grievance' },
+        { name: 'Products', path: '/products' },
+        { name: 'Opportunities', path: '/opportunities' },
+    ];
+
+    // Trailing non-auth menus
+    const trailItems = [
+        { name: 'Contact Us', path: '/contact' },
+    ];
+
+    const companySubItems = [
+        { name: 'About Us', path: '/company/about' },
+        { name: 'Legal', path: '/company/legal' },
+    ];
+
+    const franchiseSubItems = [
+        { name: 'Franchise List', path: '/franchise/list' },
+        { name: 'Franchise Login', path: '/franchise/login' },
+    ];
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
+
+    const handleNavigation = (path) => {
+        navigate(path);
+        setMobileOpen(false);
+    };
+
+    const handleLogoError = () => {
+        setLogoError(true);
+    };
+
+    const isActive = (path) => window.location.pathname === path;
+
+    const isFranchiseActive = () => franchiseSubItems.some(item => isActive(item.path));
+    const isCompanyActive = () => companySubItems.some(item => isActive(item.path));
+
+    // Desktop Menu Handlers
+    const handleFranchiseClick = (event) => {
+        setAnchorElFranchise(event.currentTarget);
+    };
+
+    const handleFranchiseClose = () => {
+        setAnchorElFranchise(null);
+    };
+
+    const handleFranchiseItemClick = (path) => {
+        handleFranchiseClose();
+        handleNavigation(path);
+    };
+
+    const handleCompanyClick = (event) => {
+        setAnchorElCompany(event.currentTarget);
+    };
+
+    const handleCompanyClose = () => {
+        setAnchorElCompany(null);
+    };
+
+    const handleCompanyItemClick = (path) => {
+        handleCompanyClose();
+        handleNavigation(path);
+    };
+
+    // User Menu Handlers
+    const handleUserMenuClick = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleUserMenuClose = () => {
+        setAnchorElUser(null);
+    };
+
+    const handleMyAccountClick = () => {
+        handleUserMenuClose();
+        navigate('/my-account');
+    };
+
+    const handleAdminDashboardClick = () => {
+        handleUserMenuClose();
+        navigate('/admin/dashboard');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        setUserData(null);
+        setUserRole(null);
+        handleUserMenuClose();
+        navigate('/');
+    };
+
+    // Mobile Collapse Handler
+    const handleMobileFranchiseToggle = () => {
+        setMobileFranchiseOpen(!mobileFranchiseOpen);
+    };
+
+    const handleMobileCompanyToggle = () => {
+        setMobileCompanyOpen(!mobileCompanyOpen);
+    };
+
+    // Get user initials for avatar
+    const getUserInitials = () => {
+        if (userData?.userName) {
+            return userData.userName.charAt(0).toUpperCase();
+        }
+        if (userData?.name) {
+            return userData.name.charAt(0).toUpperCase();
+        }
+        if (userData?.email) {
+            return userData.email.charAt(0).toUpperCase();
+        }
+        return 'U';
+    };
+
+    // Get display name for button
+    const getDisplayName = () => {
+        if (userData?.userName) {
+            return userData.userName;
+        }
+        if (userData?.name) {
+            return userData.name;
+        }
+        if (userData?.email) {
+            // Show first part of email
+            return userData.email.split('@')[0];
+        }
+        return isAdmin() ? 'Admin' : 'My Account';
+    };
+
+    // Check if user is admin
+    const isAdmin = () => {
+        return userRole === 'admin' ||
+            userRole === 'administrator' ||
+            userRole === 'Admin' ||
+            userRole === 'ADMIN';
+    };
+
+    // Debug render
+    console.log("Render - isLoggedIn:", isLoggedIn, "userRole:", userRole, "isAdmin:", isAdmin()); // Debug log
+
+    // Mobile Drawer
+    const drawer = (
+        <Box sx={{ width: 280, pt: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {/* Logo inside drawer to always keep it visible */}
+            <Box sx={{ px: 2, pb: 2, borderBottom: '1px solid #E6E6E6', mb: 1 }}>
+                <LogoContainer onClick={() => handleNavigation('/')}>
+                    {!logoError && (
+                        <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                    )}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2 }}>
+                        <LogoMain>Sanyukt Parivaar <span style={{ fontSize: '0.8rem' }}>&</span> Rich Life</LogoMain>
+                        <LogoTagline>Company</LogoTagline>
+                    </Box>
+                </LogoContainer>
+            </Box>
+
+            <List sx={{ flexGrow: 1 }}>
+                {/* Home */}
+                <ListItem disablePadding>
+                    <StyledListItemButton onClick={() => handleNavigation('/')}>
+                        <ListItemText
+                            primary="Home"
+                            sx={{
+                                '& .MuiTypography-root': {
+                                    fontFamily: '"Poppins", "Roboto", sans-serif',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    color: isActive('/') ? '#F7931E' : '#2F7A32'
+                                }
+                            }}
+                        />
+                    </StyledListItemButton>
+                </ListItem>
+
+                {/* Company Submenu (Mobile Drawer) */}
+                <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <StyledListItemButton onClick={handleMobileCompanyToggle} sx={{ width: '100%' }}>
+                        <ListItemText
+                            primary="Company"
+                            sx={{
+                                '& .MuiTypography-root': {
+                                    fontFamily: '"Poppins", "Roboto", sans-serif',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    color: isCompanyActive() ? '#F7931E' : '#2F7A32'
+                                }
+                            }}
+                        />
+                        {mobileCompanyOpen ? <ExpandLess sx={{ color: '#2F7A32' }} /> : <ExpandMore sx={{ color: '#2F7A32' }} />}
+                    </StyledListItemButton>
+                    <Collapse in={mobileCompanyOpen} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
+                        <List component="div" disablePadding>
+                            {companySubItems.map((subItem) => (
+                                <StyledListItemButton
+                                    key={subItem.name}
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleNavigation(subItem.path)}
+                                >
+                                    <ListItemText
+                                        primary={subItem.name}
+                                        sx={{
+                                            '& .MuiTypography-root': {
+                                                fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                fontSize: '13px',
+                                                fontWeight: 400,
+                                                color: isActive(subItem.path) ? '#F7931E' : '#2F7A32'
+                                            }
+                                        }}
+                                    />
+                                </StyledListItemButton>
+                            ))}
+                        </List>
+                    </Collapse>
+                </ListItem>
+
+                {/* Other Menu Items mapping */}
+                {menuItems.slice(1).map((item) => (
+                    <ListItem key={item.name} disablePadding>
+                        <StyledListItemButton onClick={() => handleNavigation(item.path)}>
+                            <ListItemText
+                                primary={item.name}
+                                sx={{
+                                    '& .MuiTypography-root': {
+                                        fontFamily: '"Poppins", "Roboto", sans-serif',
+                                        fontSize: '14px',
+                                        fontWeight: 500,
+                                        color: isActive(item.path) ? '#F7931E' : '#2F7A32'
+                                    }
+                                }}
+                            />
+                        </StyledListItemButton>
+                    </ListItem>
+                ))}
+
+                {/* Franchise Submenu (Mobile Drawer) */}
+                <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <StyledListItemButton onClick={handleMobileFranchiseToggle} sx={{ width: '100%' }}>
+                        <ListItemText
+                            primary="Franchise"
+                            sx={{
+                                '& .MuiTypography-root': {
+                                    fontFamily: '"Poppins", "Roboto", sans-serif',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    color: isFranchiseActive() ? '#F7931E' : '#2F7A32'
+                                }
+                            }}
+                        />
+                        {mobileFranchiseOpen ? <ExpandLess sx={{ color: '#2F7A32' }} /> : <ExpandMore sx={{ color: '#2F7A32' }} />}
+                    </StyledListItemButton>
+                    <Collapse in={mobileFranchiseOpen} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
+                        <List component="div" disablePadding>
+                            {franchiseSubItems.map((subItem) => (
+                                <StyledListItemButton
+                                    key={subItem.name}
+                                    sx={{ pl: 4 }}
+                                    onClick={() => handleNavigation(subItem.path)}
+                                >
+                                    <ListItemText
+                                        primary={subItem.name}
+                                        sx={{
+                                            '& .MuiTypography-root': {
+                                                fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                fontSize: '13px',
+                                                fontWeight: 400,
+                                                color: isActive(subItem.path) ? '#F7931E' : '#2F7A32'
+                                            }
+                                        }}
+                                    />
+                                </StyledListItemButton>
+                            ))}
+                        </List>
+                    </Collapse>
+                </ListItem>
+
+                {trailItems.map((item) => (
+                    <ListItem key={item.name} disablePadding>
+                        <StyledListItemButton onClick={() => handleNavigation(item.path)}>
+                            <ListItemText
+                                primary={item.name}
+                                sx={{
+                                    '& .MuiTypography-root': {
+                                        fontFamily: '"Poppins", "Roboto", sans-serif',
+                                        fontSize: '14px',
+                                        fontWeight: 500,
+                                        color: isActive(item.path) ? '#F7931E' : '#2F7A32'
+                                    }
+                                }}
+                            />
+                        </StyledListItemButton>
+                    </ListItem>
+                ))}
+
+                {/* Auth Buttons or Role-Based Buttons in Mobile Drawer */}
+                <Box sx={{ px: 2, mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {isLoggedIn ? (
+                        <>
+                            {isAdmin() ? (
+                                // Admin View
+                                <>
+                                    <AdminDashboardButton
+                                        onClick={() => handleNavigation('/admin/dashboard')}
+                                        sx={{ ml: 0, width: '100%', justifyContent: 'center' }}
+                                    >
+                                        <DashboardIcon sx={{ mr: 1 }} />
+                                        Admin Dashboard
+                                    </AdminDashboardButton>
+                                    <LoginButton
+                                        onClick={handleLogout}
+                                        sx={{ ml: 0, width: '100%', borderColor: '#d32f2f', color: '#d32f2f' }}
+                                    >
+                                        <LogoutIcon sx={{ mr: 1 }} />
+                                        Logout
+                                    </LoginButton>
+                                </>
+                            ) : (
+                                // Regular User View
+                                <>
+                                    <MyAccountButton
+                                        onClick={() => handleNavigation('/my-account')}
+                                        sx={{ ml: 0, width: '100%', justifyContent: 'center' }}
+                                    >
+                                        <AccountCircleIcon sx={{ mr: 1 }} />
+                                        {getDisplayName()}
+                                    </MyAccountButton>
+                                    <LoginButton
+                                        onClick={handleLogout}
+                                        sx={{ ml: 0, width: '100%', borderColor: '#d32f2f', color: '#d32f2f' }}
+                                    >
+                                        <LogoutIcon sx={{ mr: 1 }} />
+                                        Logout
+                                    </LoginButton>
+                                </>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <RegisterButton onClick={() => handleNavigation('/register')} sx={{ ml: 0, width: '100%' }}>
+                                Register
+                            </RegisterButton>
+                            <LoginButton onClick={() => handleNavigation('/login')} sx={{ ml: 0, width: '100%' }}>
+                                Login
+                            </LoginButton>
+                        </>
+                    )}
+                </Box>
+            </List>
+        </Box>
+    );
+
+    return (
+        <Box sx={{ flexGrow: 1 }}>
+            <StyledAppBar position="fixed">
+                <Container maxWidth={false} sx={{ px: { xs: 2, lg: 3 } }}>
+                    <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+
+                        {/* LEFT - LOGO */}
+                        <LogoContainer onClick={() => handleNavigation('/')}>
+                            {!logoError && (
+                                <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                            )}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2 }}>
+                                <LogoMain>Sanyukt Parivaar <span style={{ fontSize: '0.8rem' }}>&</span> Rich Life Company</LogoMain>
+                                <LogoTagline>Together We Grow, Together We Prosper</LogoTagline>
+                            </Box>
+                        </LogoContainer>
+
+                        {/* RIGHT - NAVIGATION (DESKTOP) */}
+                        <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1, flexWrap: 'nowrap' }}>
+                            <NavButton
+                                className={isActive('/') ? 'active' : ''}
+                                onClick={() => handleNavigation('/')}
+                            >
+                                Home
+                            </NavButton>
+
+                            {/* Company Dropdown (Desktop) */}
+                            <Box
+                                onMouseEnter={handleCompanyClick}
+                                onMouseLeave={handleCompanyClose}
+                                sx={{ position: 'relative' }}
+                            >
+                                <NavButton
+                                    className={isCompanyActive() ? 'active' : ''}
+                                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                                >
+                                    Company <ExpandMore sx={{ fontSize: '18px' }} />
+                                </NavButton>
+
+                                <Menu
+                                    anchorEl={anchorElCompany}
+                                    open={openCompanyMenu}
+                                    onClose={handleCompanyClose}
+                                    MenuListProps={{
+                                        onMouseLeave: handleCompanyClose,
+                                        sx: {
+                                            boxShadow: '0px 8px 24px rgba(0,0,0,0.1)',
+                                            border: '1px solid #E6E6E6',
+                                            borderRadius: '8px',
+                                            padding: '8px',
+                                            mt: 1,
+                                        }
+                                    }}
+                                    slotProps={{
+                                        paper: {
+                                            elevation: 0,
+                                        }
+                                    }}
+                                    disableScrollLock
+                                >
+                                    {companySubItems.map((item) => (
+                                        <MenuItem
+                                            key={item.name}
+                                            onClick={() => handleCompanyItemClick(item.path)}
+                                            sx={{
+                                                fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                fontSize: '14px',
+                                                fontWeight: 500,
+                                                color: isActive(item.path) ? '#F7931E' : '#2F7A32',
+                                                borderRadius: '4px',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(247, 147, 30, 0.08)',
+                                                    color: '#F7931E',
+                                                }
+                                            }}
+                                        >
+                                            {item.name}
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Box>
+
+                            {menuItems.slice(1).map((item) => (
+                                <NavButton
+                                    key={item.name}
+                                    className={isActive(item.path) ? 'active' : ''}
+                                    onClick={() => handleNavigation(item.path)}
+                                >
+                                    {item.name}
+                                </NavButton>
+                            ))}
+
+                            {/* Conditional rendering based on login status and role */}
+                            {isLoggedIn ? (
+                                <>
+                                    {isAdmin() ? (
+                                        // Admin View
+                                        <AdminDashboardButton
+                                            onClick={handleUserMenuClick}
+                                            startIcon={<AdminPanelSettingsIcon />}
+                                        >
+                                            {getDisplayName()}
+                                        </AdminDashboardButton>
+                                    ) : (
+                                        // Regular User View
+                                        <MyAccountButton
+                                            onClick={handleUserMenuClick}
+                                            startIcon={<AccountCircleIcon />}
+                                        >
+                                            {getDisplayName()}
+                                        </MyAccountButton>
+                                    )}
+
+                                    <Menu
+                                        anchorEl={anchorElUser}
+                                        open={openUserMenu}
+                                        onClose={handleUserMenuClose}
+                                        MenuListProps={{
+                                            sx: {
+                                                boxShadow: '0px 8px 24px rgba(0,0,0,0.1)',
+                                                border: '1px solid #E6E6E6',
+                                                borderRadius: '8px',
+                                                padding: '8px',
+                                                minWidth: '180px',
+                                            }
+                                        }}
+                                        slotProps={{
+                                            paper: {
+                                                elevation: 0,
+                                            }
+                                        }}
+                                    >
+                                        {isAdmin() ? (
+                                            // Admin Menu Items
+                                            <MenuItem
+                                                onClick={handleAdminDashboardClick}
+                                                sx={{
+                                                    fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    color: '#2F7A32',
+                                                    borderRadius: '4px',
+                                                    gap: 1,
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(247, 147, 30, 0.08)',
+                                                        color: '#F7931E',
+                                                    }
+                                                }}
+                                            >
+                                                <DashboardIcon fontSize="small" />
+                                                Dashboard
+                                            </MenuItem>
+                                        ) : (
+                                            // Regular User Menu Items
+                                            <MenuItem
+                                                onClick={handleMyAccountClick}
+                                                sx={{
+                                                    fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    color: '#2F7A32',
+                                                    borderRadius: '4px',
+                                                    gap: 1,
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(247, 147, 30, 0.08)',
+                                                        color: '#F7931E',
+                                                    }
+                                                }}
+                                            >
+                                                <AccountCircleIcon fontSize="small" />
+                                                My Account
+                                            </MenuItem>
+                                        )}
+
+                                        <LogoutMenuItem
+                                            onClick={handleLogout}
+                                            sx={{
+                                                fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                fontSize: '14px',
+                                                fontWeight: 500,
+                                                borderRadius: '4px',
+                                                gap: 1,
+                                            }}
+                                        >
+                                            <LogoutIcon fontSize="small" />
+                                            Logout
+                                        </LogoutMenuItem>
+                                    </Menu>
+                                </>
+                            ) : (
+                                <>
+                                    <RegisterButton onClick={() => handleNavigation('/register')} sx={{ ml: 1 }}>
+                                        Register
+                                    </RegisterButton>
+
+                                    <LoginButton onClick={() => handleNavigation('/login')} sx={{ ml: 1 }}>
+                                        Login
+                                    </LoginButton>
+                                </>
+                            )}
+
+                            {/* Franchise Dropdown (Desktop) */}
+                            <Box
+                                onMouseEnter={handleFranchiseClick}
+                                onMouseLeave={handleFranchiseClose}
+                                sx={{ position: 'relative' }}
+                            >
+                                <NavButton
+                                    className={isFranchiseActive() ? 'active' : ''}
+                                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                                >
+                                    Franchise <ExpandMore sx={{ fontSize: '18px' }} />
+                                </NavButton>
+
+                                <Menu
+                                    anchorEl={anchorElFranchise}
+                                    open={openFranchiseMenu}
+                                    onClose={handleFranchiseClose}
+                                    MenuListProps={{
+                                        onMouseLeave: handleFranchiseClose,
+                                        sx: {
+                                            boxShadow: '0px 8px 24px rgba(0,0,0,0.1)',
+                                            border: '1px solid #E6E6E6',
+                                            borderRadius: '8px',
+                                            padding: '8px',
+                                            mt: 1,
+                                        }
+                                    }}
+                                    slotProps={{
+                                        paper: {
+                                            elevation: 0,
+                                        }
+                                    }}
+                                    disableScrollLock
+                                >
+                                    {franchiseSubItems.map((item) => (
+                                        <MenuItem
+                                            key={item.name}
+                                            onClick={() => handleFranchiseItemClick(item.path)}
+                                            sx={{
+                                                fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                fontSize: '14px',
+                                                fontWeight: 500,
+                                                color: isActive(item.path) ? '#F7931E' : '#2F7A32',
+                                                borderRadius: '4px',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(247, 147, 30, 0.08)',
+                                                    color: '#F7931E',
+                                                }
+                                            }}
+                                        >
+                                            {item.name}
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Box>
+
+                            {trailItems.map((item) => (
+                                <NavButton
+                                    key={item.name}
+                                    className={isActive(item.path) ? 'active' : ''}
+                                    onClick={() => handleNavigation(item.path)}
+                                >
+                                    {item.name}
+                                </NavButton>
+                            ))}
+                        </Box>
+
+                        {/* RIGHT - HAMBURGER (MOBILE/TABLET) */}
+                        <Box sx={{ display: { xs: 'flex', lg: 'none' } }}>
+                            <IconButton
+                                color="inherit"
+                                aria-label="open drawer"
+                                edge="start"
+                                onClick={handleDrawerToggle}
+                                sx={{ color: '#2F7A32' }}
+                            >
+                                <MenuIcon fontSize="large" />
+                            </IconButton>
+                        </Box>
+
+                    </Toolbar>
+                </Container>
+            </StyledAppBar>
+
+            {/* Mobile Drawer */}
+            <Box component="nav">
+                <Drawer
+                    variant="temporary"
+                    anchor="right"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{
+                        keepMounted: true,
+                    }}
+                    sx={{
+                        display: { xs: 'block', lg: 'none' },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 280 },
+                    }}
+                >
+                    {drawer}
+                </Drawer>
+            </Box>
+        </Box>
+    );
+};
+
+export default Header;

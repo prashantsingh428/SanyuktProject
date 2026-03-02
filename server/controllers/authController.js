@@ -1,0 +1,219 @@
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
+
+const generateOTP = () =>
+    Math.floor(100000 + Math.random() * 900000).toString();
+
+
+// ================= REGISTER =================
+exports.register = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        let user = await User.findOne({ email });
+
+        if (user && user.isVerified)
+            return res.status(400).json({ message: "Email already exists" });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const otp = generateOTP();
+
+        if (!user) {
+            user = new User({
+                ...req.body,
+                password: hashedPassword,
+                otp,
+                otpExpire: Date.now() + 5 * 60 * 1000
+            });
+        } else {
+            user.password = hashedPassword;
+            user.otp = otp;
+            user.otpExpire = Date.now() + 5 * 60 * 1000;
+        }
+
+        await user.save();
+
+        await sendEmail(email, "Registration OTP", `Your OTP is ${otp}`);
+
+        res.json({ message: "OTP Sent to Email" });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+
+// ================= VERIFY OTP =================
+exports.verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user || user.otp !== otp || user.otpExpire < Date.now())
+        return res.status(400).json({ message: "Invalid or Expired OTP" });
+
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpire = undefined;
+
+    await user.save();
+
+    res.json({ message: "Account Verified Successfully" });
+};
+
+
+// ================= LOGIN =================
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        console.log("LOGIN DATA:", email, password);
+
+        const user = await User.findOne({ email });
+
+        if (!user)
+            return res.status(400).json({ message: "User not found" });
+
+        if (!user.isVerified)
+            return res.status(400).json({ message: "Verify Email First" });
+
+        if (!user.password) {
+            return res.status(500).json({ message: "Password not found in DB" });
+        }
+
+        const match = await bcrypt.compare(password, user.password);
+
+        if (!match)
+            return res.status(400).json({ message: "Wrong Password" });
+
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({ message: "JWT_SECRET missing" });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        res.json({
+            message: "Login Success",
+            token,
+            user: {
+                _id: user._id,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        console.log("LOGIN ERROR:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// ================= FORGOT PASSWORD =================
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user)
+        return res.status(400).json({ message: "User not found" });
+
+    const otp = generateOTP();
+
+    user.otp = otp;
+    user.otpExpire = Date.now() + 5 * 60 * 1000;
+
+    await user.save();
+
+    await sendEmail(email, "Reset Password OTP", `Your OTP is ${otp}`);
+
+    res.json({ message: "OTP Sent for Reset" });
+};
+
+// ================= RESEND OTP =================
+exports.resendOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user)
+            return res.status(400).json({ message: "User not found" });
+
+        if (user.isVerified)
+            return res.status(400).json({ message: "User already verified" });
+
+        const otp = generateOTP();
+
+        user.otp = otp;
+        user.otpExpire = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+        await user.save();
+
+        await sendEmail(email, "Resend OTP", `Your new OTP is ${otp}`);
+
+        res.json({ message: "New OTP Sent Successfully" });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+
+
+// ================= RESET PASSWORD =================
+exports.resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user || user.otp !== otp || user.otpExpire < Date.now())
+        return res.status(400).json({ message: "Invalid or Expired OTP" });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.otp = undefined;
+    user.otpExpire = undefined;
+
+    await user.save();
+
+    res.json({ message: "Password Reset Successful" });
+};
+
+
+// ================= CREATE ADMIN =================
+exports.createAdmin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const existing = await User.findOne({ email });
+        if (existing)
+            return res.status(400).json({ message: "Admin already exists" });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const admin = new User({
+            email,
+            password: hashedPassword,
+            role: "admin",
+            isVerified: true
+        });
+
+        await admin.save();
+
+        res.json({ message: "Admin Created Successfully" });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+
+// ================= PROFILE =================
+exports.profile = async (req, res) => {
+    res.json(req.user);
+};
