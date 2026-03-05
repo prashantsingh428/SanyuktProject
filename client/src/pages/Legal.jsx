@@ -883,12 +883,12 @@ const LegalPage = () => {
 
             {/* Policies Navigation Cards */}
             <section className="py-8 px-4 max-w-7xl mx-auto">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+                <div className="flex flex-wrap justify-center gap-4 mb-8">
                     {policies.map((policy, index) => (
                         <button
                             key={policy.id}
                             onClick={() => togglePolicy(policy.id)}
-                            className={`p-4 rounded-lg shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-fade-in text-center group ${expandedPolicy === policy.id
+                            className={`w-40 p-4 rounded-lg shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-fade-in text-center group ${expandedPolicy === policy.id
                                 ? 'bg-[#0A7A2F] text-white'
                                 : 'bg-white hover:shadow-lg text-[#222222]'
                                 }`}

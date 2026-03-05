@@ -34,6 +34,7 @@ import AdminUsers from '../pages/admin/Users'
 import AdminProducts from '../pages/admin/Products'
 import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
+import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
 
 const MainRoutes = () => {
     return (
@@ -64,6 +65,12 @@ const MainRoutes = () => {
             <Route path='/checkout' element={<Checkout />} />
             <Route path='/franchise/list' element={<Franchise />} />
             <Route path='/my-account' element={<MyAccount />} />
+            <Route path='/my-account/profile' element={<MyAccount />} />
+            <Route path='/my-account/address' element={<MyAccount />} />
+            <Route path='/my-account/orders' element={<MyAccount />} />
+            <Route path='/my-account/transactions' element={<MyAccount />} />
+            <Route path='/my-account/grievances' element={<MyAccount />} />
+            <Route path='/my-account/kyc' element={<MyAccount />} />
 
             {/* 🔥 Admin Routes (Nested) */}
             <Route path="/admin" element={
@@ -76,6 +83,7 @@ const MainRoutes = () => {
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="franchise" element={<AdminFranchise />} />
+                <Route path="grievance" element={<AdminGrievance />} />
             </Route>
 
         </Routes>

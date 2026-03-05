@@ -140,6 +140,7 @@ const RegistrationForm = () => {
     const [agreed, setAgreed] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [profileImage, setProfileImage] = useState(null);
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
     const [isDistrictDropdownOpen, setIsDistrictDropdownOpen] = useState(false);
     const [isAssemblyDropdownOpen, setIsAssemblyDropdownOpen] = useState(false);
@@ -217,6 +218,14 @@ const RegistrationForm = () => {
         setSuccess('');
     };
 
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => setProfileImage(reader.result);
+        reader.readAsDataURL(file);
+    };
+
     const validateForm = () => {
         if (!agreed) {
             setError("Please accept the terms and conditions");
@@ -275,7 +284,9 @@ const RegistrationForm = () => {
         setSuccess('');
 
         try {
-            const response = await api.post("/register", formData);
+            const payload = { ...formData };
+            if (profileImage) payload.profileImage = profileImage;
+            const response = await api.post("/register", payload);
 
             if (response.data) {
                 setSuccess("Registration successful! Redirecting to verification...");
@@ -342,6 +353,30 @@ const RegistrationForm = () => {
                                     {success}
                                 </div>
                             )}
+
+                            {/* Profile Picture Upload */}
+                            <div className="flex flex-col items-center py-5 border-b border-gray-100 bg-gray-50">
+                                <div className="relative inline-flex cursor-pointer group" onClick={() => document.getElementById('reg-profile-upload').click()}>
+                                    <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-green-200 bg-green-100 flex items-center justify-center shadow-md group-hover:border-green-400 transition-all">
+                                        {profileImage ? (
+                                            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Users className="w-10 h-10 text-green-400" />
+                                        )}
+                                    </div>
+                                    <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-green-600 border-2 border-white flex items-center justify-center group-hover:bg-green-700 transition-colors">
+                                        <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    </div>
+                                </div>
+                                <p className="mt-2 text-sm text-gray-500">
+                                    {profileImage ? (
+                                        <span className="text-green-600 font-medium cursor-pointer" onClick={() => setProfileImage(null)}>Remove photo</span>
+                                    ) : (
+                                        <span className="text-gray-400">Click to upload photo <span className="text-gray-300">(optional)</span></span>
+                                    )}
+                                </p>
+                                <input id="reg-profile-upload" type="file" accept="image/*" hidden onChange={handleImageUpload} />
+                            </div>
 
                             {/* Form Body */}
                             <form onSubmit={handleSubmit} noValidate>

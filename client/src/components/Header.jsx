@@ -170,12 +170,12 @@ const LoginButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-// My Account Button (Green - for regular users)
+// My Account Button (Yellow/Orange theme color)
 const MyAccountButton = styled(Button)(({ theme }) => ({
     fontFamily: '"Poppins", "Roboto", sans-serif',
     fontSize: '14px',
     fontWeight: 600,
-    backgroundColor: '#0A7A2F',
+    backgroundColor: '#F7931E',
     color: '#FFFFFF',
     padding: '6px 16px',
     borderRadius: '4px',
@@ -185,7 +185,7 @@ const MyAccountButton = styled(Button)(({ theme }) => ({
     alignItems: 'center',
     gap: '8px',
     '&:hover': {
-        backgroundColor: '#086b28',
+        backgroundColor: '#e07d0b',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     },
     transition: 'all 0.2s ease-in-out',
@@ -787,7 +787,14 @@ const Header = () => {
                                         // Regular User View
                                         <MyAccountButton
                                             onClick={handleUserMenuClick}
-                                            startIcon={<AccountCircleIcon />}
+                                            startIcon={
+                                                <Avatar
+                                                    src={userData?.profileImage || undefined}
+                                                    sx={{ width: 24, height: 24, bgcolor: 'rgba(255,255,255,0.3)', fontSize: 12, fontWeight: 700 }}
+                                                >
+                                                    {!userData?.profileImage && getUserInitials()}
+                                                </Avatar>
+                                            }
                                         >
                                             {getDisplayName()}
                                         </MyAccountButton>

@@ -11,7 +11,8 @@ router.post("/forgot-password", auth.forgotPassword);
 router.post("/reset-password", auth.resetPassword);
 
 router.get("/profile", protect, auth.profile);
-
+router.put("/profile", protect, auth.updateProfile);
+router.put("/kyc", protect, auth.submitKyc);
 router.post("/create-admin",
     protect,
     adminOnly,
