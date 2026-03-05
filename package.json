@@ -1,0 +1,10 @@
+{
+  "name": "sanyukt-parivar",
+  "version": "1.0.0",
+  "description": "Sanyukt Parivar - Root package for Hostinger deployment",
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "start": "cd server && node server.js",
+    "install:all": "cd client && npm install && cd ../server && npm install"
+  }
+}

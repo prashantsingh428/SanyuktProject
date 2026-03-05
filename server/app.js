@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 
@@ -17,13 +18,16 @@ app.use("/api/admin/users", require("./routes/adminUserRoutes"));
 app.use("/api/admin", require("./routes/adminStatsRoutes"));
 app.use("/api/franchises", require("./routes/franchiseRoutes"));
 app.use("/api/grievance", require("./routes/grievanceRoutes"));
-
 app.use("/api/recharge", require("./routes/rechargeRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 
-// Error handling for unknown routes
-app.use((req, res) => {
-    res.status(404).json({ message: "Route not found" });
+// Serve React frontend (production build)
+const clientBuildPath = path.join(__dirname, "../client/dist");
+app.use(express.static(clientBuildPath));
+
+// SPA fallback — serve index.html for all non-API routes (React Router support)
+app.get("*", (req, res) => {
+    res.sendFile(path.join(clientBuildPath, "index.html"));
 });
 
 module.exports = app;
