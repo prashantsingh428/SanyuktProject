@@ -37,6 +37,7 @@ const ProductsPage = () => {
     // Modal State
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDescExpanded, setIsDescExpanded] = useState(false);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -96,6 +97,7 @@ const ProductsPage = () => {
 
     // Toggle product details
     const openProductModal = (product) => {
+        setIsDescExpanded(false); // Reset expansion state
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
@@ -538,9 +540,40 @@ const ProductsPage = () => {
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#111827', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Info className="w-4 h-4 text-green-600" /> Description
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: '#4b5563', lineHeight: 1.8, fontSize: '15px' }}>
-                                            {selectedProduct.description || "Indulge in our premium quality product, crafted with the finest ingredients and rigorous quality checks to ensure your maximum satisfaction and wellness."}
-                                        </Typography>
+                                        <Box>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    color: '#4b5563',
+                                                    lineHeight: 1.8,
+                                                    fontSize: '15px',
+                                                    display: '-webkit-box',
+                                                    WebkitBoxOrient: 'vertical',
+                                                    WebkitLineClamp: isDescExpanded ? 'none' : 10,
+                                                    overflow: 'hidden',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                            >
+                                                {selectedProduct.description || "Indulge in our premium quality product, crafted with the finest ingredients and rigorous quality checks to ensure your maximum satisfaction and wellness."}
+                                            </Typography>
+                                            {selectedProduct.description && selectedProduct.description.length > 500 && (
+                                                <Button
+                                                    size="small"
+                                                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                                                    sx={{
+                                                        mt: 1,
+                                                        textTransform: 'none',
+                                                        fontWeight: 800,
+                                                        color: '#f7931e',
+                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
+                                                        p: 0,
+                                                        minWidth: 'auto'
+                                                    }}
+                                                >
+                                                    {isDescExpanded ? 'View Less' : 'View More'}
+                                                </Button>
+                                            )}
+                                        </Box>
                                     </Box>
 
                                     {/* Structured Specs Grid */}
