@@ -15,10 +15,30 @@ const AdminProducts = () => {
         oldPrice: "",
         bv: "",
         stock: "",
+        category: "",
         description: "",
         rating: "",
         numReviews: "",
     });
+
+    const categories = [
+        "Mobile",
+        "Electronics",
+        "Fashion",
+        "Buty and cosmetic home based products",
+        "Toys and baby toys",
+        "Food & health",
+        "Auto & accessories",
+        "Sports & games",
+        "Books & education",
+        "Furniture",
+        "Footwear",
+        "Jwellery & accessories",
+        "Appliances",
+        "Pharmacy and household",
+        "Everyday needs",
+        "Grocery"
+    ];
 
     // ✅ फोटो दिखाने के लिए बेस URL
     const BASE_URL = "http://localhost:5001";
@@ -65,6 +85,7 @@ const AdminProducts = () => {
             oldPrice: "",
             bv: "",
             stock: "",
+            category: "",
             description: "",
             rating: "",
             numReviews: "",
@@ -128,6 +149,7 @@ const AdminProducts = () => {
             oldPrice: product.oldPrice || "",
             bv: product.bv || "",
             stock: product.stock || "",
+            category: product.category || "",
             description: product.description || "",
             rating: product.rating || "",
             numReviews: product.numReviews || "",
@@ -340,6 +362,25 @@ const AdminProducts = () => {
                                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white"
                                 />
                             </div>
+
+                            {/* Category */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                    Category <span className="text-green-600">*</span>
+                                </label>
+                                <select
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white"
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         {/* Description */}
@@ -499,6 +540,12 @@ const AdminProducts = () => {
                                     <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">
                                         {product.name}
                                     </h3>
+
+                                    <div className="mb-2">
+                                        <span className="text-xs font-semibold bg-gray-100 text-gray-600 px-2 py-1 rounded-full uppercase tracking-tighter">
+                                            {product.category || "Uncategorized"}
+                                        </span>
+                                    </div>
 
                                     <div className="flex items-center gap-3 mb-3">
                                         <span className="text-2xl font-bold text-green-600">

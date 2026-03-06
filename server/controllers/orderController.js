@@ -25,7 +25,12 @@ exports.createOrder = async (req, res) => {
             shipping,
             tax,
             discount,
-            total
+            total,
+            tracking: [{
+                status: 'pending',
+                message: 'Order placed successfully',
+                timestamp: new Date()
+            }]
         });
 
         await order.save();
@@ -91,8 +96,15 @@ exports.updateOrderStatus = async (req, res) => {
         if (!order) return res.status(404).json({ message: "Order not found" });
 
         order.status = req.body.status;
-        await order.save();
 
+        // Add to tracking history
+        order.tracking.push({
+            status: req.body.status,
+            message: req.body.message || `Order status updated to ${req.body.status}`,
+            timestamp: new Date()
+        });
+
+        await order.save();
         res.json({ message: "Order status updated", order });
     } catch (error) {
         res.status(500).json({ message: "Server error" });

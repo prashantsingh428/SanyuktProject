@@ -145,8 +145,8 @@ const CheckoutPage = () => {
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Payment Method:</span>
-                                    <span className="font-medium text-gray-800">
-                                        {paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
+                                    <span className="font-medium text-gray-800 uppercase">
+                                        {paymentMethod}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
@@ -166,10 +166,10 @@ const CheckoutPage = () => {
                                 Continue Shopping
                             </button>
                             <button
-                                onClick={() => navigate('/my-account/orders')}
+                                onClick={() => navigate(`/order-details/${orderDetails?._id}`)}
                                 className="flex-1 px-6 py-3 border border-[#0A7A2F] text-[#0A7A2F] rounded-xl font-semibold hover:bg-[#0A7A2F] hover:text-white transition-all"
                             >
-                                View Orders
+                                Track Order Details
                             </button>
                         </div>
                     </div>
@@ -330,7 +330,7 @@ const CheckoutPage = () => {
                             </h2>
 
                             <div className="space-y-3">
-                                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:border-[#0A7A2F] transition-all">
+                                <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'cod' ? 'border-[#0A7A2F] bg-green-50' : 'border-gray-100'}`}>
                                     <input
                                         type="radio"
                                         name="payment"
@@ -341,22 +341,37 @@ const CheckoutPage = () => {
                                     />
                                     <span className="ml-3 flex items-center gap-2">
                                         <IndianRupee className="w-5 h-5 text-gray-600" />
-                                        <span className="font-medium">Cash on Delivery</span>
+                                        <span className="font-semibold text-gray-800">Cash on Delivery</span>
                                     </span>
                                 </label>
 
-                                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:border-[#0A7A2F] transition-all">
+                                <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'upi' ? 'border-[#0A7A2F] bg-green-50' : 'border-gray-100'}`}>
                                     <input
                                         type="radio"
                                         name="payment"
-                                        value="online"
-                                        checked={paymentMethod === 'online'}
+                                        value="upi"
+                                        checked={paymentMethod === 'upi'}
+                                        onChange={(e) => setPaymentMethod(e.target.value)}
+                                        className="w-4 h-4 text-[#0A7A2F]"
+                                    />
+                                    <span className="ml-3 flex items-center gap-2">
+                                        <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center text-[10px] text-white font-bold">UPI</div>
+                                        <span className="font-semibold text-gray-800">UPI (GPay/PhonePe/Paytm)</span>
+                                    </span>
+                                </label>
+
+                                <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-[#0A7A2F] bg-green-50' : 'border-gray-100'}`}>
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        value="card"
+                                        checked={paymentMethod === 'card'}
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4 text-[#0A7A2F]"
                                     />
                                     <span className="ml-3 flex items-center gap-2">
                                         <CreditCard className="w-5 h-5 text-gray-600" />
-                                        <span className="font-medium">Online Payment (UPI/Card/NetBanking)</span>
+                                        <span className="font-semibold text-gray-800">Debit / Credit Card</span>
                                     </span>
                                 </label>
                             </div>

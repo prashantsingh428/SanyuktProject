@@ -15,7 +15,8 @@ const AdminLayout = () => {
         { path: '/admin/users', label: 'Users', icon: Users },
         { path: '/admin/products', label: 'Products', icon: Package },
         { path: '/admin/franchise', label: 'Franchise', icon: BarChart3 },
-        { path: '/admin/grievance', label: 'Grievance', icon: BarChart3 }
+        { path: '/admin/grievance', label: 'Grievance', icon: BarChart3 },
+        { path: '/admin/orders', label: 'Orders', icon: Package }
     ];
 
     // Logout function

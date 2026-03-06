@@ -27,6 +27,7 @@ import VerifyOTP from '../pages/VerifyOTP.jsx'
 import Checkout from '../pages/Checkout.jsx'
 import Cart from '../pages/Cart.jsx'
 import Franchise from '../pages/Franchise.jsx'
+import OrderDetails from '../pages/OrderDetails.jsx'
 
 // ✅ Admin imports
 import AdminLayout from '../layouts/AdminLayout'
@@ -36,6 +37,7 @@ import AdminProducts from '../pages/admin/Products'
 import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
 import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
+import AdminOrders from '../pages/admin/Orders.jsx'
 
 const MainRoutes = () => {
     return (
@@ -74,6 +76,7 @@ const MainRoutes = () => {
             <Route path='/my-account/grievances' element={<MyAccount />} />
             <Route path='/my-account/kyc' element={<MyAccount />} />
             <Route path='/my-account/cart' element={<MyAccount />} />
+            <Route path='/order-details/:id' element={<OrderDetails />} />
 
             {/* 🔥 Admin Routes (Nested) */}
             <Route path="/admin" element={
@@ -87,6 +90,7 @@ const MainRoutes = () => {
                 <Route path="products" element={<AdminProducts />} />
                 <Route path="franchise" element={<AdminFranchise />} />
                 <Route path="grievance" element={<AdminGrievance />} />
+                <Route path="orders" element={<AdminOrders />} />
             </Route>
 
         </Routes>

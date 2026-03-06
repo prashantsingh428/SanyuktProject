@@ -471,7 +471,7 @@ const MyAccount = () => {
                         mb: 3,
                         background: 'linear-gradient(135deg, #0A7A2F 0%, #1a8c3a 55%, #0A7A2F 100%)',
                         color: 'white',
-                        borderRadius: '20px',
+                        borderRadius: { xs: '0px', sm: '20px' },
                         position: 'relative',
                         overflow: 'hidden',
                         boxShadow: '0 10px 30px rgba(10,122,47,0.2)',
@@ -605,8 +605,8 @@ const MyAccount = () => {
                                     {/* Avatar Hero Card */}
                                     <Box sx={{ mb: 3, borderRadius: '14px', overflow: 'hidden', border: '1px solid #e8f5e9', boxShadow: '0 2px 12px rgba(10,122,47,0.07)' }}>
                                         <Box sx={{ height: '5px', background: 'linear-gradient(90deg, #0A7A2F, #F7931E)' }} />
-                                        <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2.5, bgcolor: 'white', flexWrap: 'wrap' }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
+                                        <Box sx={{ p: { xs: 2, sm: 3 }, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2.5, bgcolor: 'white', flexWrap: 'wrap' }}>
+                                            <Box sx={{ display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2.5, flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
                                                 {/* Avatar with Camera Upload Overlay */}
                                                 <Box sx={{ position: 'relative', display: 'inline-flex' }}>
                                                     <Avatar
@@ -647,7 +647,7 @@ const MyAccount = () => {
                                                         <Box sx={{ bgcolor: '#e8f5e9', color: '#0A7A2F', fontWeight: 600, fontSize: '12px', px: 1.5, py: 0.25, borderRadius: '20px' }}>{formatValue(userData.position)}</Box>
                                                         <Typography sx={{ color: '#bbb', fontSize: '13px' }}>{[userData.district, userData.state].filter(Boolean).join(', ') || 'India'}</Typography>
                                                     </Box>
-                                                    <Typography sx={{ color: '#999', fontSize: '13px', mt: 0.5 }}>{formatValue(userData.email)}</Typography>
+                                                    <Typography sx={{ color: '#999', fontSize: '13px', mt: 0.5, wordBreak: 'break-all' }}>{formatValue(userData.email)}</Typography>
                                                 </Box>
                                             </Box>
                                             {/* Edit / Save / Cancel Buttons */}
@@ -657,19 +657,19 @@ const MyAccount = () => {
                                                     startIcon={<EditIcon />}
                                                     onClick={handleEditStart}
                                                     size="small"
-                                                    sx={{ borderColor: '#0A7A2F', color: '#0A7A2F', borderRadius: '8px', fontWeight: 600, '&:hover': { bgcolor: '#e8f5e9' } }}
+                                                    sx={{ borderColor: '#0A7A2F', color: '#0A7A2F', borderRadius: '8px', fontWeight: 600, '&:hover': { bgcolor: '#e8f5e9' }, ml: { xs: 0, sm: 'auto' } }}
                                                 >
                                                     Edit Profile
                                                 </Button>
                                             ) : (
-                                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <Box sx={{ display: 'flex', gap: 1, ml: { xs: 0, sm: 'auto' }, width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'flex-end', sm: 'flex-start' } }}>
                                                     <Button
                                                         variant="contained"
                                                         startIcon={saving ? <CircularProgress size={14} sx={{ color: 'white' }} /> : <SaveIcon />}
                                                         onClick={handleSaveProfile}
                                                         disabled={saving}
                                                         size="small"
-                                                        sx={{ bgcolor: '#0A7A2F', borderRadius: '8px', fontWeight: 600, '&:hover': { bgcolor: '#085c22' } }}
+                                                        sx={{ bgcolor: '#0A7A2F', borderRadius: '8px', fontWeight: 600, '&:hover': { bgcolor: '#085c22' }, flex: { xs: 1, sm: 'none' } }}
                                                     >
                                                         Save
                                                     </Button>
@@ -678,7 +678,7 @@ const MyAccount = () => {
                                                         startIcon={<CancelIcon />}
                                                         onClick={handleEditCancel}
                                                         size="small"
-                                                        sx={{ borderColor: '#ddd', color: '#666', borderRadius: '8px', fontWeight: 600 }}
+                                                        sx={{ borderColor: '#ddd', color: '#666', borderRadius: '8px', fontWeight: 600, flex: { xs: 1, sm: 'none' } }}
                                                     >
                                                         Cancel
                                                     </Button>
@@ -702,7 +702,7 @@ const MyAccount = () => {
                                                         { label: 'Phone', key: 'mobile' },
                                                         { label: 'Gender', key: 'gender', type: 'select', options: ['Male', 'Female', 'Other'] },
                                                     ].map((field) => (
-                                                        <Grid item xs={6} key={field.key}>
+                                                        <Grid item xs={12} sm={6} key={field.key}>
                                                             {field.type === 'select' ? (
                                                                 <TextField
                                                                     select
@@ -729,7 +729,7 @@ const MyAccount = () => {
                                                             )}
                                                         </Grid>
                                                     ))}
-                                                    <Grid item xs={6}>
+                                                    <Grid item xs={12} sm={6}>
                                                         <TextField
                                                             fullWidth size="small" label="Email Address"
                                                             value={formatValue(userData.email)}
@@ -737,7 +737,7 @@ const MyAccount = () => {
                                                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', bgcolor: '#f9f9f9' } }}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={6}>
+                                                    <Grid item xs={12} sm={6}>
                                                         <TextField
                                                             fullWidth size="small" label="Position"
                                                             value={formatValue(userData.position)}
@@ -818,13 +818,13 @@ const MyAccount = () => {
                                     {/* Address Summary Card */}
                                     <Box sx={{ mb: 3, borderRadius: '14px', overflow: 'hidden', border: '1px solid #e8f5e9', boxShadow: '0 2px 12px rgba(10,122,47,0.07)' }}>
                                         <Box sx={{ height: '5px', background: 'linear-gradient(90deg, #0A7A2F, #F7931E)' }} />
-                                        <Box sx={{ p: 3, bgcolor: 'white', display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <Box sx={{ width: 48, height: 48, borderRadius: '12px', bgcolor: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <LocationOnIcon sx={{ color: '#0A7A2F', fontSize: 26 }} />
+                                        <Box sx={{ p: { xs: 2, sm: 3 }, bgcolor: 'white', display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <Box sx={{ width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, borderRadius: '12px', bgcolor: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                <LocationOnIcon sx={{ color: '#0A7A2F', fontSize: { xs: 20, sm: 26 } }} />
                                             </Box>
                                             <Box>
-                                                <Typography sx={{ fontWeight: 700, fontSize: '16px', color: '#111' }}>Address Information</Typography>
-                                                <Typography sx={{ color: '#999', fontSize: '13px', mt: 0.25 }}>
+                                                <Typography sx={{ fontWeight: 700, fontSize: { xs: '14px', sm: '16px' }, color: '#111' }}>Address Information</Typography>
+                                                <Typography sx={{ color: '#999', fontSize: { xs: '11px', sm: '13px' }, mt: 0.25 }}>
                                                     {[userData.village, userData.district, userData.state].filter(Boolean).join(', ') || 'No address on file'}
                                                 </Typography>
                                             </Box>
@@ -880,7 +880,7 @@ const MyAccount = () => {
                                                 </Box>
                                                 <Box>
                                                     <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 500, mb: 0.75 }}>Full Address</Typography>
-                                                    <Typography sx={{ color: '#111', fontSize: '16px', fontWeight: 700, lineHeight: 1.6, maxWidth: '600px' }}>
+                                                    <Typography sx={{ color: '#111', fontSize: { xs: '14px', sm: '16px' }, fontWeight: 700, lineHeight: 1.6, maxWidth: '100%' }}>
                                                         {[userData.shippingAddress, userData.village, userData.villageCouncil, userData.block, userData.district, userData.state].filter(Boolean).join(', ') || 'Address not provided'}
                                                     </Typography>
                                                 </Box>
@@ -985,138 +985,205 @@ const MyAccount = () => {
                                                 </Paper>
                                             )}
 
-                                            {/* Data Table */}
+                                            {/* Data Table - Desktop */}
                                             {userOrders.length > 0 && (
-                                                <TableContainer sx={{ border: '1px solid #eee', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                                                    <Table sx={{ minWidth: 800 }} aria-label="orders table">
-                                                        <TableHead sx={{ bgcolor: '#fcfdfc' }}>
-                                                            <TableRow>
-                                                                <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #eee', py: 2 }}><Checkbox size="small" sx={{ color: '#ccc' }} /></TableCell>
-                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Order ID</TableCell>
-                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Product / Item</TableCell>
-                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Status</TableCell>
-                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Total</TableCell>
-                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Date</TableCell>
-                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }} align="center">Action</TableCell>
-                                                            </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            {userOrders
-                                                                .filter(order => {
-                                                                    const q = orderSearchQuery.toLowerCase();
-                                                                    const orderId = order._id?.slice(-8) || '';
-                                                                    const prodName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || '';
-                                                                    const matchesSearch = orderId.toLowerCase().includes(q) || prodName.toLowerCase().includes(q);
+                                                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                                                    <TableContainer sx={{ border: '1px solid #eee', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                                                        <Table sx={{ minWidth: 800 }} aria-label="orders table">
+                                                            <TableHead sx={{ bgcolor: '#fcfdfc' }}>
+                                                                <TableRow>
+                                                                    <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #eee', py: 2 }}><Checkbox size="small" sx={{ color: '#ccc' }} /></TableCell>
+                                                                    <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Order ID</TableCell>
+                                                                    <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Product / Item</TableCell>
+                                                                    <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Status</TableCell>
+                                                                    <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Total</TableCell>
+                                                                    <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Date</TableCell>
+                                                                    <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }} align="center">Action</TableCell>
+                                                                </TableRow>
+                                                            </TableHead>
+                                                            <TableBody>
+                                                                {userOrders
+                                                                    .filter(order => {
+                                                                        const q = orderSearchQuery.toLowerCase();
+                                                                        const orderId = order._id?.slice(-8) || '';
+                                                                        const prodName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || '';
+                                                                        const matchesSearch = orderId.toLowerCase().includes(q) || prodName.toLowerCase().includes(q);
 
-                                                                    let matchesTab = true;
-                                                                    const status = (order.status || 'pending').toLowerCase();
-                                                                    if (orderTab === 'Active') matchesTab = ['pending', 'processing'].includes(status);
-                                                                    if (orderTab === 'To Invoice') matchesTab = ['processing', 'shipped'].includes(status);
-                                                                    if (orderTab === 'To Ship') matchesTab = ['processing'].includes(status);
-                                                                    if (orderTab === 'To Backorder') matchesTab = status === 'backorder';
-                                                                    if (orderTab === 'All Orders') matchesTab = true;
+                                                                        let matchesTab = true;
+                                                                        const status = (order.status || 'pending').toLowerCase();
+                                                                        if (orderTab === 'Active') matchesTab = ['pending', 'processing'].includes(status);
+                                                                        if (orderTab === 'To Invoice') matchesTab = ['processing', 'shipped'].includes(status);
+                                                                        if (orderTab === 'To Ship') matchesTab = ['processing'].includes(status);
+                                                                        if (orderTab === 'To Backorder') matchesTab = status === 'backorder';
+                                                                        if (orderTab === 'All Orders') matchesTab = true;
 
-                                                                    return matchesSearch && matchesTab;
-                                                                })
-                                                                .map((order, index) => {
-                                                                    const orderNum = `#CR00${String(index + 1).padStart(2, '0')}`;
-                                                                    const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
+                                                                        return matchesSearch && matchesTab;
+                                                                    })
+                                                                    .map((order, index) => {
+                                                                        const orderNum = `#CR00${String(index + 1).padStart(2, '0')}`;
+                                                                        const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
 
-                                                                    const statusMatch = order.status?.toLowerCase() || 'pending';
+                                                                        const statusMatch = order.status?.toLowerCase() || 'pending';
 
-                                                                    let statusColor = '#fff3e0';
-                                                                    let statusTextCode = '#e65100';
-                                                                    let statusLabel = 'Pending';
+                                                                        let statusColor = '#fff3e0';
+                                                                        let statusTextCode = '#e65100';
+                                                                        let statusLabel = 'Pending';
 
-                                                                    if (statusMatch === 'processing') {
-                                                                        statusColor = '#e3f2fd';
-                                                                        statusTextCode = '#1565c0';
-                                                                        statusLabel = 'Processing';
-                                                                    } else if (statusMatch === 'shipped') {
-                                                                        statusColor = '#f3e5f5';
-                                                                        statusTextCode = '#7b1fa2';
-                                                                        statusLabel = 'Shipped';
-                                                                    } else if (statusMatch === 'delivered') {
-                                                                        statusColor = '#e8f5e9';
-                                                                        statusTextCode = '#2e7d32';
-                                                                        statusLabel = 'Delivered';
-                                                                    } else if (statusMatch === 'cancelled') {
-                                                                        statusColor = '#ffebee';
-                                                                        statusTextCode = '#c62828';
-                                                                        statusLabel = 'Cancelled';
-                                                                    }
+                                                                        if (statusMatch === 'processing') {
+                                                                            statusColor = '#e3f2fd';
+                                                                            statusTextCode = '#1565c0';
+                                                                            statusLabel = 'Processing';
+                                                                        } else if (statusMatch === 'shipped') {
+                                                                            statusColor = '#f3e5f5';
+                                                                            statusTextCode = '#7b1fa2';
+                                                                            statusLabel = 'Shipped';
+                                                                        } else if (statusMatch === 'delivered') {
+                                                                            statusColor = '#e8f5e9';
+                                                                            statusTextCode = '#2e7d32';
+                                                                            statusLabel = 'Delivered';
+                                                                        } else if (statusMatch === 'cancelled') {
+                                                                            statusColor = '#ffebee';
+                                                                            statusTextCode = '#c62828';
+                                                                            statusLabel = 'Cancelled';
+                                                                        }
 
-                                                                    const total = order.totalAmount || order.total || '0';
-                                                                    const date = new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                                                                        const total = order.totalAmount || order.total || '0';
+                                                                        const date = new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-                                                                    return (
-                                                                        <TableRow
-                                                                            key={order._id || index}
-                                                                            hover
-                                                                            sx={{
-                                                                                '&:last-child td, &:last-child th': { border: 0 },
-                                                                                bgcolor: index % 2 === 0 ? '#fcfdfc' : 'white',
-                                                                                '&:hover': { bgcolor: '#f4faf5' },
-                                                                                transition: 'background 0.2s'
-                                                                            }}
-                                                                        >
-                                                                            <TableCell padding="checkbox" sx={{ borderBottom: 'none', py: 2 }}><Checkbox size="small" sx={{ color: '#ddd' }} /></TableCell>
-                                                                            <TableCell sx={{ fontWeight: 700, color: '#333', fontSize: '13.5px', borderBottom: 'none' }}>{order._id ? `#${order._id.slice(-8).toUpperCase()}` : orderNum}</TableCell>
-                                                                            <TableCell sx={{ color: '#111', fontWeight: 600, fontSize: '13.5px', borderBottom: 'none' }}>{productName}</TableCell>
-                                                                            <TableCell sx={{ borderBottom: 'none' }}>
-                                                                                <Box sx={{
-                                                                                    display: 'inline-block', px: 1.5, py: 0.5, borderRadius: '6px',
-                                                                                    bgcolor: statusColor, color: statusTextCode,
-                                                                                    fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px'
-                                                                                }}>
-                                                                                    {statusLabel}
-                                                                                </Box>
-                                                                            </TableCell>
-                                                                            <TableCell sx={{ fontWeight: 800, color: '#0A7A2F', fontSize: '14px', borderBottom: 'none' }}>₹{parseFloat(total).toFixed(2)}</TableCell>
-                                                                            <TableCell sx={{ color: '#666', fontSize: '13px', borderBottom: 'none' }}>{date}</TableCell>
-                                                                            <TableCell align="center" sx={{ borderBottom: 'none' }}>
-                                                                                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-                                                                                    <Button
-                                                                                        size="small"
-                                                                                        variant="outlined"
-                                                                                        sx={{
-                                                                                            textTransform: 'none',
-                                                                                            borderRadius: '6px',
-                                                                                            borderColor: '#0A7A2F',
-                                                                                            color: '#0A7A2F',
-                                                                                            fontWeight: 600,
-                                                                                            '&:hover': { bgcolor: '#f4faf5', borderColor: '#086325' }
-                                                                                        }}
-                                                                                        onClick={() => navigate(`/checkout/success?orderId=${order._id}`)}
-                                                                                    >
-                                                                                        Details
-                                                                                    </Button>
-                                                                                    {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
+                                                                        return (
+                                                                            <TableRow
+                                                                                key={order._id || index}
+                                                                                hover
+                                                                                sx={{
+                                                                                    '&:last-child td, &:last-child th': { border: 0 },
+                                                                                    bgcolor: index % 2 === 0 ? '#fcfdfc' : 'white',
+                                                                                    '&:hover': { bgcolor: '#f4faf5' },
+                                                                                    transition: 'background 0.2s'
+                                                                                }}
+                                                                            >
+                                                                                <TableCell padding="checkbox" sx={{ borderBottom: 'none', py: 2 }}><Checkbox size="small" sx={{ color: '#ddd' }} /></TableCell>
+                                                                                <TableCell sx={{ fontWeight: 700, color: '#333', fontSize: '13.5px', borderBottom: 'none' }}>{order._id ? `#${order._id.slice(-8).toUpperCase()}` : orderNum}</TableCell>
+                                                                                <TableCell sx={{ color: '#111', fontWeight: 600, fontSize: '13.5px', borderBottom: 'none' }}>{productName}</TableCell>
+                                                                                <TableCell sx={{ borderBottom: 'none' }}>
+                                                                                    <Box sx={{
+                                                                                        display: 'inline-block', px: 1.5, py: 0.5, borderRadius: '6px',
+                                                                                        bgcolor: statusColor, color: statusTextCode,
+                                                                                        fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px'
+                                                                                    }}>
+                                                                                        {statusLabel}
+                                                                                    </Box>
+                                                                                </TableCell>
+                                                                                <TableCell sx={{ fontWeight: 800, color: '#0A7A2F', fontSize: '14px', borderBottom: 'none' }}>₹{parseFloat(total).toFixed(2)}</TableCell>
+                                                                                <TableCell sx={{ color: '#666', fontSize: '13px', borderBottom: 'none' }}>{date}</TableCell>
+                                                                                <TableCell align="center" sx={{ borderBottom: 'none' }}>
+                                                                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                                                                                         <Button
                                                                                             size="small"
-                                                                                            variant="contained"
+                                                                                            variant="outlined"
                                                                                             sx={{
                                                                                                 textTransform: 'none',
                                                                                                 borderRadius: '6px',
-                                                                                                bgcolor: '#f3791e',
-                                                                                                color: 'white',
+                                                                                                borderColor: '#0A7A2F',
+                                                                                                color: '#0A7A2F',
                                                                                                 fontWeight: 600,
-                                                                                                boxShadow: 'none',
-                                                                                                '&:hover': { bgcolor: '#e0681a', boxShadow: 'none' }
+                                                                                                '&:hover': { bgcolor: '#f4faf5', borderColor: '#086325' }
                                                                                             }}
-                                                                                            onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}
+                                                                                            onClick={() => navigate(`/order-details/${order._id}`)}
                                                                                         >
-                                                                                            Invoice
+                                                                                            Details
                                                                                         </Button>
-                                                                                    )}
-                                                                                </Box>
-                                                                            </TableCell>
-                                                                        </TableRow>
-                                                                    );
-                                                                })}
-                                                        </TableBody>
-                                                    </Table>
-                                                </TableContainer>
+                                                                                        {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
+                                                                                            <Button
+                                                                                                size="small"
+                                                                                                variant="contained"
+                                                                                                sx={{
+                                                                                                    textTransform: 'none',
+                                                                                                    borderRadius: '6px',
+                                                                                                    bgcolor: '#f3791e',
+                                                                                                    color: 'white',
+                                                                                                    fontWeight: 600,
+                                                                                                    boxShadow: 'none',
+                                                                                                    '&:hover': { bgcolor: '#e0681a', boxShadow: 'none' }
+                                                                                                }}
+                                                                                                onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}
+                                                                                            >
+                                                                                                Invoice
+                                                                                            </Button>
+                                                                                        )}
+                                                                                    </Box>
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        );
+                                                                    })}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </TableContainer>
+                                                </Box>
+                                            )}
+
+                                            {/* Data Cards - Mobile */}
+                                            {userOrders.length > 0 && (
+                                                <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+                                                    {userOrders
+                                                        .filter(order => {
+                                                            const q = orderSearchQuery.toLowerCase();
+                                                            const orderId = order._id?.slice(-8) || '';
+                                                            const prodName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || '';
+                                                            const matchesSearch = orderId.toLowerCase().includes(q) || prodName.toLowerCase().includes(q);
+
+                                                            let matchesTab = true;
+                                                            const status = (order.status || 'pending').toLowerCase();
+                                                            if (orderTab === 'Active') matchesTab = ['pending', 'processing'].includes(status);
+                                                            if (orderTab === 'To Invoice') matchesTab = ['processing', 'shipped'].includes(status);
+                                                            if (orderTab === 'To Ship') matchesTab = ['processing'].includes(status);
+                                                            if (orderTab === 'To Backorder') matchesTab = status === 'backorder';
+                                                            if (orderTab === 'All Orders') matchesTab = true;
+
+                                                            return matchesSearch && matchesTab;
+                                                        })
+                                                        .map((order, index) => {
+                                                            const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
+                                                            const statusMatch = order.status?.toLowerCase() || 'pending';
+                                                            let statusColor = '#fff3e0';
+                                                            let statusTextCode = '#e65100';
+                                                            let statusLabel = 'Pending';
+                                                            if (statusMatch === 'processing') { statusColor = '#e3f2fd'; statusTextCode = '#1565c0'; statusLabel = 'Processing'; }
+                                                            else if (statusMatch === 'shipped') { statusColor = '#f3e5f5'; statusTextCode = '#7b1fa2'; statusLabel = 'Shipped'; }
+                                                            else if (statusMatch === 'delivered') { statusColor = '#e8f5e9'; statusTextCode = '#2e7d32'; statusLabel = 'Delivered'; }
+                                                            else if (statusMatch === 'cancelled') { statusColor = '#ffebee'; statusTextCode = '#c62828'; statusLabel = 'Cancelled'; }
+                                                            const total = order.totalAmount || order.total || '0';
+                                                            const date = new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+                                                            return (
+                                                                <Paper key={order._id || index} variant="outlined" sx={{ p: 2, borderRadius: '12px', bgcolor: 'white' }}>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                                                                        <Box>
+                                                                            <Typography sx={{ fontWeight: 800, fontSize: '14px', color: '#111' }}>
+                                                                                #{order._id?.slice(-8).toUpperCase() || index + 1}
+                                                                            </Typography>
+                                                                            <Typography sx={{ fontSize: '12px', color: '#666' }}>{date}</Typography>
+                                                                        </Box>
+                                                                        <Box sx={{
+                                                                            px: 1, py: 0.25, borderRadius: '4px', bgcolor: statusColor, color: statusTextCode,
+                                                                            fontWeight: 800, fontSize: '10px', textTransform: 'uppercase'
+                                                                        }}>
+                                                                            {statusLabel}
+                                                                        </Box>
+                                                                    </Box>
+                                                                    <Typography sx={{ fontWeight: 600, fontSize: '14px', mb: 1, color: '#333' }}>{productName}</Typography>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                        <Typography sx={{ fontWeight: 800, color: '#0A7A2F', fontSize: '15px' }}>₹{parseFloat(total).toFixed(2)}</Typography>
+                                                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                                                            <Button size="small" variant="text" sx={{ color: '#0A7A2F', fontWeight: 700, minWidth: 'auto', p: 0.5 }} onClick={() => navigate(`/order-details/${order._id}`)}>Details</Button>
+                                                                            {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
+                                                                                <Button size="small" variant="text" sx={{ color: '#f3791e', fontWeight: 700, minWidth: 'auto', p: 0.5 }} onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
+                                                                            )}
+                                                                        </Box>
+                                                                    </Box>
+                                                                </Paper>
+                                                            );
+                                                        })}
+                                                </Box>
                                             )}
                                         </Box>
                                     )}
@@ -1183,8 +1250,8 @@ const MyAccount = () => {
                                                     }}
                                                     onClick={() => setTabValue(2)}
                                                 >
-                                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
-                                                        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', bgcolor: '#f4faf5', borderRight: '1px solid #f0f0f0' }}>
+                                                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'stretch' }}>
+                                                        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', bgcolor: '#f4faf5', borderRight: { xs: 'none', sm: '1px solid #f0f0f0' }, borderBottom: { xs: '1px solid #f0f0f0', sm: 'none' }, justifyContent: { xs: 'center', sm: 'flex-start' } }}>
                                                             <Box sx={{ width: 44, height: 44, borderRadius: '10px', bgcolor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
                                                                 <ShoppingBagIcon sx={{ color: '#0A7A2F', fontSize: 24 }} />
                                                             </Box>
@@ -1264,13 +1331,15 @@ const MyAccount = () => {
                                                         transition: 'all 0.3s ease'
                                                     }}
                                                 >
-                                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
+                                                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'stretch' }}>
                                                         <Box sx={{
                                                             p: 2,
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             bgcolor: txn.status === 'success' ? '#f4faf5' : txn.status === 'failed' ? '#fff9f9' : '#fffdf4',
-                                                            borderRight: '1px solid #f0f0f0'
+                                                            borderRight: { xs: 'none', sm: '1px solid #f0f0f0' },
+                                                            borderBottom: { xs: '1px solid #f0f0f0', sm: 'none' },
+                                                            justifyContent: { xs: 'center', sm: 'flex-start' }
                                                         }}>
                                                             <Box sx={{
                                                                 width: 44, height: 44, borderRadius: '10px', bgcolor: 'white',
@@ -1417,20 +1486,20 @@ const MyAccount = () => {
                                                                     bgcolor: '#fafafa',
                                                                     borderLeft: { xs: 'none', md: '1px solid #eaeaea' },
                                                                     borderTop: { xs: '1px solid #eaeaea', md: 'none' },
-                                                                    p: 3,
+                                                                    p: { xs: 2.5, sm: 3 },
                                                                     display: 'flex',
-                                                                    flexDirection: 'column',
+                                                                    flexDirection: { xs: 'row', md: 'column' },
                                                                     justifyContent: 'center',
-                                                                    alignItems: { xs: 'flex-start', md: 'center' },
+                                                                    alignItems: 'center',
                                                                     gap: 2
                                                                 }}>
-                                                                    <StatusChip size="medium" icon={getStatusIcon(grievance.status)} label={grievance.status} status={grievance.status} sx={{ width: '100%', py: 2.2, borderRadius: '8px' }} />
+                                                                    <StatusChip size="medium" icon={getStatusIcon(grievance.status)} label={grievance.status} status={grievance.status} sx={{ width: '100%', py: 2.2, borderRadius: '8px', flex: { xs: 1, md: 'none' } }} />
 
                                                                     <Button
                                                                         fullWidth
                                                                         variant="contained"
                                                                         startIcon={<HistoryIcon />}
-                                                                        sx={{ bgcolor: '#0A7A2F', color: 'white', '&:hover': { bgcolor: '#086325', boxShadow: '0 4px 12px rgba(10,122,47,0.3)' }, textTransform: 'none', borderRadius: '8px', py: 1.2, fontWeight: 700, boxShadow: 'none' }}
+                                                                        sx={{ bgcolor: '#0A7A2F', color: 'white', '&:hover': { bgcolor: '#086325', boxShadow: '0 4px 12px rgba(10,122,47,0.3)' }, textTransform: 'none', borderRadius: '8px', py: 1.2, fontWeight: 700, boxShadow: 'none', flex: { xs: 1, md: 'none' } }}
                                                                         onClick={() => navigate(`/grievance?ticket=${grievance.ticket}`)}
                                                                     >
                                                                         Track Status
@@ -1564,10 +1633,10 @@ const MyAccount = () => {
                             )}
                         </Box>
                     </AnimatedPaper>
-                </Fade>
+                </Fade >
 
                 {/* Snackbar */}
-                <Snackbar
+                < Snackbar
                     open={snackbar.open}
                     autoHideDuration={3000}
                     onClose={() => setSnackbar({ ...snackbar, open: false })}
@@ -1590,9 +1659,9 @@ const MyAccount = () => {
                     >
                         {snackbar.message}
                     </Alert>
-                </Snackbar>
-            </Container>
-        </FullPageContainer>
+                </Snackbar >
+            </Container >
+        </FullPageContainer >
     );
 };
 

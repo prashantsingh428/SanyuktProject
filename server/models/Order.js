@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ["cod", "online"],
+        enum: ["cod", "online", "upi", "card"],
         default: "cod"
     },
     subtotal: Number,
@@ -37,9 +37,14 @@ const orderSchema = new mongoose.Schema({
     total: Number,
     status: {
         type: String,
-        enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+        enum: ["pending", "processing", "shipped", "reached_store", "out_for_delivery", "delivered", "cancelled", "backorder"],
         default: "pending"
-    }
+    },
+    tracking: [{
+        status: String,
+        message: String,
+        timestamp: { type: Date, default: Date.now }
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Order", orderSchema);

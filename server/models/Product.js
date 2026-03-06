@@ -11,6 +11,28 @@ const productSchema = new mongoose.Schema(
         description: String,
 
         // ⭐ NEW FIELDS
+        category: {
+            type: String,
+            required: true,
+            enum: [
+                "Mobile",
+                "Electronics",
+                "Fashion",
+                "Buty and cosmetic home based products",
+                "Toys and baby toys",
+                "Food & health",
+                "Auto & accessories",
+                "Sports & games",
+                "Books & education",
+                "Furniture",
+                "Footwear",
+                "Jwellery & accessories",
+                "Appliances",
+                "Pharmacy and household",
+                "Everyday needs",
+                "Grocery"
+            ]
+        },
         rating: {
             type: Number,
             default: 0,

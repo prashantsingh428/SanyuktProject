@@ -30,6 +30,27 @@ const ProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [imageErrors, setImageErrors] = useState({});
+    const [selectedCategory, setSelectedCategory] = useState("All");
+
+    const categories = [
+        "All",
+        "Mobile",
+        "Electronics",
+        "Fashion",
+        "Buty and cosmetic home based products",
+        "Toys and baby toys",
+        "Food & health",
+        "Auto & accessories",
+        "Sports & games",
+        "Books & education",
+        "Furniture",
+        "Footwear",
+        "Jwellery & accessories",
+        "Appliances",
+        "Pharmacy and household",
+        "Everyday needs",
+        "Grocery"
+    ];
 
     // Notifications State
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -63,11 +84,13 @@ const ProductsPage = () => {
         fetchProducts();
     }, []);
 
-    // Filter products based on search
-    const filteredProducts = products.filter(product =>
-        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter products based on search and category
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
 
     // Helper: check if user is logged in
     const isLoggedIn = () => {
@@ -214,6 +237,24 @@ const ProductsPage = () => {
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Categories Navigation */}
+            <div className="bg-white border-b sticky top-[80px] md:top-[96px] z-10 overflow-x-auto no-scrollbar">
+                <div className="max-w-7xl mx-auto px-4 py-3 flex gap-3 whitespace-nowrap">
+                    {categories.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`px-4 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${selectedCategory === cat
+                                    ? "bg-green-600 text-white shadow-md shadow-green-100"
+                                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                }`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
                 </div>
             </div>
 
