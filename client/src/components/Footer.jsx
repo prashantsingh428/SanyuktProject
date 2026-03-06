@@ -19,13 +19,17 @@ const FooterContainer = styled(Box)({
     width: '100%',
 });
 
-const FooterContent = styled(Container)({
+const FooterContent = styled(Container)(({ theme }) => ({
     maxWidth: '1200px',
     margin: '0 auto',
     width: '100%',
-    paddingTop: '60px',
-    paddingBottom: '60px',
-});
+    paddingTop: '40px',
+    paddingBottom: '40px',
+    [theme?.breakpoints?.up('md') ?? '@media (min-width:900px)']: {
+        paddingTop: '60px',
+        paddingBottom: '60px',
+    },
+}));
 
 // LOGO & INFO (COLUMN 1)
 const LogoContainer = styled(Box)({
@@ -66,10 +70,10 @@ const CompanyDescription = styled(Typography)({
 
 // SECTION TITLES
 const SectionTitle = styled(Typography)({
-    fontSize: '18px',
-    fontWeight: 600,
+    fontSize: '15px',
+    fontWeight: 700,
     color: '#FFFFFF',
-    marginBottom: '24px',
+    marginBottom: '14px',
     fontFamily: '"Poppins", "Roboto", sans-serif',
 });
 
@@ -77,9 +81,9 @@ const SectionTitle = styled(Typography)({
 const FooterLink = styled(Link)({
     display: 'block',
     color: '#FFFFFF',
-    fontSize: '14px',
+    fontSize: '13px',
     textDecoration: 'none',
-    marginBottom: '12px',
+    marginBottom: '8px',
     fontFamily: '"Poppins", "Roboto", sans-serif',
     transition: 'color 0.2s ease-in-out',
     cursor: 'pointer',
@@ -229,7 +233,7 @@ const Footer = () => {
                     </Grid>
 
                     {/* COLUMN 2 – QUICK LINKS */}
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid item xs={6} sm={6} md={3}>
                         <SectionTitle>Quick Links</SectionTitle>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             {quickLinks.map((link, index) => (
@@ -241,9 +245,9 @@ const Footer = () => {
                     </Grid>
 
                     {/* COLUMN 3 – POLICIES & CONTACT US (Split internally) */}
-                    <Grid item xs={12} sm={6} md={5}>
+                    <Grid item xs={6} sm={6} md={5}>
                         <Grid container spacing={2}>
-                            {/* Policies Left side */}
+                            {/* Policies — full width on mobile inside this half-col, side-by-side on sm+ */}
                             <Grid item xs={12} sm={6}>
                                 <SectionTitle>Our Policies</SectionTitle>
                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -255,10 +259,10 @@ const Footer = () => {
                                 </Box>
                             </Grid>
 
-                            {/* Contact Us Right side */}
-                            <Grid item xs={12} sm={6}>
+                            {/* Contact Us — hidden on xs, shown from sm+ */}
+                            <Grid item xs={12} sm={6} sx={{ display: { xs: 'none', sm: 'block' } }}>
                                 <SectionTitle>Contact Us</SectionTitle>
-                                <Box sx={{ mb: 3 }}>
+                                <Box sx={{ mb: 2 }}>
                                     <ContactText sx={{ fontWeight: 600, mb: 1, color: '#FFFFFF' }}>
                                         Sanyukt Parivaar & Rich Life Company
                                     </ContactText>
@@ -269,16 +273,37 @@ const Footer = () => {
                                 </Box>
                                 <Box>
                                     <ContactLine onClick={() => window.open('tel:+919628145157', '_self')}>
-                                        <Typography sx={{ fontWeight: 600, mr: 1, color: '#F7931E' }}>Phone:</Typography>
+                                        <Typography sx={{ fontWeight: 600, mr: 1, color: '#F7931E', fontSize: '13px' }}>Phone:</Typography>
                                         +91 96281 45157
                                     </ContactLine>
                                     <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
-                                        <Typography sx={{ fontWeight: 600, mr: 1, color: '#F7931E' }}>Email:</Typography>
+                                        <Typography sx={{ fontWeight: 600, mr: 1, color: '#F7931E', fontSize: '13px' }}>Email:</Typography>
                                         info@sanyuktparivaar.com
                                     </ContactLine>
                                 </Box>
                             </Grid>
                         </Grid>
+                    </Grid>
+
+                    {/* CONTACT — full width row on xs only */}
+                    <Grid item xs={12} sx={{ display: { xs: 'block', sm: 'none' }, pt: '0 !important' }}>
+                        <SectionTitle>Contact Us</SectionTitle>
+                        <Box sx={{ mb: 1 }}>
+                            <ContactText sx={{ fontWeight: 600, mb: 0.5, color: '#FFFFFF', fontSize: '13px' }}>
+                                Sanyukt Parivaar & Rich Life Company
+                            </ContactText>
+                            <ContactText sx={{ fontSize: '13px' }}>
+                                Near Main Business Hub, India
+                            </ContactText>
+                        </Box>
+                        <ContactLine onClick={() => window.open('tel:+919628145157', '_self')}>
+                            <Typography sx={{ fontWeight: 600, mr: 1, color: '#F7931E', fontSize: '13px' }}>Phone:</Typography>
+                            +91 96281 45157
+                        </ContactLine>
+                        <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
+                            <Typography sx={{ fontWeight: 600, mr: 1, color: '#F7931E', fontSize: '13px' }}>Email:</Typography>
+                            info@sanyuktparivaar.com
+                        </ContactLine>
                     </Grid>
 
                 </Grid>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import Header from "./components/Header";
@@ -6,6 +7,11 @@ import MainRoutes from "./routes/MainRoutes";
 
 const App = () => {
   const location = useLocation();
+
+  // Scroll to top on every route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location.pathname]);
 
   const isAdminRoute = location.pathname.startsWith("/admin");
 

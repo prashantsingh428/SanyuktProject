@@ -1,0 +1,12 @@
+{
+    "name": "sanyukt-parivaar",
+    "version": "1.0.0",
+    "description": "Sanyukt Parivaar & Rich Life Company - Full Stack App",
+    "scripts": {
+        "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+        "start": "concurrently \"npm run start --prefix server\" \"npm run dev --prefix client\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

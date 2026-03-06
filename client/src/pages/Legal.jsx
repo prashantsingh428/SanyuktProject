@@ -5,6 +5,7 @@ import { ChevronRight, Shield, FileText, RefreshCw, Repeat, CreditCard, Truck, M
 const LegalPage = () => {
     const [expandedSections, setExpandedSections] = useState({});
     const [expandedPolicy, setExpandedPolicy] = useState('privacy');
+    const [showAllPolicies, setShowAllPolicies] = useState(false);
     const lastUpdated = "March 15, 2024";
 
     const togglePolicy = (policyId) => {
@@ -277,7 +278,7 @@ const LegalPage = () => {
             id: 'refund',
             title: 'Refund & Cancellation Policy',
             icon: <RefreshCw className="w-6 h-6 text-[#0A7A2F]" />,
-            path: '/refund-cancellation',
+            path: '/cancellation-policy',
             content: {
                 intro: "Sanyukt Parivaar & Rich Life Company follows a transparent refund and cancellation policy in accordance with applicable laws.",
                 sections: [
@@ -883,12 +884,12 @@ const LegalPage = () => {
 
             {/* Policies Navigation Cards */}
             <section className="py-8 px-4 max-w-7xl mx-auto">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
-                    {policies.map((policy, index) => (
+                <div className="flex flex-wrap justify-center gap-4 mb-8">
+                    {(showAllPolicies ? policies : policies.slice(0, 4)).map((policy, index) => (
                         <button
                             key={policy.id}
                             onClick={() => togglePolicy(policy.id)}
-                            className={`p-4 rounded-lg shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-fade-in text-center group ${expandedPolicy === policy.id
+                            className={`w-40 p-4 rounded-lg shadow-md transition-all duration-300 transform hover:-translate-y-1 animate-fade-in text-center group ${expandedPolicy === policy.id
                                 ? 'bg-[#0A7A2F] text-white'
                                 : 'bg-white hover:shadow-lg text-[#222222]'
                                 }`}
@@ -904,6 +905,21 @@ const LegalPage = () => {
                             </span>
                         </button>
                     ))}
+
+                    {/* View More / View Less Toggle Button */}
+                    {policies.length > 4 && (
+                        <button
+                            onClick={() => setShowAllPolicies(!showAllPolicies)}
+                            className="w-40 p-4 rounded-lg shadow-sm border border-[#0A7A2F]/20 hover:border-[#0A7A2F]/50 bg-[#F8FAF5] hover:bg-[#E8F5E9] transition-all duration-300 transform hover:-translate-y-1 text-center flex flex-col items-center justify-center animate-fade-in"
+                        >
+                            <div className="flex justify-center mb-2 text-[#0A7A2F]">
+                                {showAllPolicies ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+                            </div>
+                            <span className="text-xs sm:text-sm font-bold text-[#0A7A2F]">
+                                {showAllPolicies ? "View Less" : "View More"}
+                            </span>
+                        </button>
+                    )}
                 </div>
             </section>
 
@@ -1018,6 +1034,81 @@ const LegalPage = () => {
                     ))}
                 </section>
             )}
+
+            {/* Official Certifications Section */}
+            <section className="py-12 px-4 max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-[#0A7A2F] inline-block relative pb-2">
+                        Official Certifications & Documents
+                        <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-[#F7931E]"></span>
+                    </h2>
+                    <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+                        View and download our official company registration and compliance documents.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {/* Certificate 1  */}
+                    <a href="/certifications/certificate_1.pdf" target="_blank" rel="noopener noreferrer"
+                        className="flex flex-col items-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div className="w-16 h-16 bg-[#F8FAF5] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#0A7A2F] transition-colors">
+                            <FileText className="w-8 h-8 text-[#0A7A2F] group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-[#222222] text-center group-hover:text-[#0A7A2F] transition-colors">Certificate of Incorporation</h3>
+                        <span className="text-sm text-[#F7931E] mt-2 flex items-center gap-1 group-hover:underline">
+                            View PDF <ChevronRight className="w-4 h-4" />
+                        </span>
+                    </a>
+
+                    {/* Certificate 2 */}
+                    <a href="/certifications/certificate_2.pdf" target="_blank" rel="noopener noreferrer"
+                        className="flex flex-col items-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div className="w-16 h-16 bg-[#F8FAF5] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#0A7A2F] transition-colors">
+                            <FileText className="w-8 h-8 text-[#0A7A2F] group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-[#222222] text-center group-hover:text-[#0A7A2F] transition-colors">Memorandum of Association</h3>
+                        <span className="text-sm text-[#F7931E] mt-2 flex items-center gap-1 group-hover:underline">
+                            View PDF <ChevronRight className="w-4 h-4" />
+                        </span>
+                    </a>
+
+                    {/* Certificate 3 */}
+                    <a href="/certifications/certificate_3.pdf" target="_blank" rel="noopener noreferrer"
+                        className="flex flex-col items-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div className="w-16 h-16 bg-[#F8FAF5] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#0A7A2F] transition-colors">
+                            <FileText className="w-8 h-8 text-[#0A7A2F] group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-[#222222] text-center group-hover:text-[#0A7A2F] transition-colors">Articles of Association</h3>
+                        <span className="text-sm text-[#F7931E] mt-2 flex items-center gap-1 group-hover:underline">
+                            View PDF <ChevronRight className="w-4 h-4" />
+                        </span>
+                    </a>
+
+                    {/* Udyam */}
+                    <a href="/certifications/udyam_registration.pdf" target="_blank" rel="noopener noreferrer"
+                        className="flex flex-col items-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div className="w-16 h-16 bg-[#F8FAF5] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#0A7A2F] transition-colors">
+                            <Award className="w-8 h-8 text-[#0A7A2F] group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-[#222222] text-center group-hover:text-[#0A7A2F] transition-colors">Udyam Registration Certificate</h3>
+                        <span className="text-sm text-[#F7931E] mt-2 flex items-center gap-1 group-hover:underline">
+                            View PDF <ChevronRight className="w-4 h-4" />
+                        </span>
+                    </a>
+
+                    {/* TAN */}
+                    <a href="/certifications/tan_certificate.pdf" target="_blank" rel="noopener noreferrer"
+                        className="flex flex-col items-center p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div className="w-16 h-16 bg-[#F8FAF5] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#0A7A2F] transition-colors">
+                            <Shield className="w-8 h-8 text-[#0A7A2F] group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="font-bold text-[#222222] text-center group-hover:text-[#0A7A2F] transition-colors">TAN Certificate</h3>
+                        <span className="text-sm text-[#F7931E] mt-2 flex items-center gap-1 group-hover:underline">
+                            View PDF <ChevronRight className="w-4 h-4" />
+                        </span>
+                    </a>
+                </div>
+            </section>
 
             {/* Last Updated */}
             <section className="py-6 px-4 max-w-4xl mx-auto text-center">

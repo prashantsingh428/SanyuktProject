@@ -164,7 +164,7 @@ const CheckoutPage = () => {
                                 Continue Shopping
                             </button>
                             <button
-                                onClick={() => navigate('/orders')}
+                                onClick={() => navigate('/my-account/orders')}
                                 className="flex-1 px-6 py-3 border border-[#0A7A2F] text-[#0A7A2F] rounded-xl font-semibold hover:bg-[#0A7A2F] hover:text-white transition-all"
                             >
                                 View Orders

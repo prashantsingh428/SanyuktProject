@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
+import {
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    Button, Typography, Grid, Box, Chip, TextField, Divider, Paper
+} from '@mui/material';
 
 const AdminUsers = () => {
     const navigate = useNavigate();
@@ -16,31 +20,14 @@ const AdminUsers = () => {
         status: ""
     });
 
-    // Check if user is admin
-    const checkAdminAccess = () => {
-        const userStr = localStorage.getItem('user');
-        if (!userStr) {
-            navigate('/login');
-            return false;
-        }
-
-        try {
-            const user = JSON.parse(userStr);
-            if (user.role !== 'admin') {
-                navigate('/');
-                return false;
-            }
-            return true;
-        } catch (e) {
-            navigate('/login');
-            return false;
-        }
-    };
+    // KYC State
+    const [kycDialogOpen, setKycDialogOpen] = useState(false);
+    const [selectedUserForKyc, setSelectedUserForKyc] = useState(null);
+    const [kycRejectReason, setKycRejectReason] = useState("");
+    const [isRejecting, setIsRejecting] = useState(false);
 
     // ================= FETCH USERS =================
     const fetchUsers = async () => {
-        // First check if user is admin
-        if (!checkAdminAccess()) return;
 
         try {
             setLoading(true);
@@ -67,14 +54,12 @@ const AdminUsers = () => {
             console.error("Fetch error:", error.response?.data || error.message);
 
             if (error.response?.status === 403) {
-                setError("Admin access only. You don't have permission.");
-                // Redirect non-admin users after 2 seconds
-                setTimeout(() => navigate('/'), 2000);
+                setError("Permission denied. Please log out and log back in to refresh your session.");
             } else if (error.response?.status === 401) {
                 setError("Session expired. Please login again.");
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
-                setTimeout(() => navigate('/login'), 2000);
+                navigate('/login');
             } else {
                 setError("Failed to fetch users. Please try again.");
             }
@@ -164,6 +149,43 @@ const AdminUsers = () => {
         }));
     };
 
+    // ================= KYC HANDLERS =================
+    const handleOpenKyc = (user) => {
+        setSelectedUserForKyc(user);
+        setKycRejectReason(user.kycMessage || "");
+        setIsRejecting(false);
+        setKycDialogOpen(true);
+    };
+
+    const handleCloseKyc = () => {
+        setKycDialogOpen(false);
+        setSelectedUserForKyc(null);
+    };
+
+    const handleUpdateKycStatus = async (status) => {
+        if (status === 'Rejected' && !kycRejectReason.trim()) {
+            setError("Please provide a rejection reason.");
+            setKycDialogOpen(false);
+            window.scrollTo(0, 0);
+            return;
+        }
+
+        try {
+            setError("");
+            await api.put(`/admin/users/${selectedUserForKyc._id}`, {
+                kycStatus: status,
+                kycMessage: status === 'Rejected' ? kycRejectReason : ""
+            });
+            handleCloseKyc();
+            fetchUsers();
+        } catch (error) {
+            console.error("Update KYC error:", error.response?.data || error.message);
+            setError("Failed to update KYC status.");
+            setKycDialogOpen(false);
+            window.scrollTo(0, 0);
+        }
+    };
+
     // ================= LOGOUT =================
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -194,6 +216,16 @@ const AdminUsers = () => {
                 return '#2196F3';
             default:
                 return '#757575';
+        }
+    };
+
+    // ================= GET KYC STATUS COLOR =================
+    const getKycStatusColor = (status) => {
+        switch (status) {
+            case 'Verified': return '#4CAF50';
+            case 'Rejected': return '#f44336';
+            case 'Submitted': return '#2196F3';
+            default: return '#757575'; // Pending
         }
     };
 
@@ -321,6 +353,7 @@ const AdminUsers = () => {
                                         <th style={{ padding: "15px", textAlign: "left", fontWeight: "600" }}>Email</th>
                                         <th style={{ padding: "15px", textAlign: "left", fontWeight: "600" }}>Role</th>
                                         <th style={{ padding: "15px", textAlign: "left", fontWeight: "600" }}>Status</th>
+                                        <th style={{ padding: "15px", textAlign: "left", fontWeight: "600" }}>KYC Status</th>
                                         <th style={{ padding: "15px", textAlign: "left", fontWeight: "600" }}>Actions</th>
                                     </tr>
                                 </thead>
@@ -441,6 +474,18 @@ const AdminUsers = () => {
                                                 </td>
 
                                                 <td style={{ padding: "15px" }}>
+                                                    <span style={{
+                                                        padding: "4px 8px",
+                                                        borderRadius: "4px",
+                                                        backgroundColor: getKycStatusColor(user.kycStatus),
+                                                        color: "white",
+                                                        fontSize: "0.9em"
+                                                    }}>
+                                                        {user.kycStatus || "Pending"}
+                                                    </span>
+                                                </td>
+
+                                                <td style={{ padding: "15px" }}>
                                                     {editingUser === user._id ? (
                                                         <div style={{ display: "flex", gap: "8px" }}>
                                                             <button
@@ -484,6 +529,19 @@ const AdminUsers = () => {
                                                                 }}
                                                             >
                                                                 Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleOpenKyc(user)}
+                                                                style={{
+                                                                    padding: "8px 16px",
+                                                                    backgroundColor: "#ff9800",
+                                                                    color: "white",
+                                                                    border: "none",
+                                                                    borderRadius: "4px",
+                                                                    cursor: "pointer"
+                                                                }}
+                                                            >
+                                                                KYC
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDelete(user._id)}
@@ -562,6 +620,97 @@ const AdminUsers = () => {
                     <p>© 2024 Sanyukt Parivar. All rights reserved.</p>
                 </div>
             </div>
+
+            {/* KYC Dialog */}
+            <Dialog open={kycDialogOpen} onClose={handleCloseKyc} maxWidth="md" fullWidth>
+                <DialogTitle sx={{ bgcolor: '#0A7A2F', color: 'white' }}>KYC Verification for {selectedUserForKyc?.name}</DialogTitle>
+                <DialogContent sx={{ mt: 2 }}>
+                    {selectedUserForKyc && (
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6}>
+                                <Typography variant="subtitle2" color="textSecondary">Aadhar Number</Typography>
+                                <Typography variant="body1">{selectedUserForKyc.aadharNumber || 'N/A'}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Typography variant="subtitle2" color="textSecondary">PAN Number</Typography>
+                                <Typography variant="body1">{selectedUserForKyc.panNumber || 'N/A'}</Typography>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Divider />
+                                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>Bank Details</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <Typography variant="subtitle2" color="textSecondary">Account Number</Typography>
+                                <Typography variant="body1">{selectedUserForKyc.bankDetails?.accountNumber || 'N/A'}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <Typography variant="subtitle2" color="textSecondary">IFSC Code</Typography>
+                                <Typography variant="body1">{selectedUserForKyc.bankDetails?.ifscCode || 'N/A'}</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <Typography variant="subtitle2" color="textSecondary">Bank Name</Typography>
+                                <Typography variant="body1">{selectedUserForKyc.bankDetails?.bankName || 'N/A'}</Typography>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Divider />
+                                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>Documents</Typography>
+                            </Grid>
+                            {['aadharFront', 'aadharBack', 'panCard', 'passbook'].map((docKey) => (
+                                <Grid item xs={12} sm={6} md={3} key={docKey}>
+                                    <Paper variant="outlined" sx={{ p: 1, textAlign: 'center', height: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Typography variant="caption" sx={{ mb: 1, display: 'block' }}>
+                                            {docKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                        </Typography>
+                                        {selectedUserForKyc.kycDocuments?.[docKey] ? (
+                                            <a href={selectedUserForKyc.kycDocuments[docKey]} target="_blank" rel="noreferrer">
+                                                <img
+                                                    src={selectedUserForKyc.kycDocuments[docKey]}
+                                                    alt={docKey}
+                                                    style={{ maxHeight: '70px', maxWidth: '100%', objectFit: 'contain' }}
+                                                />
+                                            </a>
+                                        ) : (
+                                            <Typography variant="body2" color="textSecondary">Not Uploaded</Typography>
+                                        )}
+                                    </Paper>
+                                </Grid>
+                            ))}
+
+                            {isRejecting && (
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Reason for Rejection"
+                                        multiline
+                                        rows={2}
+                                        value={kycRejectReason}
+                                        onChange={(e) => setKycRejectReason(e.target.value)}
+                                        required
+                                        error={!kycRejectReason.trim()}
+                                        helperText={!kycRejectReason.trim() ? "Rejection reason is required" : ""}
+                                    />
+                                </Grid>
+                            )}
+                        </Grid>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 3, borderTop: '1px solid #eee' }}>
+                    <Button onClick={handleCloseKyc} color="inherit">Cancel</Button>
+                    {!isRejecting ? (
+                        <>
+                            <Button variant="outlined" color="error" onClick={() => setIsRejecting(true)}>Reject</Button>
+                            <Button variant="contained" color="success" onClick={() => handleUpdateKycStatus('Verified')}>Verify & Approve</Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button onClick={() => setIsRejecting(false)}>Back</Button>
+                            <Button variant="contained" color="error" onClick={() => handleUpdateKycStatus('Rejected')}>Confirm Rejection</Button>
+                        </>
+                    )}
+                </DialogActions>
+            </Dialog>
 
             {/* Animation keyframes */}
             <style jsx>{`

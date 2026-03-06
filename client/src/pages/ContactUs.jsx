@@ -78,9 +78,9 @@ const ContactUs = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 p-4 md:p-6 lg:p-8 relative overflow-hidden">
             {/* Decorative Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
             </div>
 
             <div className="max-w-7xl mx-auto relative z-10">
@@ -89,7 +89,7 @@ const ContactUs = () => {
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
                         Contact Us
                     </h1>
-                    <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
+                    <div className="w-24 h-1 bg-gradient-to-r from-[#0A7A2F] to-[#F7931E] mx-auto rounded-full"></div>
                 </div>
 
                 {/* Main Content Grid */}
@@ -98,11 +98,11 @@ const ContactUs = () => {
                     <div className="animate-slide-left h-full">
                         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:shadow-3xl h-full flex flex-col">
                             {/* Form Header */}
-                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 md:px-8 py-6">
+                            <div className="bg-gradient-to-r from-[#0A7A2F] to-[#2F7A32] px-6 md:px-8 py-6">
                                 <h2 className="text-2xl md:text-3xl font-bold text-white">
                                     Get in Touch
                                 </h2>
-                                <p className="text-blue-100 mt-2 text-sm">
+                                <p className="text-green-50 mt-2 text-sm">
                                     We'd love to hear from you
                                 </p>
                             </div>
@@ -137,7 +137,7 @@ const ContactUs = () => {
                                                 value={formData.name}
                                                 onChange={handleChange}
                                                 placeholder="Enter your full name"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:border-blue-400"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent transition-all duration-300 hover:border-[#0A7A2F]"
                                                 required
                                             />
                                         </div>
@@ -149,14 +149,14 @@ const ContactUs = () => {
                                             Email <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative group">
-                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
+                                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-[#0A7A2F] transition-colors duration-300" />
                                             <input
                                                 type="email"
                                                 name="email"
                                                 value={formData.email}
                                                 onChange={handleChange}
                                                 placeholder="Enter your email"
-                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:border-blue-400"
+                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent transition-all duration-300 hover:border-[#0A7A2F]"
                                                 required
                                             />
                                         </div>
@@ -168,14 +168,14 @@ const ContactUs = () => {
                                             Phone
                                         </label>
                                         <div className="relative group">
-                                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors duration-300" />
+                                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-[#0A7A2F] transition-colors duration-300" />
                                             <input
                                                 type="tel"
                                                 name="phone"
                                                 value={formData.phone}
                                                 onChange={handleChange}
                                                 placeholder="Enter your phone number"
-                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:border-blue-400"
+                                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent transition-all duration-300 hover:border-[#0A7A2F]"
                                             />
                                         </div>
                                     </div>
@@ -192,7 +192,7 @@ const ContactUs = () => {
                                                 onChange={handleChange}
                                                 placeholder="Type your message here..."
                                                 rows="4"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:border-blue-400 resize-none"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent transition-all duration-300 hover:border-[#0A7A2F] resize-none"
                                                 required
                                             />
                                         </div>
@@ -203,7 +203,7 @@ const ContactUs = () => {
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="w-full group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            className="w-full group relative px-8 py-4 bg-gradient-to-r from-[#F7931E] to-[#e07d0b] text-white font-bold rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:scale-105 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
                                         >
                                             <span className="relative z-10 flex items-center justify-center space-x-2">
                                                 {isSubmitting ? (
@@ -221,7 +221,7 @@ const ContactUs = () => {
                                                     </>
                                                 )}
                                             </span>
-                                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-[#e07d0b] to-[#F7931E] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </button>
                                     </div>
                                 </div>
@@ -233,11 +233,11 @@ const ContactUs = () => {
                     <div className="animate-slide-right h-full">
                         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 hover:shadow-3xl h-full flex flex-col">
                             {/* Info Header */}
-                            <div className="bg-gradient-to-r from-green-600 to-teal-600 px-6 md:px-8 py-6">
+                            <div className="bg-gradient-to-r from-[#0A7A2F] to-[#2F7A32] px-6 md:px-8 py-6">
                                 <h2 className="text-2xl md:text-3xl font-bold text-white">
                                     Contact Information
                                 </h2>
-                                <p className="text-green-100 mt-2 text-sm">
+                                <p className="text-green-50 mt-2 text-sm">
                                     Get in touch with us
                                 </p>
                             </div>
@@ -255,8 +255,8 @@ const ContactUs = () => {
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-gray-800 mb-1">Head Office</h3>
                                             <p className="text-gray-600 text-sm leading-relaxed">
-                                                Near Tirupati Appartment, Chhatrapati Nagar,<br />
-                                                Tukum, Chandrapur, Maharashtra 442401, India
+                                                Sanyukt Parivaar & Rich Life Company,<br />
+                                                Near Main Business Hub, India
                                             </p>
                                         </div>
                                     </div>

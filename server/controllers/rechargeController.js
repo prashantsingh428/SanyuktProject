@@ -13,7 +13,7 @@ const razorpay = new Razorpay({
 // @access  Public (Should be protected in production)
 exports.createOrder = async (req, res) => {
     try {
-        const { amount, type, operator, rechargeNumber, userId } = req.body;
+        const { amount, type, operator, rechargeNumber } = req.body;
 
         if (!amount || !type || !operator || !rechargeNumber) {
             return res.status(400).json({ message: "All fields are required" });
@@ -55,7 +55,7 @@ exports.createOrder = async (req, res) => {
 
         // Save initial transaction state as pending
         const transaction = await Transaction.create({
-            userId: userId || '60d0fe4f5311236168a109ca', // Dummy user ID for now if not provided
+            userId: req.user._id,
             amount,
             type,
             operator,
@@ -130,6 +130,20 @@ exports.verifyPayment = async (req, res) => {
         }
     } catch (error) {
         console.error("Verify payment error:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+// @desc    Get logged in user transactions
+// @route   GET /api/recharge/my-transactions
+// @access  Protected
+exports.getUserTransactions = async (req, res) => {
+    try {
+        const transactions = await Transaction.find({ userId: req.user._id })
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(transactions);
+    } catch (error) {
+        console.error("Fetch transactions error:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };

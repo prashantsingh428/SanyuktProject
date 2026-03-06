@@ -40,25 +40,32 @@ const HomePage = () => {
     const [showCartNotification, setShowCartNotification] = useState(false);
     const [addedToCartProduct, setAddedToCartProduct] = useState('');
 
+    // Contact form state
+    const [contactForm, setContactForm] = useState({
+        firstName: '', lastName: '', email: '', phone: '', enquiryType: 'Product Enquiry', message: ''
+    });
+    const [contactSubmitting, setContactSubmitting] = useState(false);
+    const [contactSuccess, setContactSuccess] = useState(false);
+
     // Hero slides data
     const heroSlides = [
         {
             image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80",
             title: "Welcome to Sanyukt Parivaar & Rich Life Company",
             subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Company",
-            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities."
+            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
         },
         {
             image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80",
-            title: "Build Your Financial Freedom",
-            subtitle: "Join India's Fastest Growing MLM Company",
-            description: "Experience the power of network marketing with our proven business model."
+            title: "Welcome to Sanyukt Parivaar & Rich Life Company",
+            subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Company",
+            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
         },
         {
             image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80",
-            title: "Quality Products, Unlimited Potential",
-            subtitle: "Skin Care • Hair Care • Wellness Products",
-            description: "Our range of high-quality, daily-use products ensures repeat business."
+            title: "Welcome to Sanyukt Parivaar & Rich Life Company",
+            subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Company",
+            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
         }
     ];
 
@@ -204,7 +211,21 @@ const HomePage = () => {
             rating: 4.6,
             reviews: 112,
             discount: "14%"
-        }
+        },
+        {
+            name: "Combo & Value Packs",
+            category: "Combo Offer",
+            mrp: "₹1200",
+            dp: "₹999",
+            bv: "250",
+            slug: "combo-value-packs",
+            image: "https://www.flipkart.com/hi/toroka-new-professional-beauty-ultimate-combo-for-all-skin-tone/p/itm33bfd4d3801a5",
+            fallbackIcon: "🎁",
+            altText: "Combo & Value Packs",
+            rating: 5.0,
+            reviews: 45,
+            discount: "17%"
+        },
     ];
 
     const whyChoosePoints = [
@@ -219,19 +240,36 @@ const HomePage = () => {
     const businessHighlights = [
         "Low investment, high growth potential",
         "Work from anywhere",
-        "Earn part-time or full-time"
+        "Earn part-time or full-time",
+        "Build a stable and scalable income"
     ];
 
     const supportItems = [
         "Product knowledge training",
         "Business & leadership development",
-        "Online and offline seminars"
+        "Online and offline seminars",
+        "Marketing & growth strategies"
     ];
 
     const newsItems = [
-        { date: "15 Mar 2025", title: "New Product Launch: Herbal Sunscreen Lotion", slug: "new-product-launch", category: "Product" },
-        { date: "10 Mar 2025", title: "National Seminar in Mumbai on April 5-6", slug: "national-seminar", category: "Event" },
-        { date: "05 Mar 2025", title: "Sanyukt Parivaar crosses 10,000 distributors", slug: "crosses-10000", category: "Achievement" }
+        {
+            date: "15 Mar 2025", title: "New Product Launch: Herbal Sunscreen Lotion",
+            slug: "new-product-launch", category: "Product", readTime: "4 min read",
+            image: "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop",
+            author: "Priya Sharma", authorAvatar: "P", timeAgo: "2 hours ago"
+        },
+        {
+            date: "10 Mar 2025", title: "National Seminar in Mumbai on April 5-6",
+            slug: "national-seminar", category: "Event", readTime: "6 min read",
+            image: "https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop",
+            author: "Rajesh Kumar", authorAvatar: "R", timeAgo: "5 hours ago"
+        },
+        {
+            date: "05 Mar 2025", title: "Sanyukt Parivaar crosses 10,000 distributors",
+            slug: "crosses-10000", category: "Achievement", readTime: "3 min read",
+            image: "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop",
+            author: "Anjali Singh", authorAvatar: "A", timeAgo: "1 day ago"
+        }
     ];
 
     useEffect(() => {
@@ -466,6 +504,27 @@ const HomePage = () => {
         setTimeout(() => setShowCartNotification(false), 3000);
     };
 
+    const handleContactSubmit = async (e) => {
+        e.preventDefault();
+        const { firstName, message } = contactForm;
+        if (!firstName.trim() || !message.trim()) {
+            toast.error('Please fill in your name and message.');
+            return;
+        }
+        setContactSubmitting(true);
+        try {
+            const { data } = await api.post('/contact', contactForm);
+            toast.success(data.message || 'Message sent successfully!');
+            setContactSuccess(true);
+            setContactForm({ firstName: '', lastName: '', email: '', phone: '', enquiryType: 'Product Enquiry', message: '' });
+            setTimeout(() => setContactSuccess(false), 3000);
+        } catch (err) {
+            toast.error(err?.response?.data?.message || 'Failed to send message. Please try again.');
+        } finally {
+            setContactSubmitting(false);
+        }
+    };
+
     const calculateDiscount = (mrp, dp) => {
         const mrpValue = parseInt(mrp.replace('₹', ''));
         const dpValue = parseInt(dp.replace('₹', ''));
@@ -495,6 +554,22 @@ const HomePage = () => {
             }
         }
         return stars;
+    };
+
+    const carouselRef = React.useRef(null);
+    const scroll = (direction) => {
+        const container = carouselRef.current;
+        if (container) {
+            const scrollAmount = container.offsetWidth * 0.8;
+            const targetScroll = direction === 'left'
+                ? container.scrollLeft - scrollAmount
+                : container.scrollLeft + scrollAmount;
+
+            container.scrollTo({
+                left: targetScroll,
+                behavior: 'smooth'
+            });
+        }
     };
 
     if (!imagesLoaded) {
@@ -533,25 +608,25 @@ const HomePage = () => {
                                     initial={{ y: 30, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.5, duration: 0.8 }}
-                                    className="max-w-3xl"
+                                    className="max-w-4xl mx-auto text-center"
                                 >
-                                    <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight text-white tracking-tight">
+                                    <h1 className="text-2xl sm:text-4xl md:text-6xl font-extrabold mb-4 leading-tight text-white tracking-tight">
                                         {heroSlides[currentSlide].title}
                                     </h1>
-                                    <h2 className="text-xl md:text-2xl text-[#F7931E] font-semibold mb-6">
+                                    <h2 className="text-base sm:text-xl md:text-2xl text-[#F7931E] font-semibold mb-6">
                                         {heroSlides[currentSlide].subtitle}
                                     </h2>
-                                    <p className="text-lg md:text-xl mb-8 text-gray-300 leading-relaxed max-w-2xl font-light">
+                                    <p className="text-sm sm:text-base md:text-xl mb-8 text-gray-300 leading-relaxed max-w-2xl mx-auto font-light">
                                         {heroSlides[currentSlide].description}
                                     </p>
-                                    <div className="flex flex-wrap gap-4">
+                                    <div className="flex flex-wrap justify-center gap-4">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => handleNavigation('/register')}
                                             className="px-8 py-4 bg-[#F7931E] text-white font-bold rounded-full hover:bg-[#e07d0b] transition-all shadow-xl shadow-orange-900/20 flex items-center space-x-3 text-base"
                                         >
-                                            <span>Join Our Family</span>
+                                            <span>Join Now</span>
                                             <ArrowRight className="w-5 h-5" />
                                         </motion.button>
                                         <motion.button
@@ -594,26 +669,15 @@ const HomePage = () => {
                                 Sanyukt Parivaar & Rich Life Company
                             </h3>
                             <p className="text-sm">
-                                We are a direct Selling company founded by business professionals. At Ishaavia Global Marketing, we create dynamic entrepreneurs through the promotion of high quality wellness products, personal care products, Home care products.
+                                Sanyukt Parivaar & Rich Life Company was founded with a clear vision — to create financial independence through ethical direct selling. We believe in growing together as one family, where every member gets equal opportunity, proper training, and long-term support.
                             </p>
                             <p className="text-sm">
-                                Sanyukt Parivaar & Rich Life Company was founded with a clear vision  to create financial independence through ethical direct selling. We believe in growing together.
+                                Our company focuses on personal development, leadership growth, and community success while promoting reliable lifestyle, wellness, and personal care products.
                             </p>
-                            <div className="flex items-center space-x-4 pt-3">
-                                <div className="flex -space-x-2">
-                                    {teamImages.map((img, idx) => (
-                                        <img key={idx} src={img} alt="Team" className="w-8 h-8 rounded-full border-2 border-white" />
-                                    ))}
-                                </div>
-                                <div className="text-xs">
-                                    <span className="font-bold text-[#0A7A2F]">5000+</span>
-                                    <span className="text-gray-600 ml-1">Happy Families</span>
-                                </div>
-                            </div>
                         </div>
                         <div className="relative order-1 md:order-2">
                             <img src={aboutImage} alt="About Us" className="rounded-lg shadow-xl w-full h-[300px] md:h-[350px] object-cover" />
-                            <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-100 animate-bounce" style={{ animationDuration: '3s' }}>
+                            <div className="absolute -bottom-4 -left-4 md:-bottom-6 md:-left-6 bg-white p-3 md:p-4 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-100 animate-bounce" style={{ animationDuration: '3s' }}>
                                 <div className="bg-green-100 p-2 rounded-full">
                                     <Shield className="w-5 h-5 text-[#0A7A2F]" />
                                 </div>
@@ -651,318 +715,261 @@ const HomePage = () => {
                         ))}
                     </div>
                 </div>
-            </section >
+            </section>
 
-            {/* PRODUCTS SECTION - WITHOUT SORTING OPTIONS */}
-            < section className="py-16 bg-gradient-to-b from-[#F8FAF5] to-white" >
-                <div className="container mx-auto px-4">
+            {/* PRODUCTS SECTION - SLIDING CAROUSEL */}
+            <section className="py-20 bg-gradient-to-b from-[#F8FAF5] to-white relative overflow-hidden" >
+                <div className="container mx-auto px-4 relative z-10">
                     {/* Section Header */}
-                    <div className="text-center mb-12">
-                        <span className="text-[#F7931E] font-semibold text-sm tracking-wider uppercase mb-2 block">
-                            Shop Our Collection
-                        </span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-[#0A7A2F] mb-4">
-                            Popular Products
-                        </h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">
-                            Discover our range of high-quality, natural products loved by thousands
-                        </p>
-                    </div>
-
-                    {/* Products Display - No Filters or Sorting */}
-                    <div className="flex flex-col">
-                        {/* View Toggle and Results Count */}
-                        <div className="flex justify-between items-center mb-6">
-                            <p className="text-sm text-gray-600">
-                                Showing <span className="font-semibold">{products.length}</span> products
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+                        <div className="text-center md:text-left max-w-2xl">
+                            <span className="text-[#F7931E] font-bold text-sm tracking-widest uppercase mb-3 block">
+                                Discover Quality
+                            </span>
+                            <h2 className="text-4xl md:text-5xl font-black text-[#0A7A2F] mb-4">
+                                Featured Products
+                            </h2>
+                            <p className="text-gray-500 text-lg">
+                                Our best-selling products are trusted by customers and partners for their quality and effectiveness.
                             </p>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setViewMode('grid')}
-                                    className={`p-2 rounded-lg transition-colors ${viewMode === 'grid'
-                                        ? 'bg-[#0A7A2F] text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    <Grid3x3 className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('list')}
-                                    className={`p-2 rounded-lg transition-colors ${viewMode === 'list'
-                                        ? 'bg-[#0A7A2F] text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    <List className="w-4 h-4" />
-                                </button>
-                            </div>
                         </div>
 
-                        {/* Products Grid/List */}
-                        <motion.div
-                            layout
-                            className={
-                                viewMode === 'grid'
-                                    ? 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8'
-                                    : 'space-y-6'
-                            }
-                        >
-                            <AnimatePresence>
-                                {products.map((product, index) => {
-                                    const discount = calculateDiscount(product.mrp, product.dp);
-                                    const isInWishlist = wishlist.includes(product.name);
+                        {/* Custom Navigation - Right Corner */}
+                        <div className="flex gap-3 flex-shrink-0">
+                            <button
+                                onClick={() => scroll('left')}
+                                className="w-14 h-14 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#0A7A2F] hover:text-[#0A7A2F] hover:bg-green-50 transition-all duration-300"
+                            >
+                                <ChevronDown className="w-6 h-6 rotate-90" />
+                            </button>
+                            <button
+                                onClick={() => scroll('right')}
+                                className="w-14 h-14 rounded-full bg-[#0A7A2F] flex items-center justify-center text-white shadow-xl shadow-green-900/20 hover:bg-[#086326] hover:scale-105 transition-all duration-300"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
+                        </div>
+                    </div>
 
-                                    return viewMode === 'grid' ? (
-                                        // Grid View
-                                        <motion.div
-                                            layout
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                            whileHover={{ y: -10 }}
-                                            key={product.slug}
-                                            className="group bg-white rounded-3xl shadow-sm hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500"
-                                        >
-                                            {/* Product Image Container */}
-                                            <div className="relative h-72 overflow-hidden bg-gray-50 flex items-center justify-center">
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+                    {/* Products Carousel */}
+                    <div
+                        ref={carouselRef}
+                        className="flex gap-8 overflow-x-auto pb-12 pt-4 snap-x snap-mandatory scrollbar-hide no-scrollbar"
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                        {products.map((product) => {
+                            const discount = calculateDiscount(product.mrp, product.dp);
 
-                                                {!imageErrors[product.name] ? (
-                                                    <motion.img
-                                                        whileHover={{ scale: 1.1 }}
-                                                        transition={{ duration: 0.6 }}
-                                                        src={product.image}
-                                                        alt={product.altText}
-                                                        className="w-full h-full object-cover"
-                                                        onError={() => handleImageError(product.name)}
-                                                    />
-                                                ) : (
-                                                    <div className="text-8xl grayscale group-hover:grayscale-0 transition-all duration-500">
-                                                        {product.fallbackIcon}
-                                                    </div>
-                                                )}
+                            return (
+                                <div
+                                    key={product.slug}
+                                    className="min-w-[260px] sm:min-w-[300px] md:min-w-[340px] snap-center"
+                                >
+                                    <motion.div
+                                        whileHover={{ y: -10 }}
+                                        className="bg-white rounded-[32px] shadow-sm hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500 group relative"
+                                    >
+                                        {/* Product Image Container */}
+                                        <div className="relative h-64 overflow-hidden bg-gray-50 flex items-center justify-center">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
 
-                                                {/* Badges */}
-                                                <div className="absolute top-4 left-4 flex flex-col gap-2">
-                                                    {parseInt(discount) >= 10 && (
-                                                        <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-lg shadow-red-500/20">
-                                                            Save {discount}%
-                                                        </span>
-                                                    )}
-                                                    <span className="bg-[#0A7A2F] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg shadow-green-500/20">
-                                                        {product.category}
-                                                    </span>
+                                            {!imageErrors[product.name] ? (
+                                                <motion.img
+                                                    whileHover={{ scale: 1.15 }}
+                                                    transition={{ duration: 0.8, ease: "easeOut" }}
+                                                    src={product.image}
+                                                    alt={product.altText}
+                                                    className="w-full h-full object-cover"
+                                                    onError={() => handleImageError(product.name)}
+                                                />
+                                            ) : (
+                                                <div className="text-9xl grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110">
+                                                    {product.fallbackIcon}
                                                 </div>
+                                            )}
 
-                                                {/* Add to Cart Button (Top Right) */}
+                                            {/* Top Utility Buttons */}
+                                            <div className="absolute top-6 left-6 flex flex-col gap-3 z-20">
+                                                {parseInt(discount) > 0 && (
+                                                    <span className="bg-red-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-red-500/20">
+                                                        -{discount}%
+                                                    </span>
+                                                )}
+                                                <span className="bg-[#0A7A2F] text-white text-[11px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-green-500/20">
+                                                    {product.category}
+                                                </span>
+                                            </div>
+
+                                            {/* Action Float Area */}
+                                            <div className="absolute bottom-6 right-6 z-20 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         addToCart(product);
                                                     }}
-                                                    className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all bg-white/80 backdrop-blur-md text-[#0A7A2F] hover:bg-[#0A7A2F] hover:text-white group-hover:scale-110`}
-                                                    title="Add to Cart"
+                                                    className="w-16 h-16 rounded-full bg-white text-[#0A7A2F] shadow-2xl flex items-center justify-center hover:bg-[#0A7A2F] hover:text-white transition-colors"
                                                 >
-                                                    <Plus className="w-5 h-5" />
+                                                    <ShoppingCart className="w-7 h-7" />
                                                 </button>
                                             </div>
+                                        </div>
 
-                                            {/* Product Details */}
-                                            <div className="p-6">
-                                                <div className="flex items-center gap-1 mb-3">
-                                                    {renderStars(product.rating)}
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
-                                                        {product.reviews} Reviews
+                                        {/* Product Details */}
+                                        <div className="p-6">
+                                            <div className="flex items-center gap-1.5 mb-3">
+                                                {renderStars(product.rating)}
+                                                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest ml-1">
+                                                    {product.reviews} Reviews
+                                                </span>
+                                            </div>
+
+                                            <h3 className="text-xl font-bold text-gray-900 mb-2 truncate group-hover:text-[#0A7A2F] transition-colors">
+                                                {product.name}
+                                            </h3>
+
+                                            <div className="flex items-center justify-between mt-4">
+                                                <div className="flex flex-col">
+                                                    <span className="text-2xl font-black text-[#0A7A2F]">
+                                                        {product.dp}
+                                                    </span>
+                                                    <span className="text-gray-400 text-xs line-through font-medium">
+                                                        MRP {product.mrp}
                                                     </span>
                                                 </div>
-
-                                                <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#0A7A2F] transition-colors line-clamp-1">
-                                                    {product.name}
-                                                </h3>
-
-                                                <div className="flex items-end gap-3 mb-6">
-                                                    <span className="text-2xl font-black text-[#0A7A2F] leading-none">{product.dp}</span>
-                                                    <span className="text-sm text-gray-300 line-through mb-1">MRP {product.mrp}</span>
-                                                    <div className="ml-auto bg-orange-50 px-2 py-1 rounded-md">
-                                                        <span className="text-[10px] font-bold text-[#F7931E]">BV {product.bv}</span>
-                                                    </div>
+                                                <div className="flex flex-col items-end">
+                                                    <span className="bg-orange-50 text-[#F7931E] px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest border border-orange-100">
+                                                        BV {product.bv}
+                                                    </span>
                                                 </div>
+                                            </div>
 
+                                            <div className="mt-6">
                                                 <motion.button
                                                     whileTap={{ scale: 0.95 }}
-                                                    onClick={() => {/* Buy Now Logic */ }}
-                                                    className="w-full bg-[#F7931E] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#e07d0b] transition-all shadow-xl shadow-gray-200 group-hover:shadow-orange-900/10"
+                                                    onClick={() => handleNavigation('/checkout')}
+                                                    className="w-full py-4 bg-[#F7931E] text-white font-bold rounded-xl transition-all duration-300 uppercase tracking-widest text-xs flex items-center justify-center gap-2 group/btn shadow-lg shadow-orange-100"
                                                 >
-                                                    <ShoppingCart className="w-5 h-5" />
-                                                    Buy Now
+                                                    <span>Instant Buy</span>
+                                                    <ArrowRight className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" />
                                                 </motion.button>
                                             </div>
-                                        </motion.div>
-                                    ) : (
-                                        // List View
-                                        <motion.div
-                                            layout
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: 20 }}
-                                            key={product.slug}
-                                            className="group bg-white rounded-3xl p-4 border border-gray-100 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all duration-500"
-                                        >
-                                            <div className="w-full sm:w-48 h-48 bg-gray-50 rounded-2xl flex items-center justify-center relative overflow-hidden border border-gray-100">
-                                                {!imageErrors[product.name] ? (
-                                                    <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
-                                                ) : (
-                                                    <span className="text-6xl">{product.fallbackIcon}</span>
-                                                )}
-                                                <div className="absolute top-2 left-2 bg-[#F7931E] text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase">
-                                                    {product.category}
-                                                </div>
-                                            </div>
-
-                                            <div className="flex-1 py-2 flex flex-col justify-between">
-                                                <div>
-                                                    <div className="flex items-center gap-1 mb-2">
-                                                        {renderStars(product.rating)}
-                                                        <span className="text-[10px] text-gray-400 font-medium">({product.reviews})</span>
-                                                    </div>
-                                                    <h3 className="text-xl font-extrabold text-gray-900 mb-2">{product.name}</h3>
-                                                    <div className="flex items-center gap-4 mb-4">
-                                                        <span className="text-3xl font-black text-[#0A7A2F]">{product.dp}</span>
-                                                        <span className="text-sm text-gray-300 line-through">MRP {product.mrp}</span>
-                                                        <span className="text-xs font-bold text-[#F7931E] bg-orange-50 px-2 py-1 rounded-lg">BV {product.bv}</span>
-                                                    </div>
-                                                    <div className="flex flex-wrap gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                                        <span className="flex items-center gap-1"><Truck className="w-3 h-3" /> Free Delivery</span>
-                                                        <span className="flex items-center gap-1"><ShieldIcon className="w-3 h-3" /> 1 Year Warranty</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex gap-3 mt-6">
-                                                    <motion.button
-                                                        whileTap={{ scale: 0.95 }}
-                                                        onClick={() => {/* Buy Now Logic */ }}
-                                                        className="flex-1 bg-[#F7931E] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#e07d0b] transition-all"
-                                                    >
-                                                        <ShoppingCart className="w-4 h-4" /> Buy Now
-                                                    </motion.button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            addToCart(product);
-                                                        }}
-                                                        className={`w-14 h-14 rounded-xl flex items-center justify-center border-2 transition-all bg-white border-gray-100 text-[#0A7A2F] hover:bg-[#0A7A2F] hover:text-white hover:border-[#0A7A2F]`}
-                                                        title="Add to Cart"
-                                                    >
-                                                        <Plus className="w-6 h-6" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })}
-                            </AnimatePresence>
-                        </motion.div>
+                                        </div>
+                                    </motion.div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Quick View Modal */}
-                {
-                    showQuickView && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-                            <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-fadeInUp">
-                                <div className="p-6">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h3 className="text-xl font-bold text-[#0A7A2F]">Quick View</h3>
-                                        <button
-                                            onClick={() => setShowQuickView(null)}
-                                            className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"
-                                        >
-                                            ✕
-                                        </button>
+                {/* Decorative Elements */}
+                <div className="absolute top-40 -right-20 w-80 h-80 bg-green-50 rounded-full blur-3xl opacity-50 z-0"></div>
+                <div className="absolute bottom-40 -left-20 w-80 h-80 bg-orange-50 rounded-full blur-3xl opacity-50 z-0"></div>
+
+                <style>{`
+                    .no-scrollbar::-webkit-scrollbar {
+                        display: none;
+                    }
+                `}</style>
+            </section>
+
+
+            {/* Quick View Modal */}
+            {
+                showQuickView && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                        <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-fadeInUp">
+                            <div className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h3 className="text-xl font-bold text-[#0A7A2F]">Quick View</h3>
+                                    <button
+                                        onClick={() => setShowQuickView(null)}
+                                        className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6">
+                                        {!imageErrors[showQuickView.name] ? (
+                                            <img
+                                                src={showQuickView.image}
+                                                alt={showQuickView.altText}
+                                                className="w-full h-64 object-contain"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-64 flex items-center justify-center">
+                                                <span className="text-8xl">{showQuickView.fallbackIcon}</span>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6">
-                                            {!imageErrors[showQuickView.name] ? (
-                                                <img
-                                                    src={showQuickView.image}
-                                                    alt={showQuickView.altText}
-                                                    className="w-full h-64 object-contain"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-64 flex items-center justify-center">
-                                                    <span className="text-8xl">{showQuickView.fallbackIcon}</span>
-                                                </div>
-                                            )}
+                                    <div>
+                                        <h4 className="text-2xl font-bold text-gray-800 mb-2">{showQuickView.name}</h4>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <span className="text-3xl font-bold text-[#0A7A2F]">{showQuickView.dp}</span>
+                                            <span className="text-lg text-gray-400 line-through">{showQuickView.mrp}</span>
+                                            <span className="text-sm font-semibold text-[#F7931E]">BV: {showQuickView.bv}</span>
                                         </div>
 
-                                        <div>
-                                            <h4 className="text-2xl font-bold text-gray-800 mb-2">{showQuickView.name}</h4>
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <span className="text-3xl font-bold text-[#0A7A2F]">{showQuickView.dp}</span>
-                                                <span className="text-lg text-gray-400 line-through">{showQuickView.mrp}</span>
-                                                <span className="text-sm font-semibold text-[#F7931E]">BV: {showQuickView.bv}</span>
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="flex items-center gap-1">
+                                                {renderStars(showQuickView.rating)}
                                             </div>
-
-                                            <div className="flex items-center gap-4 mb-6">
-                                                <div className="flex items-center gap-1">
-                                                    {renderStars(showQuickView.rating)}
-                                                </div>
-                                                <span className="text-sm text-gray-500">({showQuickView.reviews} reviews)</span>
-                                            </div>
-
-                                            <p className="text-gray-600 mb-6">
-                                                Experience the natural goodness of our {showQuickView.name.toLowerCase()}. Made with pure herbal ingredients for best results.
-                                            </p>
-
-                                            <div className="space-y-3 mb-6">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Check className="w-4 h-4 text-[#0A7A2F]" />
-                                                    100% Natural Ingredients
-                                                </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Check className="w-4 h-4 text-[#0A7A2F]" />
-                                                    Dermatologically Tested
-                                                </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Check className="w-4 h-4 text-[#0A7A2F]" />
-                                                    No Harmful Chemicals
-                                                </div>
-                                            </div>
-
-                                            <button
-                                                onClick={() => {
-                                                    addToCart(showQuickView);
-                                                    setShowQuickView(null);
-                                                }}
-                                                className="w-full bg-[#F7931E] text-white py-3 rounded-xl hover:bg-[#e07d0b] transition-colors flex items-center justify-center gap-2 font-semibold"
-                                            >
-                                                <ShoppingCart className="w-5 h-5" />
-                                                Add to Cart
-                                            </button>
+                                            <span className="text-sm text-gray-500">({showQuickView.reviews} reviews)</span>
                                         </div>
+
+                                        <p className="text-gray-600 mb-6">
+                                            Experience the natural goodness of our {showQuickView.name.toLowerCase()}. Made with pure herbal ingredients for best results.
+                                        </p>
+
+                                        <div className="space-y-3 mb-6">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Check className="w-4 h-4 text-[#0A7A2F]" />
+                                                100% Natural Ingredients
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Check className="w-4 h-4 text-[#0A7A2F]" />
+                                                Dermatologically Tested
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Check className="w-4 h-4 text-[#0A7A2F]" />
+                                                No Harmful Chemicals
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => {
+                                                addToCart(showQuickView);
+                                                setShowQuickView(null);
+                                            }}
+                                            className="w-full bg-[#F7931E] text-white py-3 rounded-xl hover:bg-[#e07d0b] transition-colors flex items-center justify-center gap-2 font-semibold"
+                                        >
+                                            <ShoppingCart className="w-5 h-5" />
+                                            Add to Cart
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    )
-                }
+                    </div>
+                )
+            }
 
-                {/* Cart Notification */}
-                {
-                    showCartNotification && (
-                        <div className="fixed bottom-4 right-4 z-50 animate-fadeInUp">
-                            <div className="bg-[#0A7A2F] text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3">
-                                <Check className="w-5 h-5" />
-                                <span>{addedToCartProduct} added to cart!</span>
-                            </div>
+            {/* Cart Notification */}
+            {
+                showCartNotification && (
+                    <div className="fixed bottom-4 right-4 z-50 animate-fadeInUp">
+                        <div className="bg-[#0A7A2F] text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3">
+                            <Check className="w-5 h-5" />
+                            <span>{addedToCartProduct} added to cart!</span>
                         </div>
-                    )
-                }
-            </section >
+                    </div>
+                )
+            }
 
             {/* Business Opportunity Section */}
-            < section className="py-12 md:py-16 bg-gradient-to-r from-[#0A7A2F] to-[#2F7A32] text-white" >
+            <section className="py-12 md:py-16 bg-gradient-to-r from-[#0A7A2F] to-[#2F7A32] text-white" >
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-6 items-center">
                         <div className="space-y-3">
@@ -970,7 +977,7 @@ const HomePage = () => {
                                 A Powerful Business Opportunity
                             </h2>
                             <p className="text-gray-200 text-xs md:text-sm leading-relaxed">
-                                Sanyukt Parivaar & Rich Life Company offers a proven MLM business plan that allows individuals to earn through product sales, team building, and leadership development.
+                                Sanyukt Parivaar & Rich Life Company offers a proven MLM business plan that allows individuals to earn through product sales, team building, and leadership development. Whether you are a student, professional, homemaker, or entrepreneur — this opportunity is open to all.
                             </p>
                             <div className="space-y-1">
                                 {businessHighlights.map((highlight, index) => (
@@ -996,10 +1003,10 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* Mid CTA Strip */}
-            < section className="py-8 bg-[#F7931E]" >
+            <section className="py-8 bg-[#F7931E]" >
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-3">
                         <h3 className="text-base md:text-lg font-bold text-white text-center md:text-left">
@@ -1013,10 +1020,10 @@ const HomePage = () => {
                         </button>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* Training & Support Section */}
-            < section className="py-12 md:py-16 bg-white" >
+            <section className="py-12 md:py-16 bg-white" >
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-6 items-center">
                         <div className="space-y-3 order-2 md:order-1">
@@ -1025,9 +1032,10 @@ const HomePage = () => {
                                 <span className="absolute bottom-0 left-0 w-10 h-1 bg-[#F7931E]"></span>
                             </h2>
                             <p className="text-gray-700 text-xs md:text-sm leading-relaxed">
-                                We believe success comes with knowledge and guidance. That's why we provide structured training programs and continuous mentorship.
+                                We believe success comes with knowledge and guidance. That’s why we provide structured training programs, online resources, offline seminars, and continuous mentorship to help every partner grow confidently.
                             </p>
-                            <div className="grid grid-cols-2 gap-2">
+                            <h3 className="text-sm font-bold text-[#0A7A2F] mt-4 mb-2">Support Includes</h3>
+                            <div className="grid grid-cols-1 gap-2">
                                 {supportItems.map((item, index) => (
                                     <div key={index} className="flex items-center space-x-1">
                                         <div className="w-1 h-1 bg-[#F7931E] rounded-full"></div>
@@ -1056,46 +1064,61 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* Latest News & Updates */}
-            < section className="py-12 md:py-16 bg-[#F8FAF5]" >
+            <section className="py-16 md:py-24 bg-[#F8FAF5]" >
                 <div className="container mx-auto px-4">
-                    <h2 className="text-xl md:text-2xl font-bold text-center text-[#0A7A2F] mb-2">
+                    <h2 className="text-2xl md:text-3xl font-bold text-center text-[#0A7A2F] mb-3">
                         Latest News & Updates
                     </h2>
-                    <p className="text-center text-gray-600 mb-6 max-w-2xl mx-auto text-xs">
-                        Stay updated with the latest company announcements and success stories.
+                    <p className="text-center text-gray-500 mb-12 max-w-2xl mx-auto text-sm">
+                        Stay updated with the latest company announcements, seminar schedules, product launches, and success stories from our growing Sanyukt Parivaar family.
                     </p>
-                    <div className="grid md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                         {newsItems.map((news, index) => (
-                            <div key={index} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-all duration-300">
-                                <div className="p-3">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className="text-xs font-semibold px-1.5 py-0.5 bg-[#F7931E] text-white rounded-full">
+                            <div key={index} className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden cursor-pointer" onClick={() => handleNavigation(`/news/${news.slug}`)}>
+                                {/* Cover Image */}
+                                <div className="relative h-52 overflow-hidden">
+                                    <img
+                                        src={news.image}
+                                        alt={news.title}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                    />
+                                </div>
+                                {/* Card Body */}
+                                <div className="p-6">
+                                    {/* Category + Read Time */}
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <span className="text-[10px] font-extrabold tracking-widest text-[#F7931E] uppercase">
                                             {news.category}
                                         </span>
-                                        <span className="text-xs text-gray-500 flex items-center">
-                                            <Calendar className="w-3 h-3 mr-1" />
-                                            {news.date}
-                                        </span>
+                                        <span className="text-gray-300 text-xs">•</span>
+                                        <span className="text-xs text-gray-400">{news.readTime}</span>
                                     </div>
-                                    <h4 className="font-semibold text-gray-800 mb-2 text-xs">{news.title}</h4>
-                                    <button
-                                        onClick={() => handleNavigation(`/news/${news.slug}`)}
-                                        className="text-[#0A7A2F] text-xs font-medium hover:text-[#F7931E] transition-colors inline-flex items-center"
-                                    >
-                                        Read More <ArrowRight className="w-3 h-3 ml-1" />
-                                    </button>
+                                    {/* Title */}
+                                    <h4 className="font-bold text-gray-900 text-lg mb-5 leading-snug group-hover:text-[#0A7A2F] transition-colors duration-300 line-clamp-2">
+                                        {news.title}
+                                    </h4>
+                                    {/* Author Row */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-9 h-9 rounded-full bg-[#0A7A2F] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                            {news.authorAvatar}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-[#F7931E] leading-none">{news.author}</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{news.timeAgo}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* CONTACT SECTION */}
-            < section className="py-16 bg-white" >
+            <section className="py-16 bg-white" >
                 <div className="container mx-auto px-4">
                     {/* Header */}
                     <div className="text-center mb-12">
@@ -1126,7 +1149,7 @@ const HomePage = () => {
                                 {
                                     icon: MapPin,
                                     title: 'Visit Us',
-                                    lines: ['123, Green Park Colony, Sector 5,', 'New Delhi – 110001, India'],
+                                    lines: ['Sanyukt Parivaar & Rich Life Company,  Near Main Business Hub, India'],
                                     sub: 'Head Office',
                                     color: 'bg-blue-50 text-blue-600',
                                 },
@@ -1180,28 +1203,28 @@ const HomePage = () => {
                             <h3 className="text-xl font-extrabold text-gray-900 mb-1">Send a Message</h3>
                             <p className="text-gray-400 text-sm mb-6">Fill in your details and we'll get back to you.</p>
 
-                            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-                                <div className="grid grid-cols-2 gap-3">
+                            <form className="space-y-4" onSubmit={handleContactSubmit}>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <label className="text-xs font-semibold text-gray-600 mb-1 block">First Name</label>
-                                        <input type="text" placeholder="Ravi" className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
+                                        <input type="text" placeholder="Ravi" value={contactForm.firstName} onChange={e => setContactForm(p => ({ ...p, firstName: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
                                     </div>
                                     <div>
                                         <label className="text-xs font-semibold text-gray-600 mb-1 block">Last Name</label>
-                                        <input type="text" placeholder="Sharma" className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
+                                        <input type="text" placeholder="Sharma" value={contactForm.lastName} onChange={e => setContactForm(p => ({ ...p, lastName: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="text-xs font-semibold text-gray-600 mb-1 block">Email Address</label>
-                                    <input type="email" placeholder="ravi@example.com" className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
+                                    <input type="email" placeholder="ravi@example.com" value={contactForm.email} onChange={e => setContactForm(p => ({ ...p, email: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
                                 </div>
                                 <div>
                                     <label className="text-xs font-semibold text-gray-600 mb-1 block">Phone Number</label>
-                                    <input type="tel" placeholder="+91 98765 43210" className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
+                                    <input type="tel" placeholder="+91 98765 43210" value={contactForm.phone} onChange={e => setContactForm(p => ({ ...p, phone: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition" />
                                 </div>
                                 <div>
                                     <label className="text-xs font-semibold text-gray-600 mb-1 block">Enquiry Type</label>
-                                    <select className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition text-gray-700">
+                                    <select value={contactForm.enquiryType} onChange={e => setContactForm(p => ({ ...p, enquiryType: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition text-gray-700">
                                         <option>Product Enquiry</option>
                                         <option>Business Opportunity</option>
                                         <option>Recharge Support</option>
@@ -1211,25 +1234,34 @@ const HomePage = () => {
                                 </div>
                                 <div>
                                     <label className="text-xs font-semibold text-gray-600 mb-1 block">Message</label>
-                                    <textarea rows={4} placeholder="Write your message here..." className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition resize-none" />
+                                    <textarea rows={4} placeholder="Write your message here..." value={contactForm.message} onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))} className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-[#0A7A2F] outline-none transition resize-none" />
                                 </div>
+                                {contactSuccess && (
+                                    <div className="flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
+                                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Check className="w-4 h-4 text-white" />
+                                        </div>
+                                        <span>Your message has been sent successfully! We will get back to you soon.</span>
+                                    </div>
+                                )}
                                 <motion.button
                                     type="submit"
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="w-full bg-[#0A7A2F] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#086326] transition-all"
+                                    disabled={contactSubmitting}
+                                    whileHover={{ scale: contactSubmitting ? 1 : 1.02 }}
+                                    whileTap={{ scale: contactSubmitting ? 1 : 0.98 }}
+                                    className="w-full bg-[#0A7A2F] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#086326] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                     <Mail className="w-4 h-4" />
-                                    Send Message
+                                    {contactSubmitting ? 'Sending...' : 'Send Message'}
                                 </motion.button>
                             </form>
                         </div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* Final Trust Section */}
-            < section className="py-12 md:py-16 bg-[#E8F5E9]" >
+            <section className="py-12 md:py-16 bg-[#E8F5E9]" >
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-xl md:text-2xl font-bold mb-2 text-[#0A7A2F]">
                         Together We Grow, Together We Prosper
@@ -1244,9 +1276,9 @@ const HomePage = () => {
                         Join Sanyukt Parivaar Today
                     </button>
                 </div>
-            </section >
+            </section>
 
-        </div >
+        </div>
     );
 };
 

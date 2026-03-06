@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, CheckCircle, Users, Target, Eye, TrendingUp, Shield, Star, Heart, Award, MapPin, Phone, Mail, Globe, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const AboutUsPage = () => {
+    const navigate = useNavigate();
     // Sample image URLs (replace with actual images)
     const seminarImage = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
     const teamImage = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
@@ -77,19 +79,19 @@ const AboutUsPage = () => {
             </header>
 
             {/* Intro Heading Section - Main Heading (H2) and Sub-line */}
-            <section className="py-16 px-4 max-w-7xl mx-auto text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-[#222222] mb-4 animate-slide-up">
+            <section className="py-8 md:py-16 px-4 max-w-7xl mx-auto text-center">
+                <h2 className="text-2xl md:text-4xl font-bold text-[#0A7A2F] mb-4 animate-slide-up">
                     Welcome to Sanyukt Parivaar & Rich Life Company
                 </h2>
-                <p className="text-lg text-[#2F7A32] font-medium mb-6">
+                <p className="text-lg text-[#222222] font-medium mb-6">
                     A People-Centric Multi-Level Marketing Organization
                 </p>
                 <div className="w-[60px] h-[3px] bg-[#0A7A2F] mx-auto"></div>
             </section>
 
             {/* ABOUT US - CONTENT + IMAGE (2 COLUMN LAYOUT) */}
-            <section className="py-12 px-4 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <section className="py-8 md:py-12 px-4 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-start">
                     {/* Left Content */}
                     <div className="space-y-6 animate-slide-right">
                         <article className="prose max-w-none">
@@ -132,8 +134,8 @@ const AboutUsPage = () => {
             </section>
 
             {/* MISSION & VISION SECTION (CARD STYLE) WITH IMAGES */}
-            <section className="py-16 px-4 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section className="py-8 md:py-16 px-4 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                     {/* Mission Card with Image */}
                     <article
                         className="bg-white rounded-[14px] shadow-[0_8px_24px_rgba(0,0,0,0.08)] 
@@ -196,14 +198,14 @@ const AboutUsPage = () => {
                         </div>
                     </article>
                 </div>
-            </section>
+            </section >
 
             {/* CORE VALUES SECTION WITH IMAGES */}
-            <section className="py-16 px-4 max-w-7xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold text-center text-[#222222] mb-12 animate-slide-up">
+            < section className="py-8 md:py-16 px-4 max-w-7xl mx-auto" >
+                <h2 className="text-2xl md:text-4xl font-bold text-center text-[#0A7A2F] mb-6 md:mb-12 animate-slide-up">
                     Our Core Values
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
                     {coreValues.map((value, index) => (
                         <div
                             key={index}
@@ -240,15 +242,15 @@ const AboutUsPage = () => {
                         </div>
                     ))}
                 </div>
-            </section>
+            </section >
 
             {/* Why Sanyukt Parivaar Section WITH IMAGES */}
-            <section className="py-16 px-4 bg-white">
+            < section className="py-8 md:py-16 px-4 bg-white" >
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center">
                         {/* Left Content with Images */}
                         <div className="space-y-6 animate-slide-right">
-                            <h2 className="text-3xl md:text-4xl font-bold text-[#222222] mb-6">
+                            <h2 className="text-3xl md:text-4xl font-bold text-[#0A7A2F] mb-6">
                                 Why Sanyukt Parivaar & Rich Life Company?
                             </h2>
                             <p className="text-[#222222] leading-relaxed max-w-[720px]">
@@ -300,23 +302,23 @@ const AboutUsPage = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-[#F8FAF5] p-6 rounded-lg text-center hover:shadow-lg transition-shadow">
                                     <Users className="w-10 h-10 text-[#0A7A2F] mx-auto mb-3" />
-                                    <h4 className="font-bold text-[#222222] text-2xl">10k+</h4>
-                                    <p className="text-sm text-gray-600">Happy Partners</p>
+                                    <h4 className="font-bold text-[#222222] text-xl mb-1">Financial Freedom</h4>
+                                    <p className="text-sm text-gray-600">Empowering 20,000+ partners nationwide.</p>
                                 </div>
                                 <div className="bg-[#F8FAF5] p-6 rounded-lg text-center hover:shadow-lg transition-shadow">
                                     <Star className="w-10 h-10 text-[#F7931E] mx-auto mb-3" />
-                                    <h4 className="font-bold text-[#222222] text-2xl">50+</h4>
-                                    <p className="text-sm text-gray-600">Quality Products</p>
+                                    <h4 className="font-bold text-[#222222] text-xl mb-1">Premium Wellness</h4>
+                                    <p className="text-sm text-gray-600">100+ Natural & Ayurvedic products.</p>
                                 </div>
                                 <div className="bg-[#F8FAF5] p-6 rounded-lg text-center hover:shadow-lg transition-shadow">
                                     <TrendingUp className="w-10 h-10 text-[#0A7A2F] mx-auto mb-3" />
-                                    <h4 className="font-bold text-[#222222] text-2xl">200%</h4>
-                                    <p className="text-sm text-gray-600">Growth Rate</p>
+                                    <h4 className="font-bold text-[#222222] text-xl mb-1">Success Legacy</h4>
+                                    <p className="text-sm text-gray-600">500+ successful seminars across India.</p>
                                 </div>
                                 <div className="bg-[#F8FAF5] p-6 rounded-lg text-center hover:shadow-lg transition-shadow">
                                     <Shield className="w-10 h-10 text-[#F7931E] mx-auto mb-3" />
-                                    <h4 className="font-bold text-[#222222] text-2xl">100%</h4>
-                                    <p className="text-sm text-gray-600">Transparency</p>
+                                    <h4 className="font-bold text-[#222222] text-xl mb-1">Ethical Vision</h4>
+                                    <p className="text-sm text-gray-600">100% Transparent & Legal business model.</p>
                                 </div>
                             </div>
 
@@ -338,20 +340,23 @@ const AboutUsPage = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Final CTA Section - Light Green */}
-            <section className="py-20 px-4 bg-gradient-to-r from-[#A8D5BA] to-[#C8E6C9]">
+            < section className="py-10 md:py-20 px-4 bg-gradient-to-r from-[#A8D5BA] to-[#C8E6C9]" >
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold text-[#0A7A2F] mb-8 animate-pulse">
+                    <h2 className="text-3xl md:text-4xl font-bold text-[#0A7A2F] mb-8">
                         Join a Growing Community That Believes in Shared Success
                     </h2>
-                    <button className="bg-[#F9A826] hover:bg-[#F8B84A] text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl animate-bounce-subtle">
+                    <button
+                        onClick={() => navigate('/register')}
+                        className="bg-[#F9A826] hover:bg-[#F8B84A] text-white font-bold py-4 px-10 rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl animate-bounce-subtle"
+                    >
                         Join Sanyukt Parivaar Today
                     </button>
                 </div>
-            </section>
-        </div>
+            </section >
+        </div >
     );
 };
 
