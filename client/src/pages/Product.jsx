@@ -424,16 +424,18 @@ const ProductsPage = () => {
                         <DialogContent sx={{ p: 0, overflowY: 'auto', maxHeight: '90vh' }}>
                             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: { md: '500px' } }}>
 
-                                {/* Left Column: Media & Visuals */}
+                                {/* Left Column: Media & Visuals (Sticky on Desktop) */}
                                 <Box sx={{
-                                    flex: 0.8, // Reduced flex to give right side more room
+                                    flex: 0.8,
                                     bgcolor: '#ffffff',
-                                    p: { xs: 2, md: 4 }, // Significantly reduced padding
+                                    p: { xs: 2, md: 4 },
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    position: 'relative',
+                                    position: { md: 'sticky' },
+                                    top: 0,
+                                    height: { md: 'fit-content' },
                                     borderRight: { md: '1px solid #f3f4f6' }
                                 }}>
                                     <Box sx={{
@@ -464,30 +466,29 @@ const ProductsPage = () => {
                                     </Box>
 
                                     {/* Quick Trust Indicators */}
-                                    <Box sx={{ mt: 6, display: 'flex', gap: 4, opacity: 0.7 }}>
+                                    <Box sx={{ mt: 2, display: 'flex', gap: 4, opacity: 0.7 }}>
                                         <Box sx={{ textAlign: 'center' }}>
-                                            <ShieldCheck className="w-6 h-6 mx-auto mb-1 text-green-600" />
-                                            <Typography variant="caption" fontWeight="700">100% Secure</Typography>
+                                            <ShieldCheck className="w-5 h-5 mx-auto mb-1 text-green-600" />
+                                            <Typography variant="caption" fontWeight="700" sx={{ fontSize: '10px' }}>100% Secure</Typography>
                                         </Box>
                                         <Box sx={{ textAlign: 'center' }}>
-                                            <Truck className="w-6 h-6 mx-auto mb-1 text-blue-600" />
-                                            <Typography variant="caption" fontWeight="700">Fast Delivery</Typography>
+                                            <Truck className="w-5 h-5 mx-auto mb-1 text-blue-600" />
+                                            <Typography variant="caption" fontWeight="700" sx={{ fontSize: '10px' }}>Fast Delivery</Typography>
                                         </Box>
                                         <Box sx={{ textAlign: 'center' }}>
-                                            <RotateCcw className="w-6 h-6 mx-auto mb-1 text-orange-600" />
-                                            <Typography variant="caption" fontWeight="700">Easy Returns</Typography>
+                                            <RotateCcw className="w-5 h-5 mx-auto mb-1 text-orange-600" />
+                                            <Typography variant="caption" fontWeight="700" sx={{ fontSize: '10px' }}>Easy Returns</Typography>
                                         </Box>
                                     </Box>
                                 </Box>
 
-                                {/* Right Column: Details & Actions */}
+                                {/* Right Column: Details & Actions (Scrollable) */}
                                 <Box sx={{
                                     flex: 1.2,
                                     p: { xs: 4, md: 6 },
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    height: { md: '100%' },
-                                    overflowY: { md: 'visible' } // Let DialogContent handle the main scroll
+                                    overflowY: 'auto'
                                 }}>
                                     <Box sx={{ mb: 4 }}>
                                         <Chip
