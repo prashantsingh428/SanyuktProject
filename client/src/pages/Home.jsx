@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import api from '../api';
+import { useCart } from '../context/CartContext';
 import {
     Menu, X, ChevronRight, ChevronDown, Star,
     TrendingUp, Users, Award, Shield, Sun,
@@ -36,7 +37,7 @@ const HomePage = () => {
     const [viewMode, setViewMode] = useState('grid');
     const [wishlist, setWishlist] = useState([]);
     const [showQuickView, setShowQuickView] = useState(null);
-    const [cartItems, setCartItems] = useState([]);
+    const { addToCart: contextAddToCart } = useCart();
     const [showCartNotification, setShowCartNotification] = useState(false);
     const [addedToCartProduct, setAddedToCartProduct] = useState('');
 
@@ -498,7 +499,7 @@ const HomePage = () => {
     };
 
     const addToCart = (product) => {
-        setCartItems(prev => [...prev, product]);
+        contextAddToCart(product);
         setAddedToCartProduct(product.name);
         setShowCartNotification(true);
         setTimeout(() => setShowCartNotification(false), 3000);

@@ -25,6 +25,7 @@ import TestimonialPolicy from '../footerPages/TestimonialPolicy.jsx'
 import OurBanker from '../footerPages/OurBanker.jsx'
 import VerifyOTP from '../pages/VerifyOTP.jsx'
 import Checkout from '../pages/Checkout.jsx'
+import Cart from '../pages/Cart.jsx'
 import Franchise from '../pages/Franchise.jsx'
 
 // ✅ Admin imports
@@ -58,6 +59,7 @@ const MainRoutes = () => {
             <Route path='/terms-conditions' element={<TermsConditions />} />
             <Route path='/cancellation-policy' element={<RefundCancellationPolicy />} />
             <Route path='/shipment-delivery-policy' element={<ShipmentDeliveryPolicy />} />
+            <Route path='/checkout' element={<Checkout />} />
             <Route path='/order-policy' element={<OrderPolicy />} />
             <Route path='/testimonial-policy' element={<TestimonialPolicy />} />
             <Route path='/banker' element={<OurBanker />} />
@@ -71,6 +73,7 @@ const MainRoutes = () => {
             <Route path='/my-account/transactions' element={<MyAccount />} />
             <Route path='/my-account/grievances' element={<MyAccount />} />
             <Route path='/my-account/kyc' element={<MyAccount />} />
+            <Route path='/my-account/cart' element={<MyAccount />} />
 
             {/* 🔥 Admin Routes (Nested) */}
             <Route path="/admin" element={

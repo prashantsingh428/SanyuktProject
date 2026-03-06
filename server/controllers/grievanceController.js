@@ -202,8 +202,10 @@ exports.getUserGrievances = async (req, res) => {
             subject: g.subject,
             status: g.status,
             submittedDate: g.createdAt,
+            updatedAt: g.updatedAt,
             category: g.category,
-            message: g.message
+            message: g.message,
+            mobile: g.mobile
         }));
 
         res.json({

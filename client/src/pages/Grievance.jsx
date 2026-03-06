@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import api from "../api"; // path check kar lena
+import { Snackbar, Alert, Fade } from '@mui/material';
 
 import { ChevronRight, Phone, Mail, User, MessageSquare, Send, AlertCircle, CheckCircle, ExternalLink, UserCircle, FileText, X, Ticket } from 'lucide-react';
 
@@ -26,6 +27,8 @@ const GrievancePage = () => {
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [statusResult, setStatusResult] = useState(null);
     const [statusError, setStatusError] = useState('');
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const location = useLocation();
 
     useEffect(() => {
         const user = localStorage.getItem('user');
@@ -43,6 +46,33 @@ const GrievancePage = () => {
             }
         }
     }, []);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const ticket = queryParams.get('ticket');
+        if (ticket) {
+            setStatusFormData(prev => ({ ...prev, ticketNumber: ticket }));
+            setShowStatusModal(true);
+
+            // Auto-trigger check if ticket is provided
+            const fetchStatus = async () => {
+                try {
+                    const res = await api.post("/grievance/track", { ticket });
+                    setStatusResult({
+                        ticketNumber: res.data.ticketNumber,
+                        status: res.data.status,
+                        submittedDate: new Date(res.data.submittedDate).toLocaleDateString(),
+                        lastUpdated: new Date(res.data.submittedDate).toLocaleDateString(),
+                        department: "Support Team",
+                        description: "Your grievance is being processed"
+                    });
+                } catch (err) {
+                    setStatusError("❌ Ticket not found");
+                }
+            };
+            fetchStatus();
+        }
+    }, [location.search]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -95,7 +125,11 @@ const GrievancePage = () => {
             });
 
             // 🎫 Ticket show
-            alert("🎫 Please note Generated Ticket Number: " + res.data.ticket);
+            setSnackbar({
+                open: true,
+                message: "🎫 Your grievance has been submitted! Ticket Number: " + res.data.ticket,
+                severity: 'success'
+            });
 
             setIsSubmitted(true);
 
@@ -568,6 +602,31 @@ const GrievancePage = () => {
                     </div>
                 </div>
             )}
+            {/* Global Notifications Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={8000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                TransitionComponent={Fade}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{
+                        width: '100%',
+                        borderRadius: '16px',
+                        fontWeight: 800,
+                        boxShadow: '0 8px 30px rgba(247,147,30,0.25)',
+                        bgcolor: '#f7931e',
+                        color: 'white',
+                        '& .MuiAlert-icon': { color: 'white' }
+                    }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

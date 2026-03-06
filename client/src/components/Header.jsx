@@ -330,6 +330,7 @@ const Header = () => {
         { name: 'Grievance', path: '/grievance' },
         { name: 'Products', path: '/products' },
         { name: 'Opportunities', path: '/opportunities' },
+        { name: 'My Cart', path: '/my-account/cart' },
     ];
 
     // Trailing non-auth menus
@@ -762,7 +763,7 @@ const Header = () => {
                                 </Menu>
                             </Box>
 
-                            {menuItems.slice(1).map((item) => (
+                            {menuItems.slice(1).filter(item => item.name !== 'My Cart').map((item) => (
                                 <NavButton
                                     key={item.name}
                                     className={isActive(item.path) ? 'active' : ''}

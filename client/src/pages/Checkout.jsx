@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, CreditCard, Truck, Shield, MapPin, Phone, Mail, User, Package, IndianRupee } from 'lucide-react';
 import api from '../api';
+import { Snackbar, Alert, Fade } from '@mui/material';
 
 const CheckoutPage = () => {
     const location = useLocation();
@@ -12,6 +13,7 @@ const CheckoutPage = () => {
     const [loading, setLoading] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     // Form states
     const [shippingInfo, setShippingInfo] = useState({
@@ -57,13 +59,13 @@ const CheckoutPage = () => {
         if (couponCode === 'WELCOME10') {
             setDiscount(subtotal * 0.1);
             setCouponApplied(true);
-            alert('Coupon applied successfully! 10% discount');
+            setSnackbar({ open: true, message: 'Coupon applied successfully! 10% discount', severity: 'success' });
         } else if (couponCode === 'SAVE20') {
             setDiscount(subtotal * 0.2);
             setCouponApplied(true);
-            alert('Coupon applied successfully! 20% discount');
+            setSnackbar({ open: true, message: 'Coupon applied successfully! 20% discount', severity: 'success' });
         } else {
-            alert('Invalid coupon code');
+            setSnackbar({ open: true, message: 'Invalid coupon code', severity: 'error' });
         }
     };
 
@@ -71,7 +73,7 @@ const CheckoutPage = () => {
         // Validate form
         if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.phone ||
             !shippingInfo.address || !shippingInfo.city || !shippingInfo.state || !shippingInfo.pincode) {
-            alert('Please fill all shipping details');
+            setSnackbar({ open: true, message: 'Please fill all shipping details', severity: 'warning' });
             return;
         }
 
@@ -100,7 +102,7 @@ const CheckoutPage = () => {
             setCurrentStep(3);
         } catch (error) {
             console.error('Error placing order:', error);
-            alert('Error placing order. Please try again.');
+            setSnackbar({ open: true, message: 'Error placing order. Please try again.', severity: 'error' });
         } finally {
             setLoading(false);
         }
@@ -371,7 +373,7 @@ const CheckoutPage = () => {
                                 <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
                                     {product.image ? (
                                         <img
-                                            src={`http://localhost:5000/uploads/${product.image}`}
+                                            src={`http://localhost:5001/uploads/${product.image}`}
                                             alt={product.name}
                                             className="w-full h-full object-cover"
                                         />
@@ -481,6 +483,31 @@ const CheckoutPage = () => {
                     </div>
                 </div>
             </div>
+            {/* Global Notifications Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                TransitionComponent={Fade}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{
+                        width: '100%',
+                        borderRadius: '16px',
+                        fontWeight: 800,
+                        boxShadow: '0 8px 30px rgba(247,147,30,0.25)',
+                        bgcolor: '#f7931e',
+                        color: 'white',
+                        '& .MuiAlert-icon': { color: 'white' }
+                    }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

@@ -1,17 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Star, ChevronUp } from 'lucide-react'; // Heart हटाया
+import { Search, ShoppingCart, Star, ChevronUp, Trash2 } from 'lucide-react';
 import api from '../api';
+import { useCart } from '../context/CartContext';
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Typography,
+    Box,
+    Button,
+    Snackbar,
+    Alert,
+    Divider,
+    Chip,
+    Fade,
+    useMediaQuery,
+    useTheme
+} from '@mui/material';
+import { X as CloseIcon } from 'lucide-react';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
 
+    const { cartItems, addToCart, isInCart, removeFromCart } = useCart();
     const [expandedProduct, setExpandedProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [cartItems, setCartItems] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [imageErrors, setImageErrors] = useState({});
+
+    // Notifications State
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    // Modal State
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
     // बेस URL
     const BASE_URL = 'http://localhost:5001';
@@ -40,20 +68,55 @@ const ProductsPage = () => {
         product.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Helper: check if user is logged in
+    const isLoggedIn = () => {
+        try {
+            const user = localStorage.getItem('user');
+            return user && JSON.parse(user);
+        } catch {
+            return false;
+        }
+    };
+
     // Buy Now function
     const buyNow = (product) => {
+        if (!isLoggedIn()) {
+            setSnackbar({ open: true, message: 'Please login first to buy products!', severity: 'error' });
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         if (product.stock > 0) {
             navigate('/checkout', {
                 state: { product }
             });
         } else {
-            alert(`${product.name} is out of stock!`);
+            setSnackbar({ open: true, message: `${product.name} is out of stock!`, severity: 'error' });
         }
     };
 
     // Toggle product details
-    const toggleDetails = (productId) => {
-        setExpandedProduct(expandedProduct === productId ? null : productId);
+    const openProductModal = (product) => {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const handleAddToCart = (product) => {
+        if (!isLoggedIn()) {
+            setSnackbar({ open: true, message: 'Please login first to add items to cart!', severity: 'error' });
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
+        if (isInCart(product._id)) {
+            setSnackbar({ open: true, message: `${product.name} is already in your cart!`, severity: 'warning' });
+            return;
+        }
+        addToCart(product);
+        setSnackbar({ open: true, message: `${product.name} added to cart!`, severity: 'success' });
+    };
+
+    const handleRemoveFromCart = (productId, productName) => {
+        removeFromCart(productId);
+        setSnackbar({ open: true, message: `${productName} removed from cart!`, severity: 'info' });
     };
 
     // Calculate discount percentage
@@ -104,46 +167,49 @@ const ProductsPage = () => {
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Header with Cart */}
-            <div className="bg-white shadow-sm sticky top-0 z-10">
-                <div className="max-w-7xl mx-auto px-4 py-3">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-gray-800">Our Products</h1>
+            {/* Premium Header Container */}
+            <div className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20">
+                <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            {/* Search Bar */}
-                            <div className="hidden md:block relative">
+                            <div className="hidden sm:flex w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl items-center justify-center shadow-lg shadow-green-100 ring-4 ring-green-50">
+                                <ShoppingCart className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-black text-[#111827] tracking-tight">
+                                    Our <span className="text-green-600">Products</span>
+                                </h1>
+                                <p className="text-[11px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.2em] mt-1">
+                                    Trusted Quality • Best Value
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            {/* Modern Search Bar */}
+                            <div className="relative flex-1 md:w-72 group">
                                 <input
                                     type="text"
-                                    placeholder="Search products..."
+                                    placeholder="Search for items..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-64 pl-8 pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-green-600"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-gray-400"
                                 />
-                                <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
+                                <Search className="absolute left-3.5 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-600 transition-colors" />
                             </div>
 
-                            {/* Cart Icon */}
-                            <button className="relative p-2">
-                                <ShoppingCart className="w-6 h-6 text-gray-600" />
+                            {/* Premium Cart Button */}
+                            <button
+                                className="relative p-2.5 bg-gray-50 hover:bg-green-50 rounded-xl border border-gray-200 hover:border-green-200 transition-all duration-300 group"
+                                onClick={() => navigate('/my-account/cart')}
+                            >
+                                <ShoppingCart className="w-6 h-6 text-gray-600 group-hover:text-green-600 transition-colors" />
                                 {cartItems.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                                        {cartItems.length}
+                                    <span className="absolute -top-1.5 -right-1.5 bg-[#f7931e] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black shadow-lg shadow-orange-200 border-2 border-white ring-2 ring-orange-100">
+                                        {cartItems.reduce((acc, item) => acc + (item.cartQuantity || 1), 0)}
                                     </span>
                                 )}
                             </button>
-                        </div>
-                    </div>
-
-                    {/* Mobile Search */}
-                    <div className="md:hidden mt-3">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-green-600"
-                            />
-                            <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
                         </div>
                     </div>
                 </div>
@@ -194,7 +260,7 @@ const ProductsPage = () => {
 
                                         {/* Offer Badge */}
                                         {discount && (
-                                            <div className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
                                                 {discount}% OFF
                                             </div>
                                         )}
@@ -218,25 +284,25 @@ const ProductsPage = () => {
                                                     {renderRatingStars(product.rating)}
                                                 </div>
                                                 {product.numReviews > 0 && (
-                                                    <span className="text-xs text-gray-500">
-                                                        ({product.numReviews})
+                                                    <span className="text-xs text-gray-600 font-medium">
+                                                        ({product.numReviews} Reviews)
                                                     </span>
                                                 )}
                                             </div>
                                         )}
 
                                         {/* Product Name */}
-                                        <h3 className="font-medium text-gray-800 text-sm mb-2 line-clamp-2 h-10 hover:text-green-600 transition-colors">
+                                        <h3 className="font-bold text-[#111827] text-sm mb-2 line-clamp-2 h-10 hover:text-green-600 transition-all duration-300 leading-snug">
                                             {product.name}
                                         </h3>
 
                                         {/* Price */}
-                                        <div className="mb-2">
-                                            <span className="text-lg font-bold text-green-600">
+                                        <div className="mb-2 flex items-baseline gap-2">
+                                            <span className="text-xl font-black text-green-700">
                                                 ₹{formatCurrency(product.price)}
                                             </span>
                                             {product.oldPrice && (
-                                                <span className="text-xs text-gray-400 line-through ml-2">
+                                                <span className="text-sm text-gray-400 line-through">
                                                     ₹{formatCurrency(product.oldPrice)}
                                                 </span>
                                             )}
@@ -244,8 +310,8 @@ const ProductsPage = () => {
 
                                         {/* BV */}
                                         {product.bv && (
-                                            <div className="text-xs text-gray-500 mb-3">
-                                                BV: <span className="font-medium text-orange-500">{product.bv}</span>
+                                            <div className="text-xs text-gray-600 mb-3 bg-orange-50 w-fit px-2 py-0.5 rounded-md border border-orange-100">
+                                                BV: <span className="font-bold text-[#f7931e]">{product.bv}</span>
                                             </div>
                                         )}
 
@@ -271,20 +337,40 @@ const ProductsPage = () => {
 
                                         {/* Action Buttons */}
                                         <div className="space-y-2">
-                                            <button
-                                                onClick={() => buyNow(product)}
-                                                disabled={product.stock === 0}
-                                                className={`w-full py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${product.stock > 0
-                                                    ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 hover:shadow-lg'
-                                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                                    }`}
-                                            >
-                                                <ShoppingCart className="w-4 h-4" />
-                                                {product.stock > 0 ? 'Buy Now' : 'Out of Stock'}
-                                            </button>
+                                            <div className="flex gap-2">
+                                                {isInCart(product._id) ? (
+                                                    <button
+                                                        onClick={() => handleRemoveFromCart(product._id, product.name)}
+                                                        className="flex-1 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 border-2 border-[#f7931e] text-[#f7931e] hover:bg-orange-50"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" /> Remove
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleAddToCart(product)}
+                                                        disabled={product.stock === 0}
+                                                        className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1 border-2 ${product.stock === 0
+                                                            ? 'border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50'
+                                                            : 'border-green-600 text-green-600 hover:bg-green-50'
+                                                            }`}
+                                                    >
+                                                        <ShoppingCart className="w-4 h-4" /> Add to Cart
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => buyNow(product)}
+                                                    disabled={product.stock === 0}
+                                                    className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center ${product.stock > 0
+                                                        ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800'
+                                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                        }`}
+                                                >
+                                                    Buy Now
+                                                </button>
+                                            </div>
 
                                             <button
-                                                onClick={() => toggleDetails(product._id)}
+                                                onClick={() => openProductModal(product)}
                                                 className="w-full border border-green-600 text-green-600 py-2 rounded-lg text-sm font-medium hover:bg-green-600 hover:text-white transition-all hover:shadow-md"
                                             >
                                                 View Details
@@ -292,43 +378,201 @@ const ProductsPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Expanded Details */}
-                                    {expandedProduct === product._id && (
-                                        <div className="border-t border-gray-200 p-4 bg-gradient-to-b from-gray-50 to-white rounded-b-lg">
-                                            <p className="text-sm text-gray-600 mb-3 leading-relaxed">
-                                                {product.description}
-                                            </p>
-
-                                            {/* Additional Info */}
-                                            <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
-                                                {product.bv && (
-                                                    <div className="bg-purple-50 p-2 rounded-lg">
-                                                        <span className="text-purple-600 font-medium">BV: </span>
-                                                        <span className="text-gray-700">{product.bv}</span>
-                                                    </div>
-                                                )}
-                                                {product.stock > 0 && (
-                                                    <div className="bg-green-50 p-2 rounded-lg">
-                                                        <span className="text-green-600 font-medium">Stock: </span>
-                                                        <span className="text-gray-700">{product.stock} units</span>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <button
-                                                onClick={() => toggleDetails(product._id)}
-                                                className="text-green-600 text-sm font-medium flex items-center gap-1 hover:underline"
-                                            >
-                                                Show less <ChevronUp className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })}
                     </div>
                 )}
             </div>
+
+            {/* Professional Product Details Modal */}
+            <Dialog
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                fullScreen={fullScreen}
+                maxWidth="md"
+                fullWidth
+                TransitionComponent={Fade}
+                PaperProps={{
+                    sx: { borderRadius: fullScreen ? 0 : '16px', overflow: 'hidden' }
+                }}
+            >
+                {selectedProduct && (
+                    <>
+                        <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f8f9fa' }}>
+                            <Typography variant="h6" fontWeight="700" color="#333">Product Details</Typography>
+                            <IconButton onClick={() => setIsModalOpen(false)} sx={{ color: '#666' }}>
+                                <CloseIcon size={20} />
+                            </IconButton>
+                        </DialogTitle>
+                        <DialogContent dividers sx={{ p: { xs: 2, md: 4 } }}>
+                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+                                {/* Image Section */}
+                                <Box sx={{ flex: 1, position: 'relative' }}>
+                                    <Box sx={{
+                                        width: '100%',
+                                        height: { xs: '250px', md: '350px' },
+                                        borderRadius: '12px',
+                                        overflow: 'hidden',
+                                        bgcolor: '#f5f5f5',
+                                        border: '1px solid #eee'
+                                    }}>
+                                        <img
+                                            src={getImageUrl(selectedProduct.image)}
+                                            alt={selectedProduct.name}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                        />
+                                    </Box>
+                                    {calculateDiscount(selectedProduct.price, selectedProduct.oldPrice) && (
+                                        <Chip
+                                            label={`${calculateDiscount(selectedProduct.price, selectedProduct.oldPrice)}% OFF`}
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 12,
+                                                left: 12,
+                                                background: 'linear-gradient(90deg, #F7931E, #FFC107)',
+                                                color: 'white',
+                                                fontWeight: 'bold',
+                                                boxShadow: '0 2px 8px rgba(247,147,30,0.3)',
+                                                border: 'none'
+                                            }}
+                                        />
+                                    )}
+                                </Box>
+
+                                {/* details Section */}
+                                <Box sx={{ flex: 1.2, display: 'flex', flexDirection: 'column' }}>
+                                    <Typography variant="h5" fontWeight="800" gutterBottom color="#1a1a1a">
+                                        {selectedProduct.name}
+                                    </Typography>
+
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                        <Typography variant="h4" color="#0A7A2F" fontWeight="800">
+                                            ₹{formatCurrency(selectedProduct.price)}
+                                        </Typography>
+                                        {selectedProduct.oldPrice && (
+                                            <Typography sx={{ textDecoration: 'line-through', color: '#999', fontSize: '1.1rem' }}>
+                                                ₹{formatCurrency(selectedProduct.oldPrice)}
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+                                    <Divider sx={{ mb: 3 }} />
+
+                                    <Typography variant="body1" color="#555" sx={{ mb: 3, lineHeight: 1.8 }}>
+                                        {selectedProduct.description || "No description available for this product."}
+                                    </Typography>
+
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 4 }}>
+                                        {selectedProduct.bv && (
+                                            <Box sx={{ p: 1.5, px: 2, bgcolor: '#f0f7ff', borderRadius: '8px', border: '1px solid #d0e7ff' }}>
+                                                <Typography variant="caption" color="#555" sx={{ display: 'block' }}>Business Volume</Typography>
+                                                <Typography variant="subtitle2" fontWeight="700" color="#0066cc">BV: {selectedProduct.bv}</Typography>
+                                            </Box>
+                                        )}
+                                        <Box sx={{ p: 1.5, px: 2, bgcolor: selectedProduct.stock > 0 ? '#f6ffed' : '#fff1f0', borderRadius: '8px', border: '1px solid', borderColor: selectedProduct.stock > 0 ? '#b7eb8f' : '#ffa39e' }}>
+                                            <Typography variant="caption" color="#555" sx={{ display: 'block' }}>Availability</Typography>
+                                            <Typography variant="subtitle2" fontWeight="700" color={selectedProduct.stock > 0 ? '#389e0d' : '#cf1322'}>
+                                                {selectedProduct.stock > 0 ? `In Stock (${selectedProduct.stock} units)` : 'Out of Stock'}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    <Box sx={{ mt: 'auto', display: 'flex', gap: 2 }}>
+                                        {isInCart(selectedProduct._id) ? (
+                                            <Button
+                                                variant="outlined"
+                                                fullWidth
+                                                size="large"
+                                                startIcon={<Trash2 className="w-5 h-5" />}
+                                                onClick={() => {
+                                                    handleRemoveFromCart(selectedProduct._id, selectedProduct.name);
+                                                }}
+                                                sx={{
+                                                    borderRadius: '10px',
+                                                    py: 1.5,
+                                                    borderColor: '#f7931e',
+                                                    color: '#f7931e',
+                                                    fontWeight: 700,
+                                                    '&:hover': { borderColor: '#e67e00', bgcolor: '#fffaf0' }
+                                                }}
+                                            >
+                                                Remove from Cart
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="outlined"
+                                                fullWidth
+                                                size="large"
+                                                startIcon={<ShoppingCart className="w-5 h-5" />}
+                                                onClick={() => {
+                                                    handleAddToCart(selectedProduct);
+                                                    if (!isInCart(selectedProduct._id)) setIsModalOpen(false);
+                                                }}
+                                                disabled={selectedProduct.stock === 0}
+                                                sx={{
+                                                    borderRadius: '10px',
+                                                    py: 1.5,
+                                                    borderColor: '#0A7A2F',
+                                                    color: '#0A7A2F',
+                                                    fontWeight: 700,
+                                                    '&:hover': { borderColor: '#086325', bgcolor: '#f6ffed' }
+                                                }}
+                                            >
+                                                Add to Cart
+                                            </Button>
+                                        )}
+                                        <Button
+                                            variant="contained"
+                                            fullWidth
+                                            size="large"
+                                            onClick={() => {
+                                                buyNow(selectedProduct);
+                                                setIsModalOpen(false);
+                                            }}
+                                            disabled={selectedProduct.stock === 0}
+                                            sx={{
+                                                borderRadius: '10px',
+                                                py: 1.5,
+                                                bgcolor: '#0A7A2F',
+                                                fontWeight: 700,
+                                                '&:hover': { bgcolor: '#086325' }
+                                            }}
+                                        >
+                                            Buy Now
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        </DialogContent>
+                    </>
+                )}
+            </Dialog>
+
+            {/* Global Notifications Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{
+                        width: '100%',
+                        borderRadius: '16px',
+                        fontWeight: 800,
+                        boxShadow: '0 8px 30px rgba(247,147,30,0.25)',
+                        bgcolor: '#f7931e', // User requested alert bg
+                        color: 'white',
+                        '& .MuiAlert-icon': { color: 'white' }
+                    }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };

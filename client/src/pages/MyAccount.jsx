@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from "../api"; // 👈 API import karo
+import api from "../api";
+import CartPage from './Cart';
 
 // Material-UI imports
 import Container from '@mui/material/Container';
@@ -24,8 +25,16 @@ import Grow from '@mui/material/Grow';
 import Slide from '@mui/material/Slide';
 import Zoom from '@mui/material/Zoom';
 import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Checkbox from '@mui/material/Checkbox';
 import { styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -58,6 +67,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import SearchIcon from '@mui/icons-material/Search';
 
 // Styled Components
 const AnimatedCard = styled(Card)(({ theme }) => ({
@@ -151,6 +161,7 @@ const MyAccount = () => {
         '/my-account/transactions': 3,
         '/my-account/grievances': 4,
         '/my-account/kyc': 5,
+        '/my-account/cart': -1,
     };
     const tabValue = pathToTab[location.pathname] ?? 0;
     const setTabValue = (index) => {
@@ -182,6 +193,11 @@ const MyAccount = () => {
     });
     const [kycSubmitting, setKycSubmitting] = useState(false);
     const kycReadOnly = userData?.kycStatus === 'Submitted' || userData?.kycStatus === 'Verified';
+
+    // Orders UI State
+    const [orderSearchQuery, setOrderSearchQuery] = useState('');
+    const [orderTab, setOrderTab] = useState('All Orders'); // 'Active', 'All Orders', 'To Invoice', 'To Ship', 'To Backorder' -> mapped to our status
+
 
     const handleEditStart = () => {
         setEditData({
@@ -451,13 +467,25 @@ const MyAccount = () => {
                 {/* Welcome Header */}
                 <Slide direction="down" in={showContent} timeout={800}>
                     <AnimatedPaper sx={{
-                        p: { xs: 2, sm: 3 },
+                        p: { xs: 2.5, sm: 4 },
                         mb: 3,
-                        background: 'linear-gradient(135deg, #0A7A2F 0%, #1a8c3a 50%, #2a9e45 100%)',
+                        background: 'linear-gradient(135deg, #0A7A2F 0%, #1a8c3a 55%, #0A7A2F 100%)',
                         color: 'white',
-                        borderRadius: '16px',
+                        borderRadius: '20px',
                         position: 'relative',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 30px rgba(10,122,47,0.2)',
+                        '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            top: '-50%',
+                            right: '-10%',
+                            width: '300px',
+                            height: '300px',
+                            background: 'rgba(255,255,255,0.05)',
+                            borderRadius: '50%',
+                            filter: 'blur(50px)',
+                        }
                     }}>
                         <Box sx={{
                             display: 'flex',
@@ -523,8 +551,9 @@ const MyAccount = () => {
                         }}>
                             {[
                                 { icon: <PersonIcon />, label: 'Profile', index: 0, path: '/my-account/profile' },
-                                { icon: <HomeIcon />, label: 'Address', index: 1, path: '/my-account/address' },
-                                { icon: <ShoppingBagIcon />, label: 'Orders', index: 2, path: '/my-account/orders' },
+                                { icon: <LocationOnIcon />, label: 'Address', index: 1, path: '/my-account/address' },
+                                { icon: <ShoppingCartIcon />, label: 'My Cart', index: -1, path: '/my-account/cart' },
+                                { icon: <ReceiptIcon />, label: 'Orders', index: 2, path: '/my-account/orders' },
                                 { icon: <ReceiptIcon />, label: 'Transactions', index: 3, path: '/my-account/transactions' },
                                 { icon: <SupportAgentIcon />, label: 'Grievances', index: 4, path: '/my-account/grievances' },
                                 { icon: <FingerprintIcon />, label: 'KYC Verification', index: 5, path: '/my-account/kyc' },
@@ -563,6 +592,13 @@ const MyAccount = () => {
 
                         {/* Right Content Panel */}
                         <Box sx={{ flex: 1, p: { xs: 2, sm: 3, md: 4 }, overflow: 'auto', bgcolor: '#fafafa' }}>
+                            {/* Cart Tab (index -1) */}
+                            {tabValue === -1 && (
+                                <Box>
+                                    <CartPage />
+                                </Box>
+                            )}
+
                             {/* Profile Tab */}
                             {tabValue === 0 && (
                                 <Box>
@@ -579,26 +615,29 @@ const MyAccount = () => {
                                                     >
                                                         {!profileImage && (userData.userName || 'U')[0].toUpperCase()}
                                                     </Avatar>
-                                                    <Tooltip title="Upload photo">
-                                                        <Box
-                                                            component="label"
-                                                            htmlFor="profile-image-upload"
-                                                            sx={{
-                                                                position: 'absolute', bottom: 0, right: 0,
-                                                                bgcolor: '#0A7A2F', borderRadius: '50%', width: 26, height: 26,
-                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                cursor: 'pointer', border: '2px solid white',
-                                                                '&:hover': { bgcolor: '#085c22' }, transition: 'background 0.2s'
-                                                            }}
-                                                        >
-                                                            <CameraAltIcon sx={{ color: 'white', fontSize: 13 }} />
-                                                        </Box>
-                                                    </Tooltip>
+                                                    {editMode && (
+                                                        <Tooltip title="Upload photo">
+                                                            <Box
+                                                                component="label"
+                                                                htmlFor="profile-image-upload"
+                                                                sx={{
+                                                                    position: 'absolute', bottom: 0, right: 0,
+                                                                    bgcolor: '#0A7A2F', borderRadius: '50%', width: 26, height: 26,
+                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                    cursor: 'pointer', border: '2px solid white',
+                                                                    '&:hover': { bgcolor: '#085c22' }, transition: 'background 0.2s'
+                                                                }}
+                                                            >
+                                                                <CameraAltIcon sx={{ color: 'white', fontSize: 13 }} />
+                                                            </Box>
+                                                        </Tooltip>
+                                                    )}
                                                     <input
                                                         id="profile-image-upload"
                                                         type="file"
                                                         accept="image/*"
                                                         hidden
+                                                        disabled={!editMode}
                                                         onChange={handleImageUpload}
                                                     />
                                                 </Box>
@@ -708,22 +747,29 @@ const MyAccount = () => {
                                                     </Grid>
                                                 </Grid>
                                             ) : (
-                                                // View mode — rows with dividers
+                                                // View mode — rows with icons and better spacing
                                                 [
-                                                    [{ label: 'User Name', value: formatValue(userData.userName) }, { label: "Father's Name", value: formatValue(userData.fatherName) }],
-                                                    [{ label: 'Email Address', value: formatValue(userData.email) }, { label: 'Phone', value: formatValue(userData.mobile) }],
-                                                    [{ label: 'Gender', value: formatValue(userData.gender) }, { label: 'Position', value: formatValue(userData.position) }],
+                                                    [{ label: 'User Name', value: formatValue(userData.userName), icon: <PersonIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }, { label: "Father's Name", value: formatValue(userData.fatherName), icon: <GroupsIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }],
+                                                    [{ label: 'Email Address', value: formatValue(userData.email), icon: <EmailIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }, { label: 'Phone', value: formatValue(userData.mobile), icon: <PhoneIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }],
+                                                    [{ label: 'Gender', value: formatValue(userData.gender), icon: <WcIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }, { label: 'Position', value: formatValue(userData.position), icon: <BadgeIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }],
                                                 ].map((row, ri) => (
                                                     <Box key={ri}>
-                                                        <Box sx={{ display: 'flex', py: 2.5 }}>
+                                                        <Grid container spacing={2} sx={{ py: 2.5 }}>
                                                             {row.map((field, fi) => (
-                                                                <Box key={fi} sx={{ flex: 1, pr: fi === 0 ? 3 : 0 }}>
-                                                                    <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 400, mb: 0.5 }}>{field.label}</Typography>
-                                                                    <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700 }}>{field.value}</Typography>
-                                                                </Box>
+                                                                <Grid item xs={12} sm={6} key={fi}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                        <Box sx={{ bgcolor: '#f0f9f1', p: 1, borderRadius: '8px', display: 'flex' }}>
+                                                                            {field.icon}
+                                                                        </Box>
+                                                                        <Box>
+                                                                            <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 500, mb: 0.25 }}>{field.label}</Typography>
+                                                                            <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700 }}>{field.value}</Typography>
+                                                                        </Box>
+                                                                    </Box>
+                                                                </Grid>
                                                             ))}
-                                                        </Box>
-                                                        {ri < 2 && <Divider />}
+                                                        </Grid>
+                                                        {ri < 2 && <Divider sx={{ opacity: 0.6 }} />}
                                                     </Box>
                                                 ))
                                             )}
@@ -731,25 +777,34 @@ const MyAccount = () => {
                                     </Paper>
 
                                     {/* Account Details Section (read-only) */}
-                                    <Paper variant="outlined" sx={{ borderRadius: '14px', overflow: 'hidden' }}>
-                                        <Box sx={{ px: 3, py: 2.5, borderBottom: '1px solid #f0f0f0' }}>
-                                            <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111' }}>Account Details</Typography>
+                                    <Paper variant="outlined" sx={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }}>
+                                        <Box sx={{ px: 3, py: 2, bgcolor: '#f8fbf9', borderBottom: '1px solid #f0f0f0' }}>
+                                            <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <FingerprintIcon sx={{ fontSize: 20, color: '#0A7A2F' }} /> Account Details
+                                            </Typography>
                                         </Box>
                                         <Box sx={{ px: 3, py: 1 }}>
                                             {[
-                                                [{ label: 'Sponsor ID', value: formatValue(userData.sponsorId) }, { label: 'Sponsor Name', value: formatValue(userData.sponsorName) }],
-                                                [{ label: 'State', value: formatValue(userData.state) }, { label: 'District', value: formatValue(userData.district) }],
+                                                [{ label: 'Sponsor ID', value: formatValue(userData.sponsorId), icon: <FingerprintIcon sx={{ fontSize: 18, color: '#F7931E' }} /> }, { label: 'Sponsor Name', value: formatValue(userData.sponsorName), icon: <PersonIcon sx={{ fontSize: 18, color: '#F7931E' }} /> }],
+                                                [{ label: 'State', value: formatValue(userData.state), icon: <FlagIcon sx={{ fontSize: 18, color: '#F7931E' }} /> }, { label: 'District', value: formatValue(userData.district), icon: <LocationOnIcon sx={{ fontSize: 18, color: '#F7931E' }} /> }],
                                             ].map((row, ri) => (
                                                 <Box key={ri}>
-                                                    <Box sx={{ display: 'flex', py: 2.5 }}>
+                                                    <Grid container spacing={2} sx={{ py: 2.5 }}>
                                                         {row.map((field, fi) => (
-                                                            <Box key={fi} sx={{ flex: 1, pr: fi === 0 ? 3 : 0 }}>
-                                                                <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 400, mb: 0.5 }}>{field.label}</Typography>
-                                                                <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700 }}>{field.value}</Typography>
-                                                            </Box>
+                                                            <Grid item xs={12} sm={6} key={fi}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                    <Box sx={{ bgcolor: '#fffbed', p: 1, borderRadius: '8px', display: 'flex' }}>
+                                                                        {field.icon}
+                                                                    </Box>
+                                                                    <Box>
+                                                                        <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 500, mb: 0.25 }}>{field.label}</Typography>
+                                                                        <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700 }}>{field.value}</Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Grid>
                                                         ))}
-                                                    </Box>
-                                                    {ri < 1 && <Divider />}
+                                                    </Grid>
+                                                    {ri < 1 && <Divider sx={{ opacity: 0.6 }} />}
                                                 </Box>
                                             ))}
                                         </Box>
@@ -777,41 +832,59 @@ const MyAccount = () => {
                                     </Box>
 
                                     {/* Location Details */}
-                                    <Paper variant="outlined" sx={{ borderRadius: '14px', overflow: 'hidden', mb: 3 }}>
-                                        <Box sx={{ px: 3, py: 2.5, borderBottom: '1px solid #f0f0f0' }}>
-                                            <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111' }}>Location Details</Typography>
+                                    <Paper variant="outlined" sx={{ borderRadius: '16px', overflow: 'hidden', mb: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }}>
+                                        <Box sx={{ px: 3, py: 2, bgcolor: '#f8fbf9', borderBottom: '1px solid #f0f0f0' }}>
+                                            <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <HomeIcon sx={{ fontSize: 20, color: '#0A7A2F' }} /> Location Details
+                                            </Typography>
                                         </Box>
                                         <Box sx={{ px: 3, py: 1 }}>
                                             {[
-                                                [{ label: 'State', value: formatValue(userData.state) }, { label: 'District', value: formatValue(userData.district) }],
-                                                [{ label: 'Assembly Area', value: formatValue(userData.assemblyArea) }, { label: 'Block', value: formatValue(userData.block) }],
-                                                [{ label: 'Village Council', value: formatValue(userData.villageCouncil) }, { label: 'Village', value: formatValue(userData.village) }],
+                                                [{ label: 'State', value: formatValue(userData.state), icon: <FlagIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }, { label: 'District', value: formatValue(userData.district), icon: <LocationOnIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }],
+                                                [{ label: 'Assembly Area', value: formatValue(userData.assemblyArea), icon: <GroupsIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }, { label: 'Block', value: formatValue(userData.block), icon: <VillaIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }],
+                                                [{ label: 'Village Council', value: formatValue(userData.villageCouncil), icon: <AccountCircleIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }, { label: 'Village', value: formatValue(userData.village), icon: <AgricultureIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> }],
                                             ].map((row, ri) => (
                                                 <Box key={ri}>
-                                                    <Box sx={{ display: 'flex', py: 2.5 }}>
+                                                    <Grid container spacing={2} sx={{ py: 2.5 }}>
                                                         {row.map((field, fi) => (
-                                                            <Box key={fi} sx={{ flex: 1, pr: fi === 0 ? 3 : 0 }}>
-                                                                <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 400, mb: 0.5 }}>{field.label}</Typography>
-                                                                <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700 }}>{field.value}</Typography>
-                                                            </Box>
+                                                            <Grid item xs={12} sm={6} key={fi}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                    <Box sx={{ bgcolor: '#f0f9f1', p: 1, borderRadius: '8px', display: 'flex' }}>
+                                                                        {field.icon}
+                                                                    </Box>
+                                                                    <Box>
+                                                                        <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 500, mb: 0.25 }}>{field.label}</Typography>
+                                                                        <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700 }}>{field.value}</Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Grid>
                                                         ))}
-                                                    </Box>
-                                                    {ri < 2 && <Divider />}
+                                                    </Grid>
+                                                    {ri < 2 && <Divider sx={{ opacity: 0.6 }} />}
                                                 </Box>
                                             ))}
                                         </Box>
                                     </Paper>
 
                                     {/* Shipping Address */}
-                                    <Paper variant="outlined" sx={{ borderRadius: '14px', overflow: 'hidden' }}>
-                                        <Box sx={{ px: 3, py: 2.5, borderBottom: '1px solid #f0f0f0' }}>
-                                            <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111' }}>Shipping Address</Typography>
-                                        </Box>
-                                        <Box sx={{ px: 3, py: 2.5 }}>
-                                            <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 400, mb: 0.5 }}>Full Address</Typography>
-                                            <Typography sx={{ color: '#111', fontSize: '15px', fontWeight: 700, lineHeight: 1.6 }}>
-                                                {[userData.shippingAddress, userData.village, userData.villageCouncil, userData.block, userData.district, userData.state].filter(Boolean).join(', ') || '—'}
+                                    <Paper variant="outlined" sx={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }}>
+                                        <Box sx={{ px: 3, py: 2, bgcolor: '#fffbed', borderBottom: '1px solid #f0f0f0' }}>
+                                            <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <LocationOnIcon sx={{ fontSize: 20, color: '#F7931E' }} /> Shipping Address
                                             </Typography>
+                                        </Box>
+                                        <Box sx={{ px: 4, py: 3, bgcolor: 'white' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                                                <Box sx={{ bgcolor: '#fff8e1', p: 1.5, borderRadius: '10px', display: 'flex' }}>
+                                                    <HomeIcon sx={{ color: '#F7931E' }} />
+                                                </Box>
+                                                <Box>
+                                                    <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 500, mb: 0.75 }}>Full Address</Typography>
+                                                    <Typography sx={{ color: '#111', fontSize: '16px', fontWeight: 700, lineHeight: 1.6, maxWidth: '600px' }}>
+                                                        {[userData.shippingAddress, userData.village, userData.villageCouncil, userData.block, userData.district, userData.state].filter(Boolean).join(', ') || 'Address not provided'}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
                                         </Box>
                                     </Paper>
                                 </Box>
@@ -819,51 +892,197 @@ const MyAccount = () => {
 
                             {/* Orders Tab */}
                             {tabValue === 2 && (
-                                <Box>
-                                    <Typography variant="h6" sx={{ color: '#0A7A2F', mb: 3, fontWeight: 700, borderBottom: '3px solid #0A7A2F', pb: 1, display: 'inline-block' }}>
-                                        My Orders
-                                    </Typography>
-                                    {ordersLoading ? (
-                                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={40} sx={{ color: '#0A7A2F' }} /></Box>
-                                    ) : userOrders.length === 0 ? (
-                                        <Box sx={{ textAlign: 'center', py: 4 }}>
-                                            <ShoppingBagIcon sx={{ fontSize: 80, color: '#ccc', mb: 2 }} />
-                                            <Typography variant="h6" color="textSecondary" gutterBottom>No Orders Found</Typography>
-                                            <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>You haven't placed any orders yet</Typography>
-                                            <Button variant="contained" sx={{ bgcolor: '#0A7A2F', '&:hover': { bgcolor: '#085c22' } }} onClick={() => navigate('/products')}>Start Shopping</Button>
+                                <Box sx={{ bgcolor: 'white', borderRadius: '12px', p: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+                                    {/* Header Section */}
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                                        <Typography variant="h4" sx={{ fontWeight: 800, color: '#111' }}>
+                                            Orders
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                            <TextField
+                                                size="small"
+                                                placeholder="Search order, invoice, email"
+                                                value={orderSearchQuery}
+                                                onChange={(e) => setOrderSearchQuery(e.target.value)}
+                                                sx={{
+                                                    width: { xs: '100%', sm: '320px' },
+                                                    '& .MuiOutlinedInput-root': { borderRadius: '6px' }
+                                                }}
+                                                InputProps={{
+                                                    startAdornment: (
+                                                        <InputAdornment position="start">
+                                                            <SearchIcon sx={{ color: '#aaa', fontSize: 20 }} />
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => navigate('/products')}
+                                                sx={{ bgcolor: '#7856d6', '&:hover': { bgcolor: '#5e35b1' }, borderRadius: '6px', textTransform: 'none', px: 2.5, py: 1, whiteSpace: 'nowrap', fontWeight: 600, boxShadow: 'none' }}
+                                            >
+                                                New sales order
+                                            </Button>
                                         </Box>
+                                    </Box>
+
+                                    {/* Tabs */}
+                                    <Box sx={{ borderBottom: 1, borderColor: '#f0f0f0', mb: 4 }}>
+                                        <Tabs
+                                            value={orderTab}
+                                            onChange={(e, newValue) => setOrderTab(newValue)}
+                                            variant="scrollable"
+                                            scrollButtons="auto"
+                                            sx={{
+                                                minHeight: '44px',
+                                                '& .MuiTab-root': {
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    fontSize: '14px',
+                                                    minWidth: 'auto',
+                                                    px: 3,
+                                                    py: 1,
+                                                    minHeight: '44px',
+                                                    color: '#999',
+                                                    transition: 'all 0.2s'
+                                                },
+                                                '& .Mui-selected': {
+                                                    color: '#0A7A2F !important'
+                                                },
+                                                '& .MuiTabs-indicator': {
+                                                    backgroundColor: '#0A7A2F',
+                                                    height: 3,
+                                                    borderRadius: '3px 3px 0 0'
+                                                }
+                                            }}
+                                        >
+                                            <Tab label="Active" value="Active" />
+                                            <Tab label="All Orders" value="All Orders" />
+                                            <Tab label="To Invoice" value="To Invoice" />
+                                            <Tab label="To Ship" value="To Ship" />
+                                            <Tab label="To Backorder" value="To Backorder" />
+                                        </Tabs>
+                                    </Box>
+
+                                    {ordersLoading ? (
+                                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={40} sx={{ color: '#7856d6' }} /></Box>
                                     ) : (
-                                        <Grid container spacing={2}>
-                                            {userOrders.map((order, index) => (
-                                                <Grid item xs={12} key={order._id || index}>
-                                                    <Card variant="outlined" sx={{ '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }, transition: 'all 0.3s ease' }}>
-                                                        <CardContent>
-                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                                                <Box>
-                                                                    <Typography variant="subtitle2" color="textSecondary">Order ID: #{order._id?.slice(-8).toUpperCase()}</Typography>
-                                                                    <Typography variant="h6" sx={{ color: '#0A7A2F', fontWeight: 600 }}>{order.product?.name || 'Product Details'}</Typography>
-                                                                </Box>
-                                                                <StatusChip label={order.status || 'Pending'} status={order.status || 'Pending'} size="small" />
-                                                            </Box>
-                                                            <Grid container spacing={2}>
-                                                                <Grid item xs={4}>
-                                                                    <Typography variant="caption" color="textSecondary">Price</Typography>
-                                                                    <Typography variant="body1" fontWeight="bold">₹{order.total}</Typography>
-                                                                </Grid>
-                                                                <Grid item xs={4}>
-                                                                    <Typography variant="caption" color="textSecondary">Quantity</Typography>
-                                                                    <Typography variant="body1">{order.quantity}</Typography>
-                                                                </Grid>
-                                                                <Grid item xs={4}>
-                                                                    <Typography variant="caption" color="textSecondary">Date</Typography>
-                                                                    <Typography variant="body1">{new Date(order.createdAt).toLocaleDateString()}</Typography>
-                                                                </Grid>
-                                                            </Grid>
-                                                        </CardContent>
-                                                    </Card>
-                                                </Grid>
-                                            ))}
-                                        </Grid>
+                                        <Box>
+                                            {/* Empty State / Promotional Banner */}
+                                            {userOrders.length === 0 && (
+                                                <Paper variant="outlined" sx={{ borderRadius: '12px', p: 4, mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, borderColor: '#eee', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                                                    <Box>
+                                                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#111', mb: 1, letterSpacing: '-0.5px' }}>
+                                                            Create your first order
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: '#777', maxWidth: '600px', lineHeight: 1.6 }}>
+                                                            Sanyukt Parivaar aggregates orders from all of your different sales channels here. Manage orders from creation to fulfilment in one place.
+                                                        </Typography>
+                                                    </Box>
+                                                    <Button variant="outlined" onClick={() => navigate('/products')} sx={{ borderRadius: '6px', textTransform: 'none', borderColor: '#d0d0d0', color: '#555', fontWeight: 600, '&:hover': { borderColor: '#111', color: '#111', bgcolor: 'transparent' } }}>
+                                                        Create a New Sales order
+                                                    </Button>
+                                                </Paper>
+                                            )}
+
+                                            {/* Data Table */}
+                                            {userOrders.length > 0 && (
+                                                <TableContainer sx={{ border: '1px solid #eee', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+                                                    <Table sx={{ minWidth: 800 }} aria-label="orders table">
+                                                        <TableHead sx={{ bgcolor: '#fcfdfc' }}>
+                                                            <TableRow>
+                                                                <TableCell padding="checkbox" sx={{ borderBottom: '1px solid #eee', py: 2 }}><Checkbox size="small" sx={{ color: '#ccc' }} /></TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Order ID</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Product / Item</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Status</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }} align="center">Packed</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }} align="center">Fulfilled</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }} align="center">Invoiced</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }} align="center">Paid</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Total</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Created</TableCell>
+                                                                <TableCell sx={{ color: '#111', fontWeight: 700, fontSize: '13.5px', borderBottom: '1px solid #eee', py: 2 }}>Updated</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {userOrders
+                                                                .filter(order => {
+                                                                    const q = orderSearchQuery.toLowerCase();
+                                                                    const orderId = order._id?.slice(-8) || '';
+                                                                    const prodName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || '';
+                                                                    const matchesSearch = orderId.toLowerCase().includes(q) || prodName.toLowerCase().includes(q);
+
+                                                                    let matchesTab = true;
+                                                                    const status = (order.status || 'Active').toLowerCase();
+                                                                    if (orderTab === 'Active') matchesTab = ['active', 'pending', 'placed'].includes(status);
+                                                                    if (orderTab === 'To Invoice') matchesTab = status === 'invoiced';
+                                                                    if (orderTab === 'To Ship') matchesTab = ['processing', 'packed'].includes(status);
+                                                                    if (orderTab === 'To Backorder') matchesTab = status === 'backorder';
+                                                                    if (orderTab === 'All Orders') matchesTab = true;
+
+                                                                    return matchesSearch && matchesTab;
+                                                                })
+                                                                .map((order, index) => {
+                                                                    const orderNum = `#CR00${String(index + 1).padStart(2, '0')}`;
+                                                                    const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
+
+                                                                    const statusMatch = order.status?.toLowerCase() || 'finalized';
+
+                                                                    let statusColor = '#f3e5f5';
+                                                                    let statusTextCode = '#7b1fa2';
+                                                                    let statusLabel = 'Finalized';
+
+                                                                    if (statusMatch === 'pending' || statusMatch === 'active' || statusMatch === 'placed') {
+                                                                        statusColor = '#e8f5e9';
+                                                                        statusTextCode = '#0A7A2F';
+                                                                        statusLabel = 'Active';
+                                                                    } else if (order.status) {
+                                                                        statusLabel = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+                                                                        statusColor = '#f5f5f5';
+                                                                        statusTextCode = '#555';
+                                                                    }
+
+                                                                    const total = order.totalAmount || order.total || '0';
+                                                                    const date = new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                                                                    return (
+                                                                        <TableRow
+                                                                            key={order._id || index}
+                                                                            hover
+                                                                            sx={{
+                                                                                '&:last-child td, &:last-child th': { border: 0 },
+                                                                                bgcolor: index % 2 === 0 ? '#fcfdfc' : 'white',
+                                                                                '&:hover': { bgcolor: '#f4faf5' },
+                                                                                transition: 'background 0.2s'
+                                                                            }}
+                                                                        >
+                                                                            <TableCell padding="checkbox" sx={{ borderBottom: 'none', py: 2 }}><Checkbox size="small" sx={{ color: '#ddd' }} /></TableCell>
+                                                                            <TableCell sx={{ fontWeight: 700, color: '#333', fontSize: '13.5px', borderBottom: 'none' }}>{order._id ? `#${order._id.slice(-8).toUpperCase()}` : orderNum}</TableCell>
+                                                                            <TableCell sx={{ color: '#111', fontWeight: 600, fontSize: '13.5px', borderBottom: 'none' }}>{productName}</TableCell>
+                                                                            <TableCell sx={{ borderBottom: 'none' }}>
+                                                                                <Box sx={{
+                                                                                    display: 'inline-block', px: 1.5, py: 0.5, borderRadius: '6px',
+                                                                                    bgcolor: statusColor, color: statusTextCode,
+                                                                                    fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px'
+                                                                                }}>
+                                                                                    {statusLabel}
+                                                                                </Box>
+                                                                            </TableCell>
+                                                                            <TableCell align="center" sx={{ borderBottom: 'none', color: '#0A7A2F', fontWeight: 'bold' }}>✓</TableCell>
+                                                                            <TableCell align="center" sx={{ borderBottom: 'none', color: '#ccc', fontWeight: 600 }}>-</TableCell>
+                                                                            <TableCell align="center" sx={{ borderBottom: 'none', color: '#0A7A2F', fontWeight: 'bold' }}>✓</TableCell>
+                                                                            <TableCell align="center" sx={{ borderBottom: 'none', color: '#ccc', fontWeight: 600 }}>-</TableCell>
+                                                                            <TableCell sx={{ fontWeight: 800, color: '#0A7A2F', fontSize: '14px', borderBottom: 'none' }}>₹{parseFloat(total).toFixed(2)}</TableCell>
+                                                                            <TableCell sx={{ color: '#666', fontSize: '13px', borderBottom: 'none' }}>{date}</TableCell>
+                                                                            <TableCell sx={{ color: '#666', fontSize: '13px', borderBottom: 'none' }}>{date}</TableCell>
+                                                                        </TableRow>
+                                                                    );
+                                                                })}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            )}
+                                        </Box>
                                     )}
                                 </Box>
                             )}
@@ -914,39 +1133,63 @@ const MyAccount = () => {
                                     ) : (
                                         <Box sx={{ mb: 4 }}>
                                             {userOrders.map((order, index) => (
-                                                <Paper key={order._id || index} variant="outlined" sx={{ p: 2, borderRadius: '12px', mb: 1.5, cursor: 'pointer', '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.07)', borderColor: '#0A7A2F' }, transition: 'all 0.2s' }} onClick={() => setTabValue(2)}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                                                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                                            <Box sx={{ width: 42, height: 42, borderRadius: '10px', bgcolor: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                <ShoppingBagIcon sx={{ color: '#0A7A2F', fontSize: 22 }} />
-                                                            </Box>
-                                                            <Box>
-                                                                <Typography sx={{ fontWeight: 700, fontSize: '14px' }}>
-                                                                    Order #{order._id?.slice(-8).toUpperCase() || index + 1}
-                                                                </Typography>
-                                                                <Typography sx={{ fontSize: '12px', color: '#999' }}>
-                                                                    {order.items?.length || 0} item(s) • {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                                                </Typography>
-                                                                {order.items?.slice(0, 2).map((item, i) => (
-                                                                    <Typography key={i} sx={{ fontSize: '11px', color: '#aaa' }}>
-                                                                        {item.name || item.productId?.name || 'Product'} × {item.quantity}
-                                                                    </Typography>
-                                                                ))}
+                                                <Paper
+                                                    key={order._id || index}
+                                                    variant="outlined"
+                                                    sx={{
+                                                        p: 0,
+                                                        borderRadius: '14px',
+                                                        mb: 2,
+                                                        cursor: 'pointer',
+                                                        overflow: 'hidden',
+                                                        '&:hover': { boxShadow: '0 6px 18px rgba(10,122,47,0.08)', borderColor: '#0A7A2F' },
+                                                        transition: 'all 0.3s ease'
+                                                    }}
+                                                    onClick={() => setTabValue(2)}
+                                                >
+                                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
+                                                        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', bgcolor: '#f4faf5', borderRight: '1px solid #f0f0f0' }}>
+                                                            <Box sx={{ width: 44, height: 44, borderRadius: '10px', bgcolor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}>
+                                                                <ShoppingBagIcon sx={{ color: '#0A7A2F', fontSize: 24 }} />
                                                             </Box>
                                                         </Box>
-                                                        <Box sx={{ textAlign: 'right' }}>
-                                                            <Typography sx={{ fontWeight: 800, color: '#111', fontSize: '15px' }}>
-                                                                ₹{order.totalAmount || order.total || '—'}
-                                                            </Typography>
-                                                            <Chip
-                                                                label={(order.status || 'Placed').toUpperCase()}
-                                                                size="small"
-                                                                sx={{
-                                                                    height: 20, fontSize: '10px', fontWeight: 700, mt: 0.5,
-                                                                    bgcolor: order.status === 'delivered' ? '#0A7A2F' : order.status === 'cancelled' ? '#d32f2f' : '#F7931E',
-                                                                    color: 'white'
-                                                                }}
-                                                            />
+                                                        <Box sx={{ p: 2, flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <Box>
+                                                                <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111', mb: 0.25 }}>
+                                                                    Order #{order._id?.slice(-8).toUpperCase() || index + 1}
+                                                                </Typography>
+                                                                <Typography sx={{ fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                    <EventIcon sx={{ fontSize: 12 }} /> {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                                </Typography>
+                                                                <Box sx={{ display: 'flex', gap: 0.5, mt: 0.75, flexWrap: 'wrap' }}>
+                                                                    {order.items?.slice(0, 2).map((item, i) => (
+                                                                        <Chip
+                                                                            key={i}
+                                                                            label={`${item.name || item.productId?.name || 'Product'} × ${item.quantity}`}
+                                                                            size="small"
+                                                                            sx={{ height: 18, fontSize: '10px', fontWeight: 500, bgcolor: '#f5f5f5' }}
+                                                                        />
+                                                                    ))}
+                                                                    {(order.items?.length > 2) && (
+                                                                        <Typography sx={{ fontSize: '10px', color: '#999', alignSelf: 'center', ml: 0.5 }}>+{order.items.length - 2} more</Typography>
+                                                                    )}
+                                                                </Box>
+                                                            </Box>
+                                                            <Box sx={{ textAlign: 'right' }}>
+                                                                <Typography sx={{ fontWeight: 800, color: '#0A7A2F', fontSize: '16px' }}>
+                                                                    ₹{order.totalAmount || order.total || '0'}
+                                                                </Typography>
+                                                                <Chip
+                                                                    label={(order.status || 'Placed').toUpperCase()}
+                                                                    size="small"
+                                                                    sx={{
+                                                                        height: 20, fontSize: '10px', fontWeight: 800, mt: 0.75, px: 0.5,
+                                                                        bgcolor: order.status === 'delivered' ? '#0A7A2F' : order.status === 'cancelled' ? '#d32f2f' : '#F7931E',
+                                                                        color: 'white',
+                                                                        borderRadius: '4px'
+                                                                    }}
+                                                                />
+                                                            </Box>
                                                         </Box>
                                                     </Box>
                                                 </Paper>
@@ -973,36 +1216,64 @@ const MyAccount = () => {
                                     ) : (
                                         <Box>
                                             {userTransactions.map((txn, index) => (
-                                                <Paper key={txn._id || index} variant="outlined" sx={{ p: 2, borderRadius: '12px', mb: 1.5, '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }, transition: 'all 0.2s' }}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                                <Paper
+                                                    key={txn._id || index}
+                                                    variant="outlined"
+                                                    sx={{
+                                                        p: 0,
+                                                        borderRadius: '14px',
+                                                        mb: 2,
+                                                        overflow: 'hidden',
+                                                        '&:hover': { boxShadow: '0 6px 18px rgba(0,0,0,0.06)' },
+                                                        transition: 'all 0.3s ease'
+                                                    }}
+                                                >
+                                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
+                                                        <Box sx={{
+                                                            p: 2,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            bgcolor: txn.status === 'success' ? '#f4faf5' : txn.status === 'failed' ? '#fff9f9' : '#fffdf4',
+                                                            borderRight: '1px solid #f0f0f0'
+                                                        }}>
                                                             <Box sx={{
-                                                                width: 42, height: 42, borderRadius: '10px',
-                                                                bgcolor: txn.status === 'success' ? '#e8f5e9' : txn.status === 'failed' ? '#ffebee' : '#fff8e1',
-                                                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                                width: 44, height: 44, borderRadius: '10px', bgcolor: 'white',
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                                                             }}>
-                                                                <ReceiptIcon sx={{ fontSize: 22, color: txn.status === 'success' ? '#0A7A2F' : txn.status === 'failed' ? '#d32f2f' : '#fbc02d' }} />
-                                                            </Box>
-                                                            <Box>
-                                                                <Typography sx={{ fontWeight: 700, fontSize: '14px' }}>
-                                                                    {txn.operator} — {txn.type?.toUpperCase()} Recharge
-                                                                </Typography>
-                                                                <Typography sx={{ fontSize: '12px', color: '#999' }}>
-                                                                    #{txn.rechargeNumber} • {new Date(txn.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                                                </Typography>
+                                                                <ReceiptIcon sx={{
+                                                                    fontSize: 24,
+                                                                    color: txn.status === 'success' ? '#0A7A2F' : txn.status === 'failed' ? '#d32f2f' : '#fbc02d'
+                                                                }} />
                                                             </Box>
                                                         </Box>
-                                                        <Box sx={{ textAlign: 'right' }}>
-                                                            <Typography sx={{ fontWeight: 800, color: '#111', fontSize: '15px' }}>₹{txn.amount}</Typography>
-                                                            <Chip
-                                                                label={txn.status?.toUpperCase()}
-                                                                size="small"
-                                                                sx={{
-                                                                    height: 20, fontSize: '10px', fontWeight: 700, mt: 0.5,
-                                                                    bgcolor: txn.status === 'success' ? '#0A7A2F' : txn.status === 'failed' ? '#d32f2f' : '#fbc02d',
-                                                                    color: 'white'
-                                                                }}
-                                                            />
+                                                        <Box sx={{ p: 2, flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <Box>
+                                                                <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#111', mb: 0.25 }}>
+                                                                    {txn.operator} {txn.type?.toUpperCase()}
+                                                                </Typography>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                    <Typography sx={{ fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        <PhoneIcon sx={{ fontSize: 12 }} /> {txn.rechargeNumber}
+                                                                    </Typography>
+                                                                    <Typography sx={{ fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        <EventIcon sx={{ fontSize: 12 }} /> {new Date(txn.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                                    </Typography>
+                                                                </Box>
+                                                            </Box>
+                                                            <Box sx={{ textAlign: 'right' }}>
+                                                                <Typography sx={{ fontWeight: 800, color: '#111', fontSize: '16px' }}>₹{txn.amount}</Typography>
+                                                                <Chip
+                                                                    label={txn.status?.toUpperCase()}
+                                                                    size="small"
+                                                                    sx={{
+                                                                        height: 20, fontSize: '10px', fontWeight: 800, mt: 0.75, px: 0.5,
+                                                                        bgcolor: txn.status === 'success' ? '#0A7A2F' : txn.status === 'failed' ? '#d32f2f' : '#fbc02d',
+                                                                        color: 'white',
+                                                                        borderRadius: '4px'
+                                                                    }}
+                                                                />
+                                                            </Box>
                                                         </Box>
                                                     </Box>
                                                 </Paper>
@@ -1032,27 +1303,104 @@ const MyAccount = () => {
                                             {userGrievances.map((grievance, index) => (
                                                 <Grid item xs={12} key={index}>
                                                     <Zoom in={showContent} timeout={600} style={{ transitionDelay: `${index * 100}ms` }}>
-                                                        <Card variant="outlined" sx={{ '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.1)', borderColor: '#0A7A2F' }, transition: 'all 0.3s ease' }}>
-                                                            <CardContent>
-                                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                        <Avatar sx={{ bgcolor: '#e8f5e9', width: 32, height: 32 }}><SupportAgentIcon sx={{ color: '#0A7A2F', fontSize: 18 }} /></Avatar>
-                                                                        <Typography variant="subtitle1" sx={{ color: '#0A7A2F', fontWeight: 600 }}>{grievance.ticket}</Typography>
+                                                        <Card variant="outlined" sx={{ '&:hover': { boxShadow: '0 8px 24px rgba(10,122,47,0.12)', borderColor: '#0A7A2F' }, transition: 'all 0.3s ease', borderRadius: '14px', overflow: 'hidden' }}>
+                                                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, p: 0 }}>
+                                                                {/* Left Section: Ticket Info */}
+                                                                <Box sx={{ p: 3, flex: 1.5 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                                                                        <Typography variant="caption" sx={{ color: '#0A7A2F', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 0.75, bgcolor: '#e8f5e9', px: 1.5, py: 0.5, borderRadius: '6px', letterSpacing: '0.5px' }}>
+                                                                            <SupportAgentIcon sx={{ fontSize: 16 }} /> {grievance.ticket}
+                                                                        </Typography>
+                                                                        {grievance.category && (
+                                                                            <Chip label={grievance.category} size="small" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600, color: '#666', bgcolor: '#f0f0f0' }} />
+                                                                        )}
+                                                                        <Chip
+                                                                            label={['Technical', 'Payment', 'Order'].includes(grievance.category) ? 'High Priority' : 'Normal Priority'}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{ height: 24, fontSize: '0.7rem', fontWeight: 700, borderColor: ['Technical', 'Payment', 'Order'].includes(grievance.category) ? '#d32f2f' : '#ccc', color: ['Technical', 'Payment', 'Order'].includes(grievance.category) ? '#d32f2f' : '#888' }}
+                                                                        />
                                                                     </Box>
-                                                                    <StatusChip size="small" icon={getStatusIcon(grievance.status)} label={grievance.status} status={grievance.status} />
-                                                                </Box>
-                                                                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}><strong>Subject:</strong> {grievance.subject || 'N/A'}</Typography>
-                                                                {grievance.category && <Typography variant="body2" sx={{ mb: 1, color: '#666' }}><strong>Category:</strong> {grievance.category}</Typography>}
-                                                                {grievance.message && <Typography variant="body2" sx={{ mb: 2, color: '#666', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}><strong>Message:</strong> {grievance.message}</Typography>}
-                                                                <Divider sx={{ my: 1.5 }} />
-                                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                        <EventIcon sx={{ color: '#F7931E', fontSize: 16 }} />
-                                                                        <Typography variant="caption" sx={{ color: '#666' }}>{grievance.submittedDate ? new Date(grievance.submittedDate).toLocaleDateString() : 'N/A'}</Typography>
+
+                                                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#111', mb: 1.5, fontSize: '1.15rem' }}>
+                                                                        {grievance.subject || 'No Subject Provided'}
+                                                                    </Typography>
+
+                                                                    <Typography variant="body2" sx={{ color: '#666', fontSize: '0.9rem', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                                        {grievance.message || '—'}
+                                                                    </Typography>
+
+                                                                    <Box sx={{ mt: 2.5, display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                                                                        <Box>
+                                                                            <Typography variant="caption" sx={{ color: '#999', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Contact Mobile</Typography>
+                                                                            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '13px', color: '#333' }}>{grievance.mobile || '—'}</Typography>
+                                                                        </Box>
+                                                                        <Box>
+                                                                            <Typography variant="caption" sx={{ color: '#999', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Submitted On</Typography>
+                                                                            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '13px', color: '#333' }}>{new Date(grievance.submittedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</Typography>
+                                                                        </Box>
+                                                                        <Box>
+                                                                            <Typography variant="caption" sx={{ color: '#999', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Last Activity</Typography>
+                                                                            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '13px', color: '#333' }}>
+                                                                                {grievance.updatedAt ? new Date(grievance.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                                                                            </Typography>
+                                                                        </Box>
                                                                     </Box>
-                                                                    <Button size="small" sx={{ color: '#0A7A2F' }} onClick={() => window.open(`/track-grievance?ticket=${grievance.ticket}`, '_blank')}>Track Status</Button>
                                                                 </Box>
-                                                            </CardContent>
+
+                                                                {/* Middle Section: Progress/Info */}
+                                                                <Box sx={{ flex: 1, p: 3, display: { xs: 'none', lg: 'flex' }, flexDirection: 'column', justifyContent: 'center', bgcolor: '#fbfbfb', borderLeft: '1px solid #f0f0f0' }}>
+                                                                    <Typography variant="caption" sx={{ color: '#999', fontWeight: 700, mb: 2, textTransform: 'uppercase' }}>Resolution Progress</Typography>
+                                                                    <Box sx={{ position: 'relative', width: '100%', mb: 1 }}>
+                                                                        <Box sx={{ height: 4, bgcolor: '#eee', borderRadius: 2 }} />
+                                                                        <Box sx={{
+                                                                            height: 4,
+                                                                            bgcolor: grievance.status === 'Resolved' ? '#0A7A2F' : grievance.status === 'Processing' ? '#F7931E' : '#999',
+                                                                            borderRadius: 2,
+                                                                            position: 'absolute',
+                                                                            top: 0,
+                                                                            width: grievance.status === 'Resolved' ? '100%' : grievance.status === 'Processing' ? '60%' : '15%'
+                                                                        }} />
+                                                                    </Box>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <Typography sx={{ fontSize: '10px', color: '#0A7A2F', fontWeight: 700 }}>Open</Typography>
+                                                                        <Typography sx={{ fontSize: '10px', color: grievance.status !== 'Pending' ? '#F7931E' : '#999', fontWeight: 700 }}>Processing</Typography>
+                                                                        <Typography sx={{ fontSize: '10px', color: grievance.status === 'Resolved' ? '#0A7A2F' : '#999', fontWeight: 700 }}>Resolved</Typography>
+                                                                    </Box>
+
+                                                                    <Box sx={{ mt: 3, p: 1.5, bgcolor: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+                                                                        <Typography variant="caption" sx={{ color: '#777', fontStyle: 'italic', fontSize: '11px' }}>
+                                                                            {grievance.status === 'Resolved' ? "This ticket has been marked as resolved by our support team." : "Our team is currently reviewing your grievance."}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Box>
+
+                                                                {/* Right Section: Status & Actions */}
+                                                                <Box sx={{
+                                                                    width: { xs: '100%', md: '240px' },
+                                                                    bgcolor: '#fafafa',
+                                                                    borderLeft: { xs: 'none', md: '1px solid #eaeaea' },
+                                                                    borderTop: { xs: '1px solid #eaeaea', md: 'none' },
+                                                                    p: 3,
+                                                                    display: 'flex',
+                                                                    flexDirection: 'column',
+                                                                    justifyContent: 'center',
+                                                                    alignItems: { xs: 'flex-start', md: 'center' },
+                                                                    gap: 2
+                                                                }}>
+                                                                    <StatusChip size="medium" icon={getStatusIcon(grievance.status)} label={grievance.status} status={grievance.status} sx={{ width: '100%', py: 2.2, borderRadius: '8px' }} />
+
+                                                                    <Button
+                                                                        fullWidth
+                                                                        variant="contained"
+                                                                        startIcon={<HistoryIcon />}
+                                                                        sx={{ bgcolor: '#0A7A2F', color: 'white', '&:hover': { bgcolor: '#086325', boxShadow: '0 4px 12px rgba(10,122,47,0.3)' }, textTransform: 'none', borderRadius: '8px', py: 1.2, fontWeight: 700, boxShadow: 'none' }}
+                                                                        onClick={() => navigate(`/grievance?ticket=${grievance.ticket}`)}
+                                                                    >
+                                                                        Track Status
+                                                                    </Button>
+                                                                </Box>
+                                                            </Box>
                                                         </Card>
                                                     </Zoom>
                                                 </Grid>
@@ -1069,107 +1417,87 @@ const MyAccount = () => {
                                         KYC Verification
                                     </Typography>
 
-                                    <Paper variant="outlined" sx={{ borderRadius: '14px', p: 3 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                                            <Typography variant="subtitle1" fontWeight="bold">Status</Typography>
-                                            <StatusChip
-                                                label={userData.kycStatus || 'Pending'}
-                                                status={userData.kycStatus || 'Pending'}
-                                                sx={{
-                                                    ...(userData.kycStatus === 'Verified' && { bgcolor: '#0A7A2F', color: 'white' }),
-                                                    ...(userData.kycStatus === 'Rejected' && { bgcolor: '#d32f2f', color: 'white' }),
-                                                    ...(userData.kycStatus === 'Submitted' && { bgcolor: '#F7931E', color: 'white' }),
-                                                    ...(userData.kycStatus === 'Pending' && { bgcolor: '#757575', color: 'white' }),
-                                                    ...(userData.kycStatus === undefined && { bgcolor: '#757575', color: 'white' })
-                                                }}
-                                            />
+                                    <Paper variant="outlined" sx={{ borderRadius: '14px', p: 2.5, mb: 4, bgcolor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Box>
+                                            <Typography variant="subtitle1" fontWeight="700" sx={{ color: '#333' }}>Verification Status</Typography>
+                                            <Typography variant="body2" color="textSecondary">Your KYC application status</Typography>
                                         </Box>
+                                        <StatusChip
+                                            label={userData.kycStatus || 'Pending'}
+                                            status={userData.kycStatus || 'Pending'}
+                                            sx={{
+                                                px: 2, py: 2.5, fontSize: '0.9rem', borderRadius: '8px',
+                                                ...(userData.kycStatus === 'Verified' && { bgcolor: '#0A7A2F', color: 'white' }),
+                                                ...(userData.kycStatus === 'Rejected' && { bgcolor: '#d32f2f', color: 'white' }),
+                                                ...(userData.kycStatus === 'Submitted' && { bgcolor: '#F7931E', color: 'white' }),
+                                                ...(userData.kycStatus === 'Pending' && { bgcolor: '#757575', color: 'white' }),
+                                                ...(userData.kycStatus === undefined && { bgcolor: '#757575', color: 'white' })
+                                            }}
+                                        />
+                                    </Paper>
 
-                                        {userData.kycMessage && userData.kycStatus === 'Rejected' && (
-                                            <Alert severity="error" sx={{ mb: 3 }}>
-                                                <strong>Rejection Reason:</strong> {userData.kycMessage}
-                                            </Alert>
-                                        )}
+                                    {userData.kycMessage && userData.kycStatus === 'Rejected' && (
+                                        <Alert severity="error" sx={{ mb: 4, borderRadius: '10px' }}>
+                                            <strong>Rejection Reason:</strong> {userData.kycMessage}
+                                        </Alert>
+                                    )}
 
+                                    {/* Identity Details */}
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, color: '#111' }}>Identity Details</Typography>
+                                    <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
                                         <Grid container spacing={3}>
                                             <Grid item xs={12} md={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Aadhar Number"
-                                                    value={kycData.aadharNumber}
-                                                    onChange={(e) => setKycData({ ...kycData, aadharNumber: e.target.value })}
-                                                    disabled={kycReadOnly}
-                                                />
+                                                <TextField fullWidth label="Aadhar Number" value={kycData.aadharNumber} onChange={(e) => setKycData({ ...kycData, aadharNumber: e.target.value })} disabled={kycReadOnly} />
                                             </Grid>
                                             <Grid item xs={12} md={6}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="PAN Number"
-                                                    value={kycData.panNumber}
-                                                    onChange={(e) => setKycData({ ...kycData, panNumber: e.target.value.toUpperCase() })}
-                                                    disabled={kycReadOnly}
-                                                />
+                                                <TextField fullWidth label="PAN Number" value={kycData.panNumber} onChange={(e) => setKycData({ ...kycData, panNumber: e.target.value.toUpperCase() })} disabled={kycReadOnly} />
                                             </Grid>
+                                        </Grid>
+                                    </Paper>
 
-                                            <Grid item xs={12}>
-                                                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1, mt: 1 }}>Bank Details</Typography>
-                                                <Divider sx={{ mb: 2 }} />
-                                            </Grid>
-
+                                    {/* Bank Information */}
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, color: '#111' }}>Bank Information</Typography>
+                                    <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
+                                        <Grid container spacing={3}>
                                             <Grid item xs={12} md={4}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Account Number"
-                                                    value={kycData.bankDetails.accountNumber}
-                                                    onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, accountNumber: e.target.value } })}
-                                                    disabled={kycReadOnly}
-                                                />
+                                                <TextField fullWidth label="Account Number" value={kycData.bankDetails.accountNumber} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, accountNumber: e.target.value } })} disabled={kycReadOnly} />
                                             </Grid>
                                             <Grid item xs={12} md={4}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="IFSC Code"
-                                                    value={kycData.bankDetails.ifscCode}
-                                                    onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, ifscCode: e.target.value.toUpperCase() } })}
-                                                    disabled={kycReadOnly}
-                                                />
+                                                <TextField fullWidth label="IFSC Code" value={kycData.bankDetails.ifscCode} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, ifscCode: e.target.value.toUpperCase() } })} disabled={kycReadOnly} />
                                             </Grid>
                                             <Grid item xs={12} md={4}>
-                                                <TextField
-                                                    fullWidth
-                                                    label="Bank Name"
-                                                    value={kycData.bankDetails.bankName}
-                                                    onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, bankName: e.target.value } })}
-                                                    disabled={kycReadOnly}
-                                                />
+                                                <TextField fullWidth label="Bank Name" value={kycData.bankDetails.bankName} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, bankName: e.target.value } })} disabled={kycReadOnly} />
                                             </Grid>
+                                        </Grid>
+                                    </Paper>
 
-                                            <Grid item xs={12}>
-                                                <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1, mt: 1 }}>Documents (Upload format: JPG, PNG)</Typography>
-                                                <Divider sx={{ mb: 2 }} />
-                                            </Grid>
-
-                                            {/* Document Uploads Grid */}
+                                    {/* Documents */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#111' }}>Document Proofs</Typography>
+                                        <Chip label="JPG, PNG" size="small" sx={{ height: 20, fontSize: '10px', fontWeight: 600, bgcolor: '#e8f5e9', color: '#0A7A2F' }} />
+                                    </Box>
+                                    <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
+                                        <Grid container spacing={3}>
                                             {['aadharFront', 'aadharBack', 'panCard', 'passbook'].map((docType) => (
                                                 <Grid item xs={12} sm={6} md={3} key={docType}>
-                                                    <Box sx={{ border: '1px dashed #ccc', borderRadius: 2, p: 2, textAlign: 'center', position: 'relative', height: '140px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <Box sx={{ border: '2px dashed #e0e0e0', borderRadius: '12px', p: 2, textAlign: 'center', position: 'relative', height: '160px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: kycData.kycDocuments[docType] ? '#fff' : '#fafafa', transition: 'all 0.2s', '&:hover': { borderColor: '#0A7A2F', bgcolor: '#f4fbf5' } }}>
                                                         {kycData.kycDocuments[docType] ? (
                                                             <>
-                                                                <img src={kycData.kycDocuments[docType]} alt={docType} style={{ maxHeight: '80px', maxWidth: '100%', objectFit: 'contain' }} />
+                                                                <img src={kycData.kycDocuments[docType]} alt={docType} style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
                                                                 {!kycReadOnly && (
-                                                                    <IconButton size="small" sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(255,255,255,0.8)' }} onClick={() => setKycData({ ...kycData, kycDocuments: { ...kycData.kycDocuments, [docType]: '' } })}>
-                                                                        <CancelIcon fontSize="small" color="error" />
+                                                                    <IconButton size="small" sx={{ position: 'absolute', top: -8, right: -8, bgcolor: 'white', border: '1px solid #eee', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', '&:hover': { bgcolor: '#ffebee' } }} onClick={() => setKycData({ ...kycData, kycDocuments: { ...kycData.kycDocuments, [docType]: '' } })}>
+                                                                        <CancelIcon fontSize="small" sx={{ color: '#d32f2f' }} />
                                                                     </IconButton>
                                                                 )}
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <CameraAltIcon sx={{ color: '#ccc', fontSize: 32, mb: 1 }} />
-                                                                <Typography variant="caption" sx={{ color: '#888' }}>
+                                                                <CameraAltIcon sx={{ color: '#bdbdbd', fontSize: 36, mb: 1.5 }} />
+                                                                <Typography variant="body2" sx={{ color: '#555', fontWeight: 500, mb: 1.5 }}>
                                                                     {docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                                                                 </Typography>
                                                                 {!kycReadOnly && (
-                                                                    <Button component="label" size="small" sx={{ mt: 1 }}>
+                                                                    <Button component="label" size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: '6px', px: 2, color: '#0A7A2F', borderColor: '#0A7A2F', '&:hover': { bgcolor: '#e8f5e9', borderColor: '#0A7A2F' } }}>
                                                                         Upload
                                                                         <input type="file" hidden accept="image/*" onChange={(e) => handleKycImageUpload(e, docType)} />
                                                                     </Button>
@@ -1179,23 +1507,23 @@ const MyAccount = () => {
                                                     </Box>
                                                 </Grid>
                                             ))}
-
-                                            {!kycReadOnly && (
-                                                <Grid item xs={12} sx={{ mt: 2 }}>
-                                                    <Button
-                                                        variant="contained"
-                                                        fullWidth
-                                                        onClick={handleKycSubmit}
-                                                        disabled={kycSubmitting}
-                                                        startIcon={kycSubmitting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
-                                                        sx={{ bgcolor: '#0A7A2F', '&:hover': { bgcolor: '#085c22' }, py: 1.5, fontSize: '16px', fontWeight: 'bold' }}
-                                                    >
-                                                        {kycSubmitting ? 'Submitting...' : 'Submit KYC'}
-                                                    </Button>
-                                                </Grid>
-                                            )}
                                         </Grid>
                                     </Paper>
+
+                                    {!kycReadOnly && (
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                            <Button
+                                                variant="contained"
+                                                size="large"
+                                                onClick={handleKycSubmit}
+                                                disabled={kycSubmitting}
+                                                startIcon={kycSubmitting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                                                sx={{ bgcolor: '#0A7A2F', '&:hover': { bgcolor: '#085c22' }, py: 1.5, px: 4, borderRadius: '8px', fontSize: '15px', fontWeight: 600, boxShadow: '0 4px 14px rgba(10,122,47,0.2)' }}
+                                            >
+                                                {kycSubmitting ? 'Submitting...' : 'Submit KYC Details'}
+                                            </Button>
+                                        </Box>
+                                    )}
                                 </Box>
                             )}
                         </Box>
@@ -1210,7 +1538,20 @@ const MyAccount = () => {
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     TransitionComponent={Slide}
                 >
-                    <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    <Alert
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                        severity={snackbar.severity}
+                        variant="filled"
+                        sx={{
+                            width: '100%',
+                            borderRadius: '16px',
+                            fontWeight: 800,
+                            boxShadow: '0 8px 30px rgba(247,147,30,0.25)',
+                            bgcolor: '#f7931e',
+                            color: 'white',
+                            '& .MuiAlert-icon': { color: 'white' }
+                        }}
+                    >
                         {snackbar.message}
                     </Alert>
                 </Snackbar>
