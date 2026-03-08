@@ -42,9 +42,6 @@ import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
 import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
 import AdminOrders from '../pages/admin/Orders.jsx'
-import AdminGallery from '../pages/admin/Gallery.jsx'
-import AdminEvents from '../pages/admin/Events.jsx'
-import AdminNews from '../pages/admin/News.jsx'
 
 const MainRoutes = () => {
     return (
@@ -112,9 +109,6 @@ const MainRoutes = () => {
                 <Route path="franchise" element={<AdminFranchise />} />
                 <Route path="grievance" element={<AdminGrievance />} />
                 <Route path="orders" element={<AdminOrders />} />
-                <Route path="gallery" element={<AdminGallery />} />
-                <Route path="events" element={<AdminEvents />} />
-                <Route path="news" element={<AdminNews />} />
 
 
             </Route>
