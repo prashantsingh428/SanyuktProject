@@ -11,9 +11,6 @@ import Grievance from '../pages/Grievance.jsx'
 import Product from '../pages/Product.jsx'
 import Recharge from '../pages/Recharge.jsx'
 import MyAccount from '../pages/MyAccount.jsx'
-import Gallery from '../pages/Gallery.jsx'
-import Events from '../pages/Events.jsx'
-import News from '../pages/News.jsx'
 import UserDashboardLayout from '../layouts/UserDashboardLayout.jsx'
 import DashboardOverview from '../pages/DashboardOverview.jsx'
 import DashboardPlaceholder from '../components/DashboardPlaceholder.jsx'
@@ -100,9 +97,6 @@ const MainRoutes = () => {
             </Route>
 
             <Route path='/order-details/:id' element={<OrderDetails />} />
-            <Route path='/gallery' element={<Gallery />} />
-            <Route path='/news' element={<News />} />
-            <Route path='/events' element={<Events />} />
 
 
             {/* 🔥 Admin Routes (Nested) */}
