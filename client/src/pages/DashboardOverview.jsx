@@ -16,10 +16,29 @@ const DashboardOverview = () => {
         generationWallet: "0.00",
         netCommission: "450.00",
         productPurchases: "1,250.00",
+
+        productWallet: "0.00",
+        paidWithdrawalToday: "0.00",
         totalDownline: 124,
         leftCount: 56,
         rightCount: 68,
         activeDirects: 12,
+        pvLeft: 0,
+        pvRight: 0,
+        totalPvLeft: 0,
+        totalPvRight: 0,
+        currentSilverLeft: 0,
+        currentSilverRight: 0,
+        totalSilverLeft: 0,
+        totalSilverRight: 0,
+        currentGoldLeft: 0,
+        currentGoldRight: 0,
+        totalGoldLeft: 0,
+        totalGoldRight: 0,
+        currentDiamondLeft: 0,
+        currentDiamondRight: 0,
+        totalDiamondLeft: 0,
+        totalDiamondRight: 0,
         dailyPV: { current: 450, target: 320 },
         lifetimePV: { current: "12,450", target: "10,200" }
     });
@@ -61,7 +80,7 @@ const DashboardOverview = () => {
     const WalletCard = ({ title, amount, color, icon: Icon }) => (
         <motion.div 
             variants={cardVariants}
-            className="bg-white rounded-[1.5rem] p-5 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group h-full"
+            className="bg-white rounded-[1.5rem] p-4 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group"
         >
             <div className="flex justify-between items-start mb-4">
                 <div className={`p-2.5 rounded-xl ${color.bg} ${color.text}`}>
@@ -78,10 +97,36 @@ const DashboardOverview = () => {
         </motion.div>
     );
 
+    const LeftRightCard = ({ title, left, right, color, icon: Icon }) => (
+        <motion.div 
+            variants={cardVariants}
+            className="bg-white rounded-[1.5rem] p-4 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group"
+        >
+            <div className="flex justify-between items-start mb-4">
+                <div className={`p-2.5 rounded-xl ${color.bg} ${color.text}`}>
+                    <Icon size={18} />
+                </div>
+                <div className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">Live Balance</div>
+            </div>
+            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{title}</h3>
+            <div className="flex items-baseline justify-between mt-1">
+                <div className="flex items-baseline gap-1">
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">L</span>
+                    <span className="text-xl font-black text-black tracking-tighter">{left}</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">R</span>
+                    <span className="text-xl font-black text-black tracking-tighter">{right}</span>
+                </div>
+            </div>
+            <div className={`absolute bottom-0 left-0 h-1 w-full transition-all duration-500 ${color.accent}`}></div>
+        </motion.div>
+    );
+
     const StatListCard = ({ title, value, badge, color, icon: Icon }) => (
         <motion.div 
             variants={cardVariants}
-            className="bg-white rounded-[1.2rem] p-4 shadow-sm border border-gray-100 flex flex-col h-full"
+            className="bg-white rounded-[1.2rem] p-3.5 shadow-sm border border-gray-100 flex flex-col"
         >
             <div className="flex items-start justify-between mb-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color.bg} ${color.text} shadow-sm`}>
@@ -102,11 +147,11 @@ const DashboardOverview = () => {
         return (
             <motion.div 
                 variants={cardVariants}
-                className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col items-center text-center h-full"
+                className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center"
             >
                 <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">{title}</div>
                 
-                <div className="relative w-40 h-20 mb-4">
+                <div className="relative w-32 h-16 mb-3">
                     <svg className="w-full h-full" viewBox="0 0 100 50">
                         <path 
                             d="M 10 50 A 40 40 0 0 1 90 50" 
@@ -239,6 +284,18 @@ const DashboardOverview = () => {
                             color={{ bg: "bg-orange-50", text: "text-orange-600", accent: "bg-orange-600" }} 
                             icon={TrendingUp} 
                         />
+                        <WalletCard 
+                            title="Product Wallet" 
+                            amount={stats.productWallet} 
+                            color={{ bg: "bg-emerald-50", text: "text-emerald-600", accent: "bg-emerald-600" }} 
+                            icon={Package} 
+                        />
+                        <WalletCard 
+                            title="Paid Withdrawal Today" 
+                            amount={stats.paidWithdrawalToday} 
+                            color={{ bg: "bg-orange-50", text: "text-orange-600", accent: "bg-orange-600" }} 
+                            icon={Briefcase} 
+                        />
                     </div>
                 </div>
 
@@ -274,7 +331,7 @@ const DashboardOverview = () => {
                 {/* --- RIGHT SECTION (Gauges + Activity) --- */}
                 <div className="lg:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Gauge Cards Column */}
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-4">
                         <GaugeCard 
                             title="Daily Performance" 
                             current={stats.dailyPV.current} 
@@ -295,7 +352,7 @@ const DashboardOverview = () => {
                     <div className="flex flex-col gap-6">
                         <motion.div 
                             variants={cardVariants}
-                            className="bg-white rounded-[1.2rem] p-5 shadow-sm border border-gray-100 flex flex-col items-center text-center"
+                            className="bg-white rounded-[1.2rem] p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center"
                         >
                             <div className="w-10 h-10 rounded-xl bg-gray-50 text-black flex items-center justify-center mb-4">
                                 <ShoppingBag size={20} />
@@ -309,7 +366,7 @@ const DashboardOverview = () => {
 
                         <motion.div 
                             variants={cardVariants}
-                            className="bg-white rounded-[1.5rem] p-6 shadow-sm border border-gray-100 flex-1 flex flex-col"
+                            className="bg-white rounded-[1.5rem] p-4 shadow-sm border border-gray-100 flex flex-col"
                         >
                             <h3 className="text-[10px] font-black text-black uppercase tracking-[0.2em] mb-6">Recent Activity</h3>
                             <div className="flex flex-col gap-6">
@@ -331,6 +388,66 @@ const DashboardOverview = () => {
                     </div>
                 </div>
             </motion.div>
+
+            {/* PV & Rank Left/Right Grid - full width so right side empty space na rahe */}
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4">
+                <LeftRightCard 
+                    title="PV Left / Right" 
+                    left={stats.pvLeft} 
+                    right={stats.pvRight} 
+                    color={{ bg: "bg-emerald-50", text: "text-emerald-600", accent: "bg-emerald-600" }} 
+                    icon={Target} 
+                />
+                <LeftRightCard 
+                    title="Total PV Left / Right" 
+                    left={stats.totalPvLeft} 
+                    right={stats.totalPvRight} 
+                    color={{ bg: "bg-orange-50", text: "text-orange-600", accent: "bg-orange-600" }} 
+                    icon={Target} 
+                />
+                <LeftRightCard 
+                    title="Current Silver Left / Right" 
+                    left={stats.currentSilverLeft} 
+                    right={stats.currentSilverRight} 
+                    color={{ bg: "bg-gray-50", text: "text-black", accent: "bg-black" }} 
+                    icon={CheckCircle2} 
+                />
+                <LeftRightCard 
+                    title="Total Silver Left / Right" 
+                    left={stats.totalSilverLeft} 
+                    right={stats.totalSilverRight} 
+                    color={{ bg: "bg-emerald-50", text: "text-emerald-600", accent: "bg-emerald-600" }} 
+                    icon={CheckCircle2} 
+                />
+                <LeftRightCard 
+                    title="Current Gold Left / Right" 
+                    left={stats.currentGoldLeft} 
+                    right={stats.currentGoldRight} 
+                    color={{ bg: "bg-orange-50", text: "text-orange-600", accent: "bg-orange-600" }} 
+                    icon={CreditCard} 
+                />
+                <LeftRightCard 
+                    title="Total Gold Left / Right" 
+                    left={stats.totalGoldLeft} 
+                    right={stats.totalGoldRight} 
+                    color={{ bg: "bg-gray-50", text: "text-black", accent: "bg-black" }} 
+                    icon={CreditCard} 
+                />
+                <LeftRightCard 
+                    title="Current Diamond Left / Right" 
+                    left={stats.currentDiamondLeft} 
+                    right={stats.currentDiamondRight} 
+                    color={{ bg: "bg-emerald-50", text: "text-emerald-600", accent: "bg-emerald-600" }} 
+                    icon={Activity} 
+                />
+                <LeftRightCard 
+                    title="Total Diamond Left / Right" 
+                    left={stats.totalDiamondLeft} 
+                    right={stats.totalDiamondRight} 
+                    color={{ bg: "bg-orange-50", text: "text-orange-600", accent: "bg-orange-600" }} 
+                    icon={Activity} 
+                />
+            </div>
 
             {/* Dashboard Footer Decoration to match image */}
             <div className="mt-20 pt-8 border-t border-gray-100 flex justify-between items-center text-[10px] font-black text-gray-300 uppercase tracking-widest">
