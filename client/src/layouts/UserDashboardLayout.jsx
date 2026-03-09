@@ -12,6 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 const UserDashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [userData, setUserData] = useState(null);
+    const [openDropdown, setOpenDropdown] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -39,14 +40,92 @@ const UserDashboardLayout = () => {
     const menuItems = [
         { name: 'Home', icon: Home, path: '/my-account', id: 'home' },
         { name: 'New Sign Up', icon: UserPlus, path: '/register', id: 'signup' },
-        { name: 'My Downline', icon: Users, path: '/my-account/downline', id: 'downline', badge: 5 },
+        { 
+            name: 'My Downline', 
+            icon: Users, 
+            path: '/my-account/downline', 
+            id: 'downline', 
+            badge: 5,
+            children: [
+                { name: 'My Directs', path: '/my-account/downline/directs', id: 'downline_directs' },
+                { name: 'Left Team', path: '/my-account/downline/left-team', id: 'downline_left' },
+                { name: 'Right Team', path: '/my-account/downline/right-team', id: 'downline_right' },
+                { name: 'All Team', path: '/my-account/downline/all-team', id: 'downline_all' },
+                { name: 'Tree View', path: '/my-account/downline/tree-view', id: 'downline_tree' },
+            ],
+        },
         { name: 'Product Order', icon: ShoppingCart, path: '/my-account/orders', id: 'orders', badge: 6 },
-        { name: 'First Purchase Bonus', icon: Gift, path: '/my-account/bonus/first', id: 'first_bonus', badge: 3 },
-        { name: 'Repurchase Bonus', icon: Package, path: '/my-account/bonus/repurchase', id: 'repurchase_bonus', badge: 10 },
+        { 
+            name: 'First Purchase Bonus', 
+            icon: Gift, 
+            path: '/my-account/bonus/first', 
+            id: 'first_bonus', 
+            badge: 3,
+            children: [
+                { name: 'Silver Matching', path: '/my-account/bonus/first/silver', id: 'first_silver' },
+                { name: 'Gold Matching', path: '/my-account/bonus/first/gold', id: 'first_gold' },
+                { name: 'Diamond Matching', path: '/my-account/bonus/first/diamond', id: 'first_diamond' },
+            ],
+        },
+        { 
+            name: 'Repurchase Bonus', 
+            icon: Package, 
+            path: '/my-account/bonus/repurchase', 
+            id: 'repurchase_bonus', 
+            badge: 10,
+            children: [
+                { name: 'Self Repurchase Income', path: '/my-account/bonus/repurchase/self', id: 'repurchase_self' },
+                { name: 'Repurchase Level Income', path: '/my-account/bonus/repurchase/level', id: 'repurchase_level' },
+                { name: 'Sponsor Income', path: '/my-account/bonus/repurchase/sponsor', id: 'repurchase_sponsor' },
+                { name: 'Royalty Bonus', path: '/my-account/bonus/repurchase/royalty', id: 'repurchase_royalty' },
+                { name: 'Director Bonus', path: '/my-account/bonus/repurchase/director', id: 'repurchase_director' },
+                { name: 'House Fund', path: '/my-account/bonus/repurchase/house', id: 'repurchase_house' },
+                { name: 'Leadership Fund', path: '/my-account/bonus/repurchase/leadership', id: 'repurchase_leadership' },
+                { name: 'Car Fund', path: '/my-account/bonus/repurchase/car', id: 'repurchase_car' },
+                { name: 'Travel Fund', path: '/my-account/bonus/repurchase/travel', id: 'repurchase_travel' },
+                { name: 'Bike Fund', path: '/my-account/bonus/repurchase/bike', id: 'repurchase_bike' },
+            ],
+        },
         { name: 'Our Products', icon: ShoppingBag, path: '/products', id: 'shop' },
-        { name: 'E-Wallet', icon: Wallet, path: '/my-account/wallet', id: 'wallet', badge: 4 },
-        { name: 'Generation Wallet', icon: Wallet, path: '/my-account/wallet/generation', id: 'gen_wallet', badge: 4 },
-        { name: 'My Folder', icon: Folder, path: '/my-account/folder', id: 'folder', badge: 4 },
+        { 
+            name: 'E-Wallet', 
+            icon: Wallet, 
+            path: '/my-account/wallet', 
+            id: 'wallet', 
+            badge: 4,
+            children: [
+                { name: 'Deduction Report', path: '/my-account/wallet/deduction-report', id: 'wallet_deduction' },
+                { name: 'Withdrawal History', path: '/my-account/wallet/withdrawal-history', id: 'wallet_withdrawal' },
+                { name: 'All Transaction Report', path: '/my-account/wallet/all-transactions', id: 'wallet_all_txn' },
+                { name: 'Daily Closing Report', path: '/my-account/wallet/daily-closing', id: 'wallet_daily' },
+            ],
+        },
+        { 
+            name: 'Generation Wallet', 
+            icon: Wallet, 
+            path: '/my-account/wallet/generation', 
+            id: 'gen_wallet', 
+            badge: 4,
+            children: [
+                { name: 'Deduction Report', path: '/my-account/wallet/generation/deduction-report', id: 'gen_deduction' },
+                { name: 'Withdrawal History', path: '/my-account/wallet/generation/withdrawal-history', id: 'gen_withdrawal' },
+                { name: 'All Transaction Report', path: '/my-account/wallet/generation/all-transactions', id: 'gen_all_txn' },
+                { name: 'Monthly Closing Report', path: '/my-account/wallet/generation/monthly-closing', id: 'gen_monthly' },
+            ],
+        },
+        { 
+            name: 'My Folder', 
+            icon: Folder, 
+            path: '/my-account/folder', 
+            id: 'folder', 
+            badge: 4,
+            children: [
+                { name: 'Welcome Letter', path: '/my-account/folder/welcome-letter', id: 'folder_welcome' },
+                { name: 'Download Files', path: '/my-account/folder/download-files', id: 'folder_downloads' },
+                { name: 'Our Banker', path: '/my-account/folder/our-banker', id: 'folder_banker' },
+                { name: 'ID Card', path: '/my-account/folder/id-card', id: 'folder_id' },
+            ],
+        },
         { name: 'Profile & KYC', icon: UserCheck, path: '/my-account/profile', id: 'profile', badge: 4 },
         { name: 'Submit Complain', icon: MessageSquare, path: '/my-account/grievances', id: 'grievance', badge: 2 },
     ];
@@ -101,27 +180,71 @@ const UserDashboardLayout = () => {
                     {/* Navigation Menu */}
                     <nav className="flex-1 space-y-1">
                         {menuItems.map((item) => {
-                            const active = location.pathname === item.path || (item.path === '/my-account' && location.pathname === '/my-account/');
+                            const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+                            const isActiveDirect = location.pathname === item.path || (item.path === '/my-account' && location.pathname === '/my-account/');
+                            const isChildActive = hasChildren && item.children.some(child => location.pathname === child.path);
+                            const active = isActiveDirect || isChildActive;
+
                             return (
-                                <Link
-                                    key={item.id}
-                                    to={item.path}
-                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                        ${active ? 'bg-white text-[#0A7A2F]' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
-                                >
-                                    <item.icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#0A7A2F]' : 'group-hover:text-white'}`} />
-                                    {sidebarOpen && (
-                                        <div className="flex items-center justify-between flex-1 overflow-hidden">
-                                            <span className="font-bold text-[13px] whitespace-nowrap">{item.name}</span>
-                                            {item.badge && (
-                                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black
-                                                    ${active ? 'bg-orange-600 text-white' : 'bg-white/10 text-white/50'}`}>
-                                                    {item.badge}
-                                                </span>
-                                            )}
+                                <div key={item.id} className="space-y-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (hasChildren) {
+                                                setOpenDropdown(prev => prev === item.id ? null : item.id);
+                                            } else {
+                                                navigate(item.path);
+                                            }
+                                        }}
+                                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group text-left
+                                            ${active ? 'bg-white text-[#0A7A2F]' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+                                    >
+                                        <item.icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#0A7A2F]' : 'group-hover:text-white'}`} />
+                                        {sidebarOpen && (
+                                            <div className="flex items-center justify-between flex-1 overflow-hidden">
+                                                <span className="font-bold text-[13px] whitespace-nowrap">{item.name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    {item.badge && (
+                                                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-black
+                                                            ${active ? 'bg-orange-600 text-white' : 'bg-white/10 text-white/50'}`}>
+                                                            {item.badge}
+                                                        </span>
+                                                    )}
+                                                    {hasChildren && (
+                                                        <ChevronDown 
+                                                            className={`w-4 h-4 transition-transform duration-200 ${openDropdown === item.id ? 'rotate-180' : ''}`} 
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </button>
+
+                                    {hasChildren && sidebarOpen && (
+                                        <div
+                                            className={`
+                                                ml-10 mr-4 rounded-b-xl overflow-hidden bg-[#0A7A2F]
+                                                transition-[max-height,opacity,transform] duration-200
+                                                ${openDropdown === item.id ? 'max-h-96 opacity-100 translate-y-0 py-2' : 'max-h-0 opacity-0 -translate-y-1 py-0'}
+                                            `}
+                                        >
+                                            {item.children.map((child) => {
+                                                const childActive = location.pathname === child.path;
+                                                return (
+                                                    <Link
+                                                        key={child.id}
+                                                        to={child.path}
+                                                        className={`block px-4 py-1.5 text-[13px] text-left ${
+                                                            childActive ? 'text-white font-bold' : 'text-white/80 hover:text-white font-semibold'
+                                                        }`}
+                                                    >
+                                                        {child.name}
+                                                    </Link>
+                                                );
+                                            })}
                                         </div>
                                     )}
-                                </Link>
+                                </div>
                             );
                         })}
                     </nav>
