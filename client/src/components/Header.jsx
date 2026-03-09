@@ -916,36 +916,34 @@ const Header = () => {
                                             </MenuItem>
                                         ) : (
                                             // Regular User Menu Items
-                                            <>
-                                                {[
-                                                    { label: 'Dashboard', icon: <DashboardIcon fontSize="small" />, path: '/my-account' },
-                                                    { label: 'My Orders', icon: <ReceiptIcon fontSize="small" />, path: '/my-account/orders' },
-                                                    { label: 'My Profile', icon: <PersonIcon fontSize="small" />, path: '/my-account/profile' },
-                                                    { label: 'Transactions', icon: <HistoryIcon fontSize="small" />, path: '/my-account/transactions' },
-                                                    { label: 'KYC Status', icon: <FingerprintIcon fontSize="small" />, path: '/my-account/kyc' },
-                                                ].map((item) => (
-                                                    <MenuItem
-                                                        key={item.label}
-                                                        onClick={() => handleNavigation(item.path)}
-                                                        sx={{
-                                                            fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                            fontSize: '13px',
-                                                            fontWeight: 500,
-                                                            color: '#2F7A32',
-                                                            borderRadius: '4px',
-                                                            gap: 1.5,
-                                                            py: 1,
-                                                            '&:hover': {
-                                                                backgroundColor: 'rgba(10, 122, 47, 0.05)',
-                                                                color: '#0A7A2F',
-                                                            }
-                                                        }}
-                                                    >
-                                                        {item.icon}
-                                                        {item.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </>
+                                            [
+                                                { label: 'Dashboard', icon: <DashboardIcon fontSize="small" />, path: '/my-account' },
+                                                { label: 'My Orders', icon: <ReceiptIcon fontSize="small" />, path: '/my-account/orders' },
+                                                { label: 'My Profile', icon: <PersonIcon fontSize="small" />, path: '/my-account/profile' },
+                                                { label: 'Transactions', icon: <HistoryIcon fontSize="small" />, path: '/my-account/transactions' },
+                                                { label: 'KYC Status', icon: <FingerprintIcon fontSize="small" />, path: '/my-account/kyc' },
+                                            ].map((item) => (
+                                                <MenuItem
+                                                    key={item.label}
+                                                    onClick={() => handleNavigation(item.path)}
+                                                    sx={{
+                                                        fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                        fontSize: '13px',
+                                                        fontWeight: 500,
+                                                        color: '#2F7A32',
+                                                        borderRadius: '4px',
+                                                        gap: 1.5,
+                                                        py: 1,
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(10, 122, 47, 0.05)',
+                                                            color: '#0A7A2F',
+                                                        }
+                                                    }}
+                                                >
+                                                    {item.icon}
+                                                    {item.label}
+                                                </MenuItem>
+                                            ))
                                         )}
 
                                         <LogoutMenuItem

@@ -434,6 +434,118 @@ const MyAccount = ({ defaultTab }) => {
             'User';
     };
 
+    const renderKycForm = () => (
+        <Box>
+            <Paper variant="outlined" sx={{ borderRadius: '14px', p: 2.5, mb: 4, bgcolor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box>
+                    <Typography variant="subtitle1" fontWeight="700" sx={{ color: '#333' }}>Verification Status</Typography>
+                    <Typography variant="body2" color="textSecondary">Your KYC application status</Typography>
+                </Box>
+                <StatusChip
+                    label={userData.kycStatus || 'Pending'}
+                    status={userData.kycStatus || 'Pending'}
+                    sx={{
+                        px: 2, py: 2.5, fontSize: '0.9rem', borderRadius: '8px',
+                        ...(userData.kycStatus === 'Verified' && { bgcolor: '#0A7A2F', color: 'white' }),
+                        ...(userData.kycStatus === 'Rejected' && { bgcolor: '#d32f2f', color: 'white' }),
+                        ...(userData.kycStatus === 'Submitted' && { bgcolor: '#F7931E', color: 'white' }),
+                        ...(userData.kycStatus === 'Pending' && { bgcolor: '#757575', color: 'white' }),
+                        ...(userData.kycStatus === undefined && { bgcolor: '#757575', color: 'white' })
+                    }}
+                />
+            </Paper>
+
+            {userData.kycMessage && userData.kycStatus === 'Rejected' && (
+                <Alert severity="error" sx={{ mb: 4, borderRadius: '10px' }}>
+                    <strong>Rejection Reason:</strong> {userData.kycMessage}
+                </Alert>
+            )}
+
+            {/* Identity Details */}
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, color: '#111' }}>Identity Details</Typography>
+            <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <TextField fullWidth label="Aadhar Number" value={kycData.aadharNumber} onChange={(e) => setKycData({ ...kycData, aadharNumber: e.target.value })} disabled={kycReadOnly} />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <TextField fullWidth label="PAN Number" value={kycData.panNumber} onChange={(e) => setKycData({ ...kycData, panNumber: e.target.value.toUpperCase() })} disabled={kycReadOnly} />
+                    </Grid>
+                </Grid>
+            </Paper>
+
+            {/* Bank Information */}
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, color: '#111' }}>Bank Information</Typography>
+            <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={4}>
+                        <TextField fullWidth label="Account Number" value={kycData.bankDetails.accountNumber} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, accountNumber: e.target.value } })} disabled={kycReadOnly} />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField fullWidth label="IFSC Code" value={kycData.bankDetails.ifscCode} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, ifscCode: e.target.value.toUpperCase() } })} disabled={kycReadOnly} />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <TextField fullWidth label="Bank Name" value={kycData.bankDetails.bankName} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, bankName: e.target.value } })} disabled={kycReadOnly} />
+                    </Grid>
+                </Grid>
+            </Paper>
+
+            {/* Documents */}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#111' }}>Document Proofs</Typography>
+                <Chip label="JPG, PNG" size="small" sx={{ height: 20, fontSize: '10px', fontWeight: 600, bgcolor: '#e8f5e9', color: '#0A7A2F' }} />
+            </Box>
+            <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
+                <Grid container spacing={3}>
+                    {['aadharFront', 'aadharBack', 'panCard', 'passbook'].map((docType) => (
+                        <Grid item xs={12} sm={6} md={3} key={docType}>
+                            <Box sx={{ border: '2px dashed #e0e0e0', borderRadius: '12px', p: 2, textAlign: 'center', position: 'relative', height: '160px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: kycData.kycDocuments[docType] ? '#fff' : '#fafafa', transition: 'all 0.2s', '&:hover': { borderColor: '#0A7A2F', bgcolor: '#f4fbf5' } }}>
+                                {kycData.kycDocuments[docType] ? (
+                                    <>
+                                        <img src={kycData.kycDocuments[docType]} alt={docType} style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
+                                        {!kycReadOnly && (
+                                            <IconButton size="small" sx={{ position: 'absolute', top: -8, right: -8, bgcolor: 'white', border: '1px solid #eee', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', '&:hover': { bgcolor: '#ffebee' } }} onClick={() => setKycData({ ...kycData, kycDocuments: { ...kycData.kycDocuments, [docType]: '' } })}>
+                                                <CancelIcon fontSize="small" sx={{ color: '#d32f2f' }} />
+                                            </IconButton>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <CameraAltIcon sx={{ color: '#bdbdbd', fontSize: 36, mb: 1.5 }} />
+                                        <Typography variant="body2" sx={{ color: '#555', fontWeight: 500, mb: 1.5 }}>
+                                            {docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                        </Typography>
+                                        {!kycReadOnly && (
+                                            <Button component="label" size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: '6px', px: 2, color: '#0A7A2F', borderColor: '#0A7A2F', '&:hover': { bgcolor: '#e8f5e9', borderColor: '#0A7A2F' } }}>
+                                                Upload
+                                                <input type="file" hidden accept="image/*" onChange={(e) => handleKycImageUpload(e, docType)} />
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                            </Box>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Paper>
+
+            {!kycReadOnly && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        onClick={handleKycSubmit}
+                        disabled={kycSubmitting}
+                        startIcon={kycSubmitting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                        sx={{ bgcolor: '#0A7A2F', '&:hover': { bgcolor: '#085c22' }, py: 1.5, px: 4, borderRadius: '8px', fontSize: '15px', fontWeight: 600, boxShadow: '0 4px 14px rgba(10,122,47,0.2)' }}
+                    >
+                        {kycSubmitting ? 'Submitting...' : 'Submit KYC Details'}
+                    </Button>
+                </Box>
+            )}
+        </Box>
+    );
+
     const formatValue = (value) => {
         if (value === undefined || value === null || value === '') return 'Not provided';
         return value;
@@ -809,9 +921,9 @@ const MyAccount = ({ defaultTab }) => {
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.75 }}>
                                                         <Box sx={{ bgcolor: '#e8f5e9', color: '#0A7A2F', fontWeight: 600, fontSize: '11px', px: 1.5, py: 0.25, borderRadius: '20px' }}>ID: {formatValue(userData.memberId)}</Box>
                                                         <Box sx={{ bgcolor: '#fffbed', color: '#F7931E', fontWeight: 600, fontSize: '11px', px: 1.5, py: 0.25, borderRadius: '20px' }}>{formatValue(userData.position)}</Box>
-                                                        <Typography sx={{ color: '#bbb', fontSize: '13px' }}>{[userData.district, userData.state].filter(Boolean).join(', ') || 'India'}</Typography>
+                                                        <Typography sx={{ color: '#888', fontSize: '13px' }}>{[userData.district, userData.state].filter(Boolean).join(', ') || 'India'}</Typography>
                                                     </Box>
-                                                    <Typography sx={{ color: '#999', fontSize: '13px', mt: 0.5, wordBreak: 'break-all' }}>{formatValue(userData.email)}</Typography>
+                                                    <Typography sx={{ color: '#666', fontSize: '13px', mt: 0.5, wordBreak: 'break-all' }}>{formatValue(userData.email)}</Typography>
                                                 </Box>
                                             </Box>
                                             {/* Edit / Save / Cancel Buttons */}
@@ -866,7 +978,7 @@ const MyAccount = ({ defaultTab }) => {
                                                         { label: 'Phone', key: 'mobile' },
                                                         { label: 'Gender', key: 'gender', type: 'select', options: ['Male', 'Female', 'Other'] },
                                                     ].map((field) => (
-                                                        <Grid item xs={12} sm={6} key={field.key}>
+                                                        <Grid item xs={12} key={field.key}>
                                                             {field.type === 'select' ? (
                                                                 <TextField
                                                                     select
@@ -893,7 +1005,7 @@ const MyAccount = ({ defaultTab }) => {
                                                             )}
                                                         </Grid>
                                                     ))}
-                                                    <Grid item xs={12} sm={6}>
+                                                    <Grid item xs={12}>
                                                         <TextField
                                                             fullWidth size="small" label="Email Address"
                                                             value={formatValue(userData.email)}
@@ -901,7 +1013,7 @@ const MyAccount = ({ defaultTab }) => {
                                                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px', bgcolor: '#f9f9f9' } }}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={12} sm={6}>
+                                                    <Grid item xs={12}>
                                                         <TextField
                                                             fullWidth size="small" label="Position"
                                                             value={formatValue(userData.position)}
@@ -921,7 +1033,7 @@ const MyAccount = ({ defaultTab }) => {
                                                         { label: 'Gender', value: formatValue(userData.gender), icon: <WcIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
                                                         { label: 'Position', value: formatValue(userData.position), icon: <BadgeIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
                                                     ].map((field, fi) => (
-                                                        <Grid item xs={12} sm={6} md={6} key={fi}>
+                                                        <Grid item xs={12} key={fi}>
                                                             <Box sx={{
                                                                 display: 'flex',
                                                                 alignItems: 'center',
@@ -931,6 +1043,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                 bgcolor: '#fcfdfc',
                                                                 border: '1px solid rgba(10, 122, 47, 0.08)',
                                                                 height: '100%',
+                                                                width: '100%',
                                                                 transition: 'transform 0.2s, box-shadow 0.2s',
                                                                 '&:hover': {
                                                                     transform: 'translateY(-2px)',
@@ -942,7 +1055,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                     {field.icon}
                                                                 </Box>
                                                                 <Box>
-                                                                    <Typography sx={{ color: '#999', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
+                                                                    <Typography sx={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
                                                                     <Typography sx={{ color: '#111', fontSize: '14px', fontWeight: 700 }}>{field.value}</Typography>
                                                                 </Box>
                                                             </Box>
@@ -968,7 +1081,7 @@ const MyAccount = ({ defaultTab }) => {
                                                     { label: 'Sponsor Name', value: formatValue(userData.sponsorName), icon: <PersonIcon sx={{ fontSize: 18, color: '#F7931E' }} /> },
                                                     { label: 'State', value: formatValue(userData.state), icon: <FlagIcon sx={{ fontSize: 18, color: '#F7931E' }} /> },
                                                 ].map((field, fi) => (
-                                                    <Grid item xs={12} sm={6} md={6} key={fi}>
+                                                    <Grid item xs={12} key={fi}>
                                                         <Box sx={{
                                                             display: 'flex',
                                                             alignItems: 'center',
@@ -978,6 +1091,7 @@ const MyAccount = ({ defaultTab }) => {
                                                             bgcolor: '#fffdf9',
                                                             border: '1px solid rgba(247, 147, 30, 0.08)',
                                                             height: '100%',
+                                                            width: '100%',
                                                             transition: 'transform 0.2s, box-shadow 0.2s',
                                                             '&:hover': {
                                                                 transform: 'translateY(-2px)',
@@ -989,7 +1103,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                 {field.icon}
                                                             </Box>
                                                             <Box>
-                                                                <Typography sx={{ color: '#999', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
+                                                                <Typography sx={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
                                                                 <Typography sx={{ color: '#111', fontSize: '14px', fontWeight: 700 }}>{field.value}</Typography>
                                                             </Box>
                                                         </Box>
@@ -998,6 +1112,14 @@ const MyAccount = ({ defaultTab }) => {
                                             </Grid>
                                         </Box>
                                     </Paper>
+
+                                    {/* KYC Verification Section Integrated into Profile */}
+                                    <Box sx={{ mb: 3 }}>
+                                        <Typography variant="h6" sx={{ color: '#0A7A2F', mb: 2, fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <FingerprintIcon sx={{ fontSize: 22 }} /> KYC Verification
+                                        </Typography>
+                                        {renderKycForm()}
+                                    </Box>
                                 </Box>
                             )}
 
@@ -1013,7 +1135,7 @@ const MyAccount = ({ defaultTab }) => {
                                             </Box>
                                             <Box>
                                                 <Typography sx={{ fontWeight: 700, fontSize: { xs: '14px', sm: '16px' }, color: '#111' }}>Address Information</Typography>
-                                                <Typography sx={{ color: '#999', fontSize: { xs: '11px', sm: '13px' }, mt: 0.25 }}>
+                                                <Typography sx={{ color: '#666', fontSize: { xs: '11px', sm: '13px' }, mt: 0.25 }}>
                                                     {[userData.village, userData.district, userData.state].filter(Boolean).join(', ') || 'No address on file'}
                                                 </Typography>
                                             </Box>
@@ -1037,7 +1159,7 @@ const MyAccount = ({ defaultTab }) => {
                                                     { label: 'Village Council', value: formatValue(userData.villageCouncil), icon: <AccountCircleIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
                                                     { label: 'Village', value: formatValue(userData.village), icon: <AgricultureIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
                                                 ].map((field, fi) => (
-                                                    <Grid item xs={12} sm={6} md={6} key={fi}>
+                                                    <Grid item xs={12} key={fi}>
                                                         <Box sx={{
                                                             display: 'flex',
                                                             alignItems: 'center',
@@ -1047,6 +1169,7 @@ const MyAccount = ({ defaultTab }) => {
                                                             bgcolor: '#fcfdfc',
                                                             border: '1px solid rgba(10, 122, 47, 0.08)',
                                                             height: '100%',
+                                                            width: '100%',
                                                             transition: 'transform 0.2s, box-shadow 0.2s',
                                                             '&:hover': {
                                                                 transform: 'translateY(-2px)',
@@ -1058,7 +1181,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                 {field.icon}
                                                             </Box>
                                                             <Box>
-                                                                <Typography sx={{ color: '#999', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
+                                                                <Typography sx={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
                                                                 <Typography sx={{ color: '#111', fontSize: '14px', fontWeight: 700 }}>{field.value}</Typography>
                                                             </Box>
                                                         </Box>
@@ -1081,7 +1204,7 @@ const MyAccount = ({ defaultTab }) => {
                                                     <HomeIcon sx={{ color: '#F7931E' }} />
                                                 </Box>
                                                 <Box>
-                                                    <Typography sx={{ color: '#999', fontSize: '12px', fontWeight: 500, mb: 0.75 }}>Full Address</Typography>
+                                                    <Typography sx={{ color: '#666', fontSize: '12px', fontWeight: 500, mb: 0.75 }}>Full Address</Typography>
                                                     <Typography sx={{ color: '#111', fontSize: { xs: '14px', sm: '16px' }, fontWeight: 700, lineHeight: 1.6, maxWidth: '100%' }}>
                                                         {[userData.shippingAddress, userData.village, userData.villageCouncil, userData.block, userData.district, userData.state].filter(Boolean).join(', ') || 'Address not provided'}
                                                     </Typography>
@@ -1145,7 +1268,7 @@ const MyAccount = ({ defaultTab }) => {
                                                     px: 3,
                                                     py: 1,
                                                     minHeight: '44px',
-                                                    color: '#999',
+                                                    color: '#666',
                                                     transition: 'all 0.2s'
                                                 },
                                                 '& .Mui-selected': {
@@ -1403,19 +1526,19 @@ const MyAccount = ({ defaultTab }) => {
                                     <Grid container spacing={2} sx={{ mb: 4 }}>
                                         <Grid item xs={12} sm={4}>
                                             <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #0A7A2F', bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                                                <Typography variant="caption" sx={{ color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Total Orders</Typography>
+                                                <Typography variant="caption" sx={{ color: '#666', fontWeight: 600, textTransform: 'uppercase' }}>Total Orders</Typography>
                                                 <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: '#111' }}>{userOrders.length}</Typography>
                                             </Paper>
                                         </Grid>
                                         <Grid item xs={12} sm={4}>
                                             <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #F7931E', bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                                                <Typography variant="caption" sx={{ color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Recharges</Typography>
+                                                <Typography variant="caption" sx={{ color: '#666', fontWeight: 600, textTransform: 'uppercase' }}>Recharges</Typography>
                                                 <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: '#111' }}>{userTransactions.length}</Typography>
                                             </Paper>
                                         </Grid>
                                         <Grid item xs={12} sm={4}>
                                             <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #2196f3', bgcolor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                                                <Typography variant="caption" sx={{ color: '#999', fontWeight: 600, textTransform: 'uppercase' }}>Support Tickets</Typography>
+                                                <Typography variant="caption" sx={{ color: '#666', fontWeight: 600, textTransform: 'uppercase' }}>Support Tickets</Typography>
                                                 <Typography variant="h5" sx={{ fontWeight: 800, mt: 0.5, color: '#111' }}>{userGrievances.length}</Typography>
                                             </Paper>
                                         </Grid>
@@ -1432,7 +1555,7 @@ const MyAccount = ({ defaultTab }) => {
                                     ) : userOrders.length === 0 ? (
                                         <Box sx={{ textAlign: 'center', py: 4, bgcolor: 'white', borderRadius: '12px', border: '1px solid #eee', mb: 4 }}>
                                             <ShoppingBagIcon sx={{ fontSize: 60, color: '#eee', mb: 1 }} />
-                                            <Typography sx={{ color: '#999', fontWeight: 600 }}>No Orders Yet</Typography>
+                                            <Typography sx={{ color: '#666', fontWeight: 600 }}>No Orders Yet</Typography>
                                             <Typography variant="body2" sx={{ color: '#ccc', mt: 0.5 }}>Your product orders will appear here.</Typography>
                                         </Box>
                                     ) : (
@@ -1476,7 +1599,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                         />
                                                                     ))}
                                                                     {(order.items?.length > 2) && (
-                                                                        <Typography sx={{ fontSize: '10px', color: '#999', alignSelf: 'center', ml: 0.5 }}>+{order.items.length - 2} more</Typography>
+                                                                        <Typography sx={{ fontSize: '10px', color: '#666', alignSelf: 'center', ml: 0.5 }}>+{order.items.length - 2} more</Typography>
                                                                     )}
                                                                 </Box>
                                                             </Box>
@@ -1512,7 +1635,7 @@ const MyAccount = ({ defaultTab }) => {
                                     ) : userTransactions.length === 0 ? (
                                         <Box sx={{ textAlign: 'center', py: 4, bgcolor: 'white', borderRadius: '12px', border: '1px solid #eee' }}>
                                             <ReceiptIcon sx={{ fontSize: 60, color: '#eee', mb: 1 }} />
-                                            <Typography sx={{ color: '#999', fontWeight: 600 }}>No Recharges Yet</Typography>
+                                            <Typography sx={{ color: '#666', fontWeight: 600 }}>No Recharges Yet</Typography>
                                             <Typography variant="body2" sx={{ color: '#ccc', mt: 0.5 }}>Your Mobile / DTH / Data recharges will appear here.</Typography>
                                             <Button variant="outlined" size="small" sx={{ mt: 2, borderColor: '#0A7A2F', color: '#0A7A2F', borderRadius: '8px' }} onClick={() => navigate('/recharge')}>
                                                 Do a Recharge
@@ -1639,15 +1762,15 @@ const MyAccount = ({ defaultTab }) => {
 
                                                                     <Box sx={{ mt: 2.5, display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                                                                         <Box>
-                                                                            <Typography variant="caption" sx={{ color: '#999', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Contact Mobile</Typography>
+                                                                            <Typography variant="caption" sx={{ color: '#666', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Contact Mobile</Typography>
                                                                             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '13px', color: '#333' }}>{grievance.mobile || '—'}</Typography>
                                                                         </Box>
                                                                         <Box>
-                                                                            <Typography variant="caption" sx={{ color: '#999', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Submitted On</Typography>
+                                                                            <Typography variant="caption" sx={{ color: '#666', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Submitted On</Typography>
                                                                             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '13px', color: '#333' }}>{new Date(grievance.submittedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</Typography>
                                                                         </Box>
                                                                         <Box>
-                                                                            <Typography variant="caption" sx={{ color: '#999', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Last Activity</Typography>
+                                                                            <Typography variant="caption" sx={{ color: '#666', textTransform: 'uppercase', fontWeight: 700, fontSize: '10px' }}>Last Activity</Typography>
                                                                             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '13px', color: '#333' }}>
                                                                                 {grievance.updatedAt ? new Date(grievance.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                                                                             </Typography>
@@ -1657,7 +1780,7 @@ const MyAccount = ({ defaultTab }) => {
 
                                                                 {/* Middle Section: Progress/Info */}
                                                                 <Box sx={{ flex: 1, p: 3, display: { xs: 'none', lg: 'flex' }, flexDirection: 'column', justifyContent: 'center', bgcolor: '#fbfbfb', borderLeft: '1px solid #f0f0f0' }}>
-                                                                    <Typography variant="caption" sx={{ color: '#999', fontWeight: 700, mb: 2, textTransform: 'uppercase' }}>Resolution Progress</Typography>
+                                                                    <Typography variant="caption" sx={{ color: '#666', fontWeight: 700, mb: 2, textTransform: 'uppercase' }}>Resolution Progress</Typography>
                                                                     <Box sx={{ position: 'relative', width: '100%', mb: 1 }}>
                                                                         <Box sx={{ height: 4, bgcolor: '#eee', borderRadius: 2 }} />
                                                                         <Box sx={{
@@ -1724,113 +1847,8 @@ const MyAccount = ({ defaultTab }) => {
                                         KYC Verification
                                     </Typography>
 
-                                    <Paper variant="outlined" sx={{ borderRadius: '14px', p: 2.5, mb: 4, bgcolor: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Box>
-                                            <Typography variant="subtitle1" fontWeight="700" sx={{ color: '#333' }}>Verification Status</Typography>
-                                            <Typography variant="body2" color="textSecondary">Your KYC application status</Typography>
-                                        </Box>
-                                        <StatusChip
-                                            label={userData.kycStatus || 'Pending'}
-                                            status={userData.kycStatus || 'Pending'}
-                                            sx={{
-                                                px: 2, py: 2.5, fontSize: '0.9rem', borderRadius: '8px',
-                                                ...(userData.kycStatus === 'Verified' && { bgcolor: '#0A7A2F', color: 'white' }),
-                                                ...(userData.kycStatus === 'Rejected' && { bgcolor: '#d32f2f', color: 'white' }),
-                                                ...(userData.kycStatus === 'Submitted' && { bgcolor: '#F7931E', color: 'white' }),
-                                                ...(userData.kycStatus === 'Pending' && { bgcolor: '#757575', color: 'white' }),
-                                                ...(userData.kycStatus === undefined && { bgcolor: '#757575', color: 'white' })
-                                            }}
-                                        />
-                                    </Paper>
-
-                                    {userData.kycMessage && userData.kycStatus === 'Rejected' && (
-                                        <Alert severity="error" sx={{ mb: 4, borderRadius: '10px' }}>
-                                            <strong>Rejection Reason:</strong> {userData.kycMessage}
-                                        </Alert>
-                                    )}
-
-                                    {/* Identity Details */}
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, color: '#111' }}>Identity Details</Typography>
-                                    <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
-                                        <Grid container spacing={3}>
-                                            <Grid item xs={12} md={6}>
-                                                <TextField fullWidth label="Aadhar Number" value={kycData.aadharNumber} onChange={(e) => setKycData({ ...kycData, aadharNumber: e.target.value })} disabled={kycReadOnly} />
-                                            </Grid>
-                                            <Grid item xs={12} md={6}>
-                                                <TextField fullWidth label="PAN Number" value={kycData.panNumber} onChange={(e) => setKycData({ ...kycData, panNumber: e.target.value.toUpperCase() })} disabled={kycReadOnly} />
-                                            </Grid>
-                                        </Grid>
-                                    </Paper>
-
-                                    {/* Bank Information */}
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5, color: '#111' }}>Bank Information</Typography>
-                                    <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
-                                        <Grid container spacing={3}>
-                                            <Grid item xs={12} md={4}>
-                                                <TextField fullWidth label="Account Number" value={kycData.bankDetails.accountNumber} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, accountNumber: e.target.value } })} disabled={kycReadOnly} />
-                                            </Grid>
-                                            <Grid item xs={12} md={4}>
-                                                <TextField fullWidth label="IFSC Code" value={kycData.bankDetails.ifscCode} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, ifscCode: e.target.value.toUpperCase() } })} disabled={kycReadOnly} />
-                                            </Grid>
-                                            <Grid item xs={12} md={4}>
-                                                <TextField fullWidth label="Bank Name" value={kycData.bankDetails.bankName} onChange={(e) => setKycData({ ...kycData, bankDetails: { ...kycData.bankDetails, bankName: e.target.value } })} disabled={kycReadOnly} />
-                                            </Grid>
-                                        </Grid>
-                                    </Paper>
-
-                                    {/* Documents */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1 }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#111' }}>Document Proofs</Typography>
-                                        <Chip label="JPG, PNG" size="small" sx={{ height: 20, fontSize: '10px', fontWeight: 600, bgcolor: '#e8f5e9', color: '#0A7A2F' }} />
-                                    </Box>
-                                    <Paper variant="outlined" sx={{ borderRadius: '12px', p: 3, mb: 4 }}>
-                                        <Grid container spacing={3}>
-                                            {['aadharFront', 'aadharBack', 'panCard', 'passbook'].map((docType) => (
-                                                <Grid item xs={12} sm={6} md={3} key={docType}>
-                                                    <Box sx={{ border: '2px dashed #e0e0e0', borderRadius: '12px', p: 2, textAlign: 'center', position: 'relative', height: '160px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: kycData.kycDocuments[docType] ? '#fff' : '#fafafa', transition: 'all 0.2s', '&:hover': { borderColor: '#0A7A2F', bgcolor: '#f4fbf5' } }}>
-                                                        {kycData.kycDocuments[docType] ? (
-                                                            <>
-                                                                <img src={kycData.kycDocuments[docType]} alt={docType} style={{ maxHeight: '100px', maxWidth: '100%', objectFit: 'contain', borderRadius: '4px' }} />
-                                                                {!kycReadOnly && (
-                                                                    <IconButton size="small" sx={{ position: 'absolute', top: -8, right: -8, bgcolor: 'white', border: '1px solid #eee', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', '&:hover': { bgcolor: '#ffebee' } }} onClick={() => setKycData({ ...kycData, kycDocuments: { ...kycData.kycDocuments, [docType]: '' } })}>
-                                                                        <CancelIcon fontSize="small" sx={{ color: '#d32f2f' }} />
-                                                                    </IconButton>
-                                                                )}
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <CameraAltIcon sx={{ color: '#bdbdbd', fontSize: 36, mb: 1.5 }} />
-                                                                <Typography variant="body2" sx={{ color: '#555', fontWeight: 500, mb: 1.5 }}>
-                                                                    {docType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                                                </Typography>
-                                                                {!kycReadOnly && (
-                                                                    <Button component="label" size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: '6px', px: 2, color: '#0A7A2F', borderColor: '#0A7A2F', '&:hover': { bgcolor: '#e8f5e9', borderColor: '#0A7A2F' } }}>
-                                                                        Upload
-                                                                        <input type="file" hidden accept="image/*" onChange={(e) => handleKycImageUpload(e, docType)} />
-                                                                    </Button>
-                                                                )}
-                                                            </>
-                                                        )}
-                                                    </Box>
-                                                </Grid>
-                                            ))}
-                                        </Grid>
-                                    </Paper>
-
-                                    {!kycReadOnly && (
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                            <Button
-                                                variant="contained"
-                                                size="large"
-                                                onClick={handleKycSubmit}
-                                                disabled={kycSubmitting}
-                                                startIcon={kycSubmitting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
-                                                sx={{ bgcolor: '#0A7A2F', '&:hover': { bgcolor: '#085c22' }, py: 1.5, px: 4, borderRadius: '8px', fontSize: '15px', fontWeight: 600, boxShadow: '0 4px 14px rgba(10,122,47,0.2)' }}
-                                            >
-                                                {kycSubmitting ? 'Submitting...' : 'Submit KYC Details'}
-                                            </Button>
-                                        </Box>
-                                    )}
+                                    {/* Reusing KYC Form */}
+                                    {renderKycForm()}
                                 </Box>
                             )}
                         </Box>

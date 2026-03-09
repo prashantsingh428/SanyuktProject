@@ -50,3 +50,30 @@ test
 [2026-03-09T09:22:54.979Z] Login error for chaubeyayush323@gmail.com: getaddrinfo ENOTFOUND ac-gnhvqgt-shard-00-00.bhprzwx.mongodb.net
 [2026-03-09T09:27:29.121Z] Login error for SPRL3561: connection <monitor> to 159.41.242.136:27017 timed out
 [2026-03-09T09:32:47.563Z] Login match result for SPRL3561: true
+[2026-03-09T11:57:16.710Z] Login match result for prashant895301@gmail.com: true
+[2026-03-09T11:58:02.436Z] Forgot password error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 98e67ed59e1d1-359bcc2d096sm4117207a91.14 - gsmtp - Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 98e67ed59e1d1-359bcc2d096sm4117207a91.14 - gsmtp
+    at SMTPConnection._formatError (/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/node_modules/nodemailer/lib/smtp-connection/index.js:912:19)
+    at SMTPConnection._actionAUTHComplete (/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/node_modules/nodemailer/lib/smtp-connection/index.js:1722:34)
+    at SMTPConnection.<anonymous> (/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/node_modules/nodemailer/lib/smtp-connection/index.js:651:26)
+    at SMTPConnection._processResponse (/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/node_modules/nodemailer/lib/smtp-connection/index.js:1098:20)
+    at SMTPConnection._onData (/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/node_modules/nodemailer/lib/smtp-connection/index.js:872:14)
+    at SMTPConnection._onSocketData (/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/node_modules/nodemailer/lib/smtp-connection/index.js:196:44)
+    at TLSSocket.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+[2026-03-09T12:00:37.975Z] OTP Sent for Reset: prashant895301@gmail.com
+[2026-03-09T12:01:26.959Z] Password reset successful for prashant895301@gmail.com. New hash starts with: $2b$10$L.A
+[2026-03-09T12:01:48.250Z] Login match result for SPRL3561: true
+[2026-03-09T12:02:06.664Z] Login match result for SPRL3561: true
+[2026-03-09T12:02:11.802Z] OTP Sent for Reset: prashant895301@gmail.com
+[2026-03-09T12:02:45.632Z] Login match result for chaubeyayush323@gmail.com: true
+[2026-03-09T12:03:12.357Z] OTP Sent for Reset: chaubeyayush323@gmail.com
+[2026-03-09T12:03:21.936Z] Login match result for prashant63942@gmail.com: true
+[2026-03-09T12:04:53.340Z] Login match result for chaubeyayush323@gmail.com: true
+[2026-03-09T12:26:53.972Z] Login match result for chaubeyayush323@gmail.com: true
+[2026-03-09T12:56:58.191Z] Login error for SPRL3561: getaddrinfo ENOTFOUND ac-gnhvqgt-shard-00-00.bhprzwx.mongodb.net
+[2026-03-09T12:57:11.841Z] Login error for SPRL3561: getaddrinfo ENOTFOUND ac-gnhvqgt-shard-00-00.bhprzwx.mongodb.net
+[2026-03-09T17:47:32.220Z] Login match result for SPRL3561: true

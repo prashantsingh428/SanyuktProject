@@ -157,7 +157,13 @@ exports.forgotPassword = async (req, res) => {
     } catch (error) {
         debugLog(`Forgot password error: ${error.message} - ${error.stack}`);
         console.error("Error in forgotPassword:", error);
-        res.status(500).json({ message: "Server Error" });
+        
+        // Return a more descriptive error if it's likely an email issue
+        if (error.message.includes('login') || error.message.includes('auth')) {
+            return res.status(500).json({ message: "Email service authentication failed. Please check server configuration." });
+        }
+        
+        res.status(500).json({ message: "Server Error. Please try again later." });
     }
 };
 

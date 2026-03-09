@@ -12,6 +12,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 const UserDashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [userData, setUserData] = useState(null);
+    const [openDropdown, setOpenDropdown] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -20,7 +21,14 @@ const UserDashboardLayout = () => {
     useEffect(() => {
         const user = localStorage.getItem('user');
         if (user) {
-            setUserData(JSON.parse(user));
+            try {
+                setUserData(JSON.parse(user));
+            } catch (error) {
+                console.error("Error parsing user data in dashboard layout:", error);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                navigate('/login');
+            }
         } else {
             navigate('/login');
         }
@@ -44,14 +52,92 @@ const UserDashboardLayout = () => {
     const menuItems = [
         { name: 'Home', icon: Home, path: '/my-account', id: 'home' },
         { name: 'New Sign Up', icon: UserPlus, path: '/register', id: 'signup' },
-        { name: 'My Downline', icon: Users, path: '/my-account/downline', id: 'downline', badge: 5 },
+        {
+            name: 'My Downline',
+            icon: Users,
+            path: '/my-account/downline',
+            id: 'downline',
+            badge: 5,
+            children: [
+                { name: 'My Directs', path: '/my-account/downline/directs', id: 'downline_directs' },
+                { name: 'Left Team', path: '/my-account/downline/left-team', id: 'downline_left' },
+                { name: 'Right Team', path: '/my-account/downline/right-team', id: 'downline_right' },
+                { name: 'All Team', path: '/my-account/downline/all-team', id: 'downline_all' },
+                { name: 'Tree View', path: '/my-account/downline/tree-view', id: 'downline_tree' },
+            ],
+        },
         { name: 'Product Order', icon: ShoppingCart, path: '/my-account/orders', id: 'orders', badge: 6 },
-        { name: 'First Purchase Bonus', icon: Gift, path: '/my-account/bonus/first', id: 'first_bonus', badge: 3 },
-        { name: 'Repurchase Bonus', icon: Package, path: '/my-account/bonus/repurchase', id: 'repurchase_bonus', badge: 10 },
+        {
+            name: 'First Purchase Bonus',
+            icon: Gift,
+            path: '/my-account/bonus/first',
+            id: 'first_bonus',
+            badge: 3,
+            children: [
+                { name: 'Silver Matching', path: '/my-account/bonus/first/silver', id: 'first_silver' },
+                { name: 'Gold Matching', path: '/my-account/bonus/first/gold', id: 'first_gold' },
+                { name: 'Diamond Matching', path: '/my-account/bonus/first/diamond', id: 'first_diamond' },
+            ],
+        },
+        {
+            name: 'Repurchase Bonus',
+            icon: Package,
+            path: '/my-account/bonus/repurchase',
+            id: 'repurchase_bonus',
+            badge: 10,
+            children: [
+                { name: 'Self Repurchase Income', path: '/my-account/bonus/repurchase/self', id: 'repurchase_self' },
+                { name: 'Repurchase Level Income', path: '/my-account/bonus/repurchase/level', id: 'repurchase_level' },
+                { name: 'Sponsor Income', path: '/my-account/bonus/repurchase/sponsor', id: 'repurchase_sponsor' },
+                { name: 'Royalty Bonus', path: '/my-account/bonus/repurchase/royalty', id: 'repurchase_royalty' },
+                { name: 'Director Bonus', path: '/my-account/bonus/repurchase/director', id: 'repurchase_director' },
+                { name: 'House Fund', path: '/my-account/bonus/repurchase/house', id: 'repurchase_house' },
+                { name: 'Leadership Fund', path: '/my-account/bonus/repurchase/leadership', id: 'repurchase_leadership' },
+                { name: 'Car Fund', path: '/my-account/bonus/repurchase/car', id: 'repurchase_car' },
+                { name: 'Travel Fund', path: '/my-account/bonus/repurchase/travel', id: 'repurchase_travel' },
+                { name: 'Bike Fund', path: '/my-account/bonus/repurchase/bike', id: 'repurchase_bike' },
+            ],
+        },
         { name: 'Our Products', icon: ShoppingBag, path: '/products', id: 'shop' },
-        { name: 'E-Wallet', icon: Wallet, path: '/my-account/wallet', id: 'wallet', badge: 4 },
-        { name: 'Generation Wallet', icon: Wallet, path: '/my-account/wallet/generation', id: 'gen_wallet', badge: 4 },
-        { name: 'My Folder', icon: Folder, path: '/my-account/folder', id: 'folder', badge: 4 },
+        {
+            name: 'E-Wallet',
+            icon: Wallet,
+            path: '/my-account/wallet',
+            id: 'wallet',
+            badge: 4,
+            children: [
+                { name: 'Deduction Report', path: '/my-account/wallet/deduction-report', id: 'wallet_deduction' },
+                { name: 'Withdrawal History', path: '/my-account/wallet/withdrawal-history', id: 'wallet_withdrawal' },
+                { name: 'All Transaction Report', path: '/my-account/wallet/all-transactions', id: 'wallet_all_txn' },
+                { name: 'Daily Closing Report', path: '/my-account/wallet/daily-closing', id: 'wallet_daily' },
+            ],
+        },
+        {
+            name: 'Generation Wallet',
+            icon: Wallet,
+            path: '/my-account/wallet/generation',
+            id: 'gen_wallet',
+            badge: 4,
+            children: [
+                { name: 'Deduction Report', path: '/my-account/wallet/generation/deduction-report', id: 'gen_deduction' },
+                { name: 'Withdrawal History', path: '/my-account/wallet/generation/withdrawal-history', id: 'gen_withdrawal' },
+                { name: 'All Transaction Report', path: '/my-account/wallet/generation/all-transactions', id: 'gen_all_txn' },
+                { name: 'Monthly Closing Report', path: '/my-account/wallet/generation/monthly-closing', id: 'gen_monthly' },
+            ],
+        },
+        {
+            name: 'My Folder',
+            icon: Folder,
+            path: '/my-account/folder',
+            id: 'folder',
+            badge: 4,
+            children: [
+                { name: 'Welcome Letter', path: '/my-account/folder/welcome-letter', id: 'folder_welcome' },
+                { name: 'Download Files', path: '/my-account/folder/download-files', id: 'folder_downloads' },
+                { name: 'Our Banker', path: '/my-account/folder/our-banker', id: 'folder_banker' },
+                { name: 'ID Card', path: '/my-account/folder/id-card', id: 'folder_id' },
+            ],
+        },
         { name: 'Profile & KYC', icon: UserCheck, path: '/my-account/profile', id: 'profile', badge: 4 },
         { name: 'Submit Complain', icon: MessageSquare, path: '/my-account/grievances', id: 'grievance', badge: 2 },
     ];
@@ -69,7 +155,7 @@ const UserDashboardLayout = () => {
                     {/* Brand / Logo Area */}
                     <div className={`flex items-center mb-10 ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
                         <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'flex-col space-y-4'}`}>
-                            <button 
+                            <button
                                 onClick={() => setSidebarOpen(!sidebarOpen)}
                                 className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all active:scale-95
                                     ${sidebarOpen ? 'bg-white/5 hover:bg-white/10' : 'bg-white/20 hover:bg-white/30'}`}
@@ -80,12 +166,12 @@ const UserDashboardLayout = () => {
                             {sidebarOpen && (
                                 <Link to="/" className="leading-none text-white hover:opacity-80 transition-opacity flex flex-col pt-1">
                                     <h2 className="font-black text-2xl whitespace-nowrap uppercase tracking-tighter">SANYUKT</h2>
-                                    <p className="text-[10px] text-white/60 uppercase tracking-[0.4em] font-black -mt-0.5">Parivaar</p>
+                                    <p className="text-[10px] text-white/80 uppercase tracking-[0.4em] font-black -mt-0.5">Parivaar</p>
                                 </Link>
                             )}
                         </div>
                         {sidebarOpen && (
-                            <button 
+                            <button
                                 onClick={() => setSidebarOpen(false)}
                                 className="p-2 rounded-xl hover:bg-black/10 text-white transition-all"
                                 title="Close Menu"
@@ -110,7 +196,7 @@ const UserDashboardLayout = () => {
                             </div>
                             <h3 className="font-black text-lg leading-tight uppercase tracking-wide text-white">{userData.userName}</h3>
                             <div className="flex flex-col gap-1 mt-2">
-                                <p className="text-[10px] text-white/50 font-black tracking-widest uppercase">Member ID: {userData.memberId || 'SPRL0000'}</p>
+                                <p className="text-[11px] text-white/90 font-black tracking-widest uppercase">Member ID: {userData.memberId || 'SPRL0000'}</p>
                                 <div className="flex items-center justify-center gap-2 text-white/90">
                                     <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
                                     <span className="text-[10px] font-bold uppercase tracking-wider">Live Support</span>
@@ -122,42 +208,84 @@ const UserDashboardLayout = () => {
                     {/* Navigation Menu */}
                     <nav className="flex-1 space-y-1">
                         {menuItems.map((item) => {
-                            const active = location.pathname === item.path || (item.path === '/my-account' && location.pathname === '/my-account/');
-                            return (
-                                <Link
-                                    key={item.id}
-                                    to={item.path}
-                                    className={`relative flex items-center justify-center transition-all duration-300 group
-                                        ${sidebarOpen 
-                                            ? 'px-4 mx-0 rounded-xl space-x-3 mb-1 h-12 !justify-start' 
-                                            : 'mx-2.5 rounded-[1.5rem] mb-3 h-14'
-                                        }
-                                        ${active 
-                                            ? 'bg-white text-[#0A7A2F] shadow-lg shadow-black/5' 
-                                            : 'text-white/70 hover:text-white hover:bg-white/5'}`}
-                                >
-                                    <item.icon className={`shrink-0 transition-transform duration-300 ${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'} 
-                                        ${active ? 'text-[#0A7A2F]' : 'group-hover:scale-110'}`} />
-                                    
-                                    {sidebarOpen && (
-                                        <div className="flex items-center justify-between flex-1 overflow-hidden">
-                                            <span className="font-bold text-[13px] whitespace-nowrap">{item.name}</span>
-                                            {item.badge && (
-                                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-black
-                                                    ${active ? 'bg-orange-600 text-white' : 'bg-white/20 text-white'}`}>
-                                                    {item.badge}
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
+                            const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+                            const isActiveDirect = location.pathname === item.path || (item.path === '/my-account' && location.pathname === '/my-account/');
+                            const isChildActive = hasChildren && item.children.some(child => location.pathname === child.path);
+                            const active = isActiveDirect || isChildActive;
 
-                                    {!sidebarOpen && (
-                                        <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-xl border border-white/10 pointer-events-none">
-                                            {item.name}
-                                            {item.badge && <span className="ml-2 bg-orange-500 px-1 rounded text-[9px]">{item.badge}</span>}
+                            return (
+                                <div key={item.id} className="w-full">
+                                    <button
+                                        onClick={() => {
+                                            if (hasChildren && sidebarOpen) {
+                                                setOpenDropdown(prev => prev === item.id ? null : item.id);
+                                            } else {
+                                                navigate(item.path);
+                                                if (isMobile) setSidebarOpen(false);
+                                            }
+                                        }}
+                                        className={`relative w-full flex items-center transition-all duration-300 group
+                                            ${sidebarOpen
+                                                ? 'px-4 mx-0 rounded-xl space-x-3 mb-1 h-12 !justify-start'
+                                                : 'mx-2.5 rounded-[1.5rem] mb-3 h-14 justify-center'
+                                            }
+                                            ${active
+                                                ? 'bg-white text-[#0A7A2F] shadow-lg shadow-black/5'
+                                                : 'text-white/90 hover:text-white hover:bg-white/5'}`}
+                                    >
+                                        <item.icon className={`shrink-0 transition-transform duration-300 ${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'} 
+                                            ${active ? 'text-[#0A7A2F]' : 'group-hover:scale-110'}`} />
+
+                                        {sidebarOpen && (
+                                            <div className="flex items-center justify-between flex-1 overflow-hidden">
+                                                <span className="font-bold text-[13px] whitespace-nowrap">{item.name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    {item.badge && (
+                                                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-black
+                                                            ${active ? 'bg-orange-600 text-white' : 'bg-white/20 text-white'}`}>
+                                                            {item.badge}
+                                                        </span>
+                                                    )}
+                                                    {hasChildren && (
+                                                        <ChevronDown
+                                                            size={14}
+                                                            className={`transition-transform duration-300 ${openDropdown === item.id ? 'rotate-180' : ''}`}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {!sidebarOpen && (
+                                            <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-xl border border-white/10 pointer-events-none">
+                                                {item.name}
+                                                {item.badge && <span className="ml-2 bg-orange-500 px-1 rounded text-[9px]">{item.badge}</span>}
+                                            </div>
+                                        )}
+                                    </button>
+
+                                    {/* Dropdown Menu */}
+                                    {hasChildren && sidebarOpen && openDropdown === item.id && (
+                                        <div className="ml-12 mr-4 border-l border-white/20 mb-2 py-1 space-y-1">
+                                            {item.children.map((child) => {
+                                                const childActive = location.pathname === child.path;
+                                                return (
+                                                    <Link
+                                                        key={child.id}
+                                                        to={child.path}
+                                                        onClick={() => isMobile && setSidebarOpen(false)}
+                                                        className={`block px-4 py-1.5 text-[12px] rounded-lg transition-all ${childActive
+                                                                ? 'text-white font-black bg-white/10'
+                                                                : 'text-white/85 hover:text-white hover:bg-white/5 font-bold'
+                                                            }`}
+                                                    >
+                                                        {child.name}
+                                                    </Link>
+                                                );
+                                            })}
                                         </div>
                                     )}
-                                </Link>
+                                </div>
                             );
                         })}
                     </nav>
@@ -166,11 +294,11 @@ const UserDashboardLayout = () => {
                         <button
                             onClick={handleLogout}
                             className={`flex items-center h-12 rounded-xl transition-all group w-full
-                                ${sidebarOpen ? 'px-4 space-x-3 text-white/50 hover:text-orange-400 hover:bg-white/5' : 'justify-center text-white/50 hover:text-orange-400 hover:bg-white/5'}`}
+                                ${sidebarOpen ? 'px-4 space-x-3 text-white/90 hover:text-orange-400 hover:bg-white/5' : 'justify-center text-white/90 hover:text-orange-400 hover:bg-white/5'}`}
                         >
                             <LogOut className={`shrink-0 ${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'}`} />
                             {sidebarOpen && <span className="font-bold text-[13px]">Logout</span>}
-                            
+
                             {!sidebarOpen && (
                                 <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-xl border border-white/10 pointer-events-none">
                                     Logout
@@ -182,7 +310,7 @@ const UserDashboardLayout = () => {
             </aside>
 
             {/* Main Content Area */}
-            <main 
+            <main
                 className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-80px)]
                     ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}
             >
@@ -190,7 +318,7 @@ const UserDashboardLayout = () => {
                     {/* Mobile Menu Action Bar - Only visible when sidebar is closed on mobile */}
                     {!sidebarOpen && isMobile && (
                         <div className="py-5 mb-4 flex items-center space-x-4 text-[#0A7A2F] md:hidden">
-                            <button 
+                            <button
                                 onClick={() => setSidebarOpen(true)}
                                 className="w-14 h-14 flex items-center justify-center bg-white shadow-xl shadow-black/5 border border-slate-100 rounded-[2rem] active:scale-95 transition-all text-[#0A7A2F]"
                             >

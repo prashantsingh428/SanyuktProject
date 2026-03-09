@@ -33,12 +33,13 @@ import Franchise from '../pages/Franchise.jsx'
 import FranchiseLogin from '../pages/FranchiseLogin.jsx';
 import OrderDetails from '../pages/OrderDetails.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
+import FranchiseDashboard from '../pages/FranchiseDashboard.jsx'
 
 // ✅ Admin imports
-import AdminLayout from '../layouts/AdminLayout'
-import AdminDashboard from '../pages/admin/Dashboard'
-import AdminUsers from '../pages/admin/Users'
-import AdminProducts from '../pages/admin/Products'
+import AdminLayout from '../layouts/AdminLayout.jsx'
+import AdminDashboard from '../pages/admin/Dashboard.jsx'
+import AdminUsers from '../pages/admin/Users.jsx'
+import AdminProducts from '../pages/admin/Products.jsx'
 import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
 import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
@@ -71,10 +72,10 @@ const MainRoutes = () => {
             <Route path='/testimonial-policy' element={<TestimonialPolicy />} />
             <Route path='/banker' element={<OurBanker />} />
             <Route path='/verify-otp' element={<VerifyOTP />} />
-            <Route path='/checkout' element={<Checkout />} />
             <Route path='/franchise/list' element={<Franchise />} />
             <Route path='/franchise/login' element={<FranchiseLogin />} />
             <Route path='/forgot-password' element={<ForgotPassword />} />
+            <Route path='/franchise/dashboard' element={<FranchiseDashboard />} />
 
             <Route path='/my-account' element={<UserDashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
@@ -85,14 +86,49 @@ const MainRoutes = () => {
                 <Route path='grievances' element={<MyAccount defaultTab={4} />} />
                 <Route path='kyc' element={<MyAccount defaultTab={5} />} />
                 <Route path='cart' element={<MyAccount defaultTab={-1} />} />
-                
+
                 {/* Placeholder Routes for unfinished sections */}
                 <Route path='downline' element={<DashboardPlaceholder title="My Downline" />} />
+                <Route path='downline/directs' element={<DashboardPlaceholder title="My Directs" />} />
+                <Route path='downline/left-team' element={<DashboardPlaceholder title="Left Team" />} />
+                <Route path='downline/right-team' element={<DashboardPlaceholder title="Right Team" />} />
+                <Route path='downline/all-team' element={<DashboardPlaceholder title="All Team" />} />
+                <Route path='downline/tree-view' element={<DashboardPlaceholder title="Tree View" />} />
+
                 <Route path='bonus/first' element={<DashboardPlaceholder title="First Purchase Bonus" />} />
+                <Route path='bonus/first/silver' element={<DashboardPlaceholder title="Silver Matching" />} />
+                <Route path='bonus/first/gold' element={<DashboardPlaceholder title="Gold Matching" />} />
+                <Route path='bonus/first/diamond' element={<DashboardPlaceholder title="Diamond Matching" />} />
+
                 <Route path='bonus/repurchase' element={<DashboardPlaceholder title="Repurchase Bonus" />} />
+                <Route path='bonus/repurchase/self' element={<DashboardPlaceholder title="Self Repurchase Income" />} />
+                <Route path='bonus/repurchase/level' element={<DashboardPlaceholder title="Repurchase Level Income" />} />
+                <Route path='bonus/repurchase/sponsor' element={<DashboardPlaceholder title="Sponsor Income" />} />
+                <Route path='bonus/repurchase/royalty' element={<DashboardPlaceholder title="Royalty Bonus" />} />
+                <Route path='bonus/repurchase/director' element={<DashboardPlaceholder title="Director Bonus" />} />
+                <Route path='bonus/repurchase/house' element={<DashboardPlaceholder title="House Fund" />} />
+                <Route path='bonus/repurchase/leadership' element={<DashboardPlaceholder title="Leadership Fund" />} />
+                <Route path='bonus/repurchase/car' element={<DashboardPlaceholder title="Car Fund" />} />
+                <Route path='bonus/repurchase/travel' element={<DashboardPlaceholder title="Travel Fund" />} />
+                <Route path='bonus/repurchase/bike' element={<DashboardPlaceholder title="Bike Fund" />} />
+
                 <Route path='wallet' element={<DashboardPlaceholder title="E-Wallet" />} />
+                <Route path='wallet/deduction-report' element={<DashboardPlaceholder title="Deduction Report" />} />
+                <Route path='wallet/withdrawal-history' element={<DashboardPlaceholder title="Withdrawal History" />} />
+                <Route path='wallet/all-transactions' element={<DashboardPlaceholder title="All Transaction Report" />} />
+                <Route path='wallet/daily-closing' element={<DashboardPlaceholder title="Daily Closing Report" />} />
+
                 <Route path='wallet/generation' element={<DashboardPlaceholder title="Generation Wallet" />} />
+                <Route path='wallet/generation/deduction-report' element={<DashboardPlaceholder title="Generation Deduction Report" />} />
+                <Route path='wallet/generation/withdrawal-history' element={<DashboardPlaceholder title="Generation Withdrawal History" />} />
+                <Route path='wallet/generation/all-transactions' element={<DashboardPlaceholder title="Generation All Transactions" />} />
+                <Route path='wallet/generation/monthly-closing' element={<DashboardPlaceholder title="Monthly Closing Report" />} />
+
                 <Route path='folder' element={<DashboardPlaceholder title="My Folder" />} />
+                <Route path='folder/welcome-letter' element={<DashboardPlaceholder title="Welcome Letter" />} />
+                <Route path='folder/download-files' element={<DashboardPlaceholder title="Download Files" />} />
+                <Route path='folder/our-banker' element={<DashboardPlaceholder title="Our Banker" />} />
+                <Route path='folder/id-card' element={<DashboardPlaceholder title="ID Card" />} />
             </Route>
 
             <Route path='/order-details/:id' element={<OrderDetails />} />

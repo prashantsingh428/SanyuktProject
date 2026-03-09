@@ -54,8 +54,8 @@ const ProfileBanner = ({ userData }) => {
                 <div className="flex flex-col md:flex-row items-center gap-6 lg:gap-10">
                     <div className="relative shrink-0">
                         <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-full overflow-hidden shadow-xl border-4 border-white ring-1 ring-slate-100 bg-slate-50">
-                            <img 
-                                src={userData.profileImage || "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=400&h=400&q=80"} 
+                            <img
+                                src={userData.profileImage || "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=400&h=400&q=80"}
                                 alt="User"
                                 className="w-full h-full object-cover"
                             />
@@ -72,7 +72,7 @@ const ProfileBanner = ({ userData }) => {
                             <span className="text-[15px] font-black text-[#0A7A2F] uppercase tracking-[0.2em]">
                                 Premium Membership
                             </span>
-                            <span className="text-[14px] font-bold text-slate-500 tracking-wide">
+                            <span className="text-[14px] font-bold text-slate-600 tracking-wide">
                                 {userData.email}
                             </span>
                             <div className="flex items-center gap-2 mt-1 px-3 py-1 rounded-full bg-slate-50 border border-slate-100">
@@ -90,14 +90,14 @@ const ProfileBanner = ({ userData }) => {
                             <Shield size={14} className="fill-emerald-700/10" />
                             <span className="text-[11px] font-black uppercase tracking-widest">{userData.status || 'Verified Active'}</span>
                         </div>
-                        <span className="text-[12px] font-black text-slate-400 uppercase tracking-[0.25em]">Member ID</span>
+                        <span className="text-[12px] font-black text-slate-500 uppercase tracking-[0.25em]">Member ID</span>
                         <div className="flex items-center gap-3">
                             <span className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tighter">
                                 {userData.memberId}
                             </span>
-                            <button 
+                            <button
                                 onClick={() => copyToClipboard(userData.memberId)}
-                                className="p-3 rounded-2xl bg-slate-50 text-slate-400 hover:text-[#0A7A2F] hover:bg-white hover:shadow-lg transition-all border border-slate-100 active:scale-95"
+                                className="p-3 rounded-2xl bg-slate-50 text-slate-600 hover:text-[#0A7A2F] hover:bg-white hover:shadow-lg transition-all border border-slate-100 active:scale-95"
                                 title="Copy Member ID"
                             >
                                 <Copy size={22} />
@@ -114,7 +114,7 @@ const ProfileBanner = ({ userData }) => {
                                 <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#0A7A2F]/10 group-hover:text-[#0A7A2F] transition-all">
                                     <item.icon size={16} />
                                 </div>
-                                <span className="text-[12px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">
+                                <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-700 transition-colors">
                                     {item.label}
                                 </span>
                             </div>
