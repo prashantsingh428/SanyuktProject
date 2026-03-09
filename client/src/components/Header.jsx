@@ -772,6 +772,7 @@ const Header = () => {
 
                         {/* RIGHT - NAVIGATION (DESKTOP) */}
                         <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1, flexWrap: 'nowrap' }}>
+                            
                             <NavButton
                                 className={isActive('/') ? 'active' : ''}
                                 onClick={() => handleNavigation('/')}

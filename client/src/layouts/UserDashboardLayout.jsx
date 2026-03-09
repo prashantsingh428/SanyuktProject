@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
-import { 
-    Home, UserPlus, Users, ShoppingCart, 
-    Gift, Package, Wallet, Folder, 
+import {
+    Home, UserPlus, Users, ShoppingCart,
+    Gift, Package, Wallet, Folder,
     UserCheck, MessageSquare, LogOut, Menu, X, ChevronDown, Bell, Search, Shield,
     ShoppingBag, Globe
 } from 'lucide-react';
@@ -28,6 +28,11 @@ const UserDashboardLayout = () => {
         if (isMobile) {
             setSidebarOpen(false);
         }
+
+        // Global listener for cross-component toggle
+        const handleExternalToggle = () => setSidebarOpen(prev => !prev);
+        window.addEventListener('toggle-dashboard-sidebar', handleExternalToggle);
+        return () => window.removeEventListener('toggle-dashboard-sidebar', handleExternalToggle);
     }, [isMobile, navigate]);
 
     const handleLogout = () => {
@@ -56,32 +61,48 @@ const UserDashboardLayout = () => {
     return (
         <div className="min-h-screen bg-white flex">
             {/* Sidebar */}
-            <aside 
+            <aside
                 className={`fixed left-0 h-[calc(100vh-60px)] md:h-[calc(100vh-80px)] top-[60px] md:top-[80px] bg-[#0A7A2F] text-white transition-all duration-300 z-50 shadow-none overflow-y-auto no-scrollbar
                     ${sidebarOpen ? 'w-72' : 'w-0 md:w-20 overflow-hidden'}`}
             >
-                <div className="p-6 flex flex-col h-full">
+                <div className={`flex flex-col h-full transition-all duration-300 ${sidebarOpen ? 'p-6' : 'p-0 py-6'}`}>
                     {/* Brand / Logo Area */}
-                    <Link to="/" className="flex items-center space-x-3 mb-10 hover:opacity-80 transition-opacity">
-                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
-                            <Shield className="w-6 h-6 text-white" />
+                    <div className={`flex items-center mb-10 ${sidebarOpen ? 'justify-between' : 'justify-center'}`}>
+                        <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'flex-col space-y-4'}`}>
+                            <button 
+                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all active:scale-95
+                                    ${sidebarOpen ? 'bg-white/5 hover:bg-white/10' : 'bg-white/20 hover:bg-white/30'}`}
+                                title={sidebarOpen ? "Toggle Menu" : "Open Menu"}
+                            >
+                                {sidebarOpen ? <Shield className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+                            </button>
+                            {sidebarOpen && (
+                                <Link to="/" className="leading-none text-white hover:opacity-80 transition-opacity flex flex-col pt-1">
+                                    <h2 className="font-black text-2xl whitespace-nowrap uppercase tracking-tighter">SANYUKT</h2>
+                                    <p className="text-[10px] text-white/60 uppercase tracking-[0.4em] font-black -mt-0.5">Parivaar</p>
+                                </Link>
+                            )}
                         </div>
                         {sidebarOpen && (
-                            <div className="leading-tight text-white">
-                                <h2 className="font-bold text-lg whitespace-nowrap">SANYUKT</h2>
-                                <p className="text-[10px] text-white/70 uppercase tracking-widest">Parivaar</p>
-                            </div>
+                            <button 
+                                onClick={() => setSidebarOpen(false)}
+                                className="p-2 rounded-xl hover:bg-black/10 text-white transition-all"
+                                title="Close Menu"
+                            >
+                                <X size={20} />
+                            </button>
                         )}
-                    </Link>
+                    </div>
 
                     {/* Profile Summary in Sidebar */}
                     {sidebarOpen && (
                         <div className="mb-10 text-center px-4">
                             <div className="relative inline-block mb-4">
                                 <div className="w-24 h-24 rounded-full border-2 border-white/20 p-1 bg-[#096628] overflow-hidden">
-                                    <img 
-                                        src={userData.profileImage || "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&h=200&q=80"} 
-                                        alt="Profile" 
+                                    <img
+                                        src={userData.profileImage || "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&h=200&q=80"}
+                                        alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />
                                 </div>
@@ -106,19 +127,34 @@ const UserDashboardLayout = () => {
                                 <Link
                                     key={item.id}
                                     to={item.path}
-                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                        ${active ? 'bg-white text-[#0A7A2F]' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+                                    className={`relative flex items-center justify-center transition-all duration-300 group
+                                        ${sidebarOpen 
+                                            ? 'px-4 mx-0 rounded-xl space-x-3 mb-1 h-12 !justify-start' 
+                                            : 'mx-2.5 rounded-[1.5rem] mb-3 h-14'
+                                        }
+                                        ${active 
+                                            ? 'bg-white text-[#0A7A2F] shadow-lg shadow-black/5' 
+                                            : 'text-white/70 hover:text-white hover:bg-white/5'}`}
                                 >
-                                    <item.icon className={`w-5 h-5 shrink-0 ${active ? 'text-[#0A7A2F]' : 'group-hover:text-white'}`} />
+                                    <item.icon className={`shrink-0 transition-transform duration-300 ${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'} 
+                                        ${active ? 'text-[#0A7A2F]' : 'group-hover:scale-110'}`} />
+                                    
                                     {sidebarOpen && (
                                         <div className="flex items-center justify-between flex-1 overflow-hidden">
                                             <span className="font-bold text-[13px] whitespace-nowrap">{item.name}</span>
                                             {item.badge && (
                                                 <span className={`text-[9px] px-1.5 py-0.5 rounded font-black
-                                                    ${active ? 'bg-orange-600 text-white' : 'bg-white/10 text-white/50'}`}>
+                                                    ${active ? 'bg-orange-600 text-white' : 'bg-white/20 text-white'}`}>
                                                     {item.badge}
                                                 </span>
                                             )}
+                                        </div>
+                                    )}
+
+                                    {!sidebarOpen && (
+                                        <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-xl border border-white/10 pointer-events-none">
+                                            {item.name}
+                                            {item.badge && <span className="ml-2 bg-orange-500 px-1 rounded text-[9px]">{item.badge}</span>}
                                         </div>
                                     )}
                                 </Link>
@@ -126,14 +162,20 @@ const UserDashboardLayout = () => {
                         })}
                     </nav>
 
-                    {/* Logout at bottom */}
-                    <div className="mt-auto pt-6">
+                    <div className={`mt-auto pt-6 ${sidebarOpen ? '' : 'px-2'}`}>
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center space-x-3 px-4 py-3 text-white/50 hover:text-orange-400 hover:bg-white/5 rounded-xl transition-all"
+                            className={`flex items-center h-12 rounded-xl transition-all group w-full
+                                ${sidebarOpen ? 'px-4 space-x-3 text-white/50 hover:text-orange-400 hover:bg-white/5' : 'justify-center text-white/50 hover:text-orange-400 hover:bg-white/5'}`}
                         >
-                            <LogOut className="w-5 h-5 shrink-0" />
+                            <LogOut className={`shrink-0 ${sidebarOpen ? 'w-5 h-5' : 'w-6 h-6'}`} />
                             {sidebarOpen && <span className="font-bold text-[13px]">Logout</span>}
+                            
+                            {!sidebarOpen && (
+                                <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] shadow-xl border border-white/10 pointer-events-none">
+                                    Logout
+                                </div>
+                            )}
                         </button>
                     </div>
                 </div>
@@ -144,30 +186,29 @@ const UserDashboardLayout = () => {
                 className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-80px)]
                     ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}
             >
-                {/* Dashboard Sub-Header (Toggle Only) */}
-                <div className="h-12 bg-white flex items-center px-6 border-b border-gray-100">
-                    <button 
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="p-2 hover:bg-gray-50 rounded-lg transition-colors text-black flex items-center gap-2"
-                    >
-                        {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[#0A7A2F]">{sidebarOpen ? 'Close Menu' : 'Open Menu'}</span>
-                    </button>
-                    <div className="ml-auto flex items-center gap-4">
-                         <span className="text-[10px] font-black text-[#0A7A2F] uppercase tracking-[0.2em] hidden sm:block">Dashboard Mode</span>
-                         <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                    </div>
-                </div>
-
-                {/* Dynamic Page Content */}
-                <div className="flex-1 animate-fadeIn">
+                <div className="flex-1 px-4 md:px-8 pb-8 pt-0 animate-fadeIn relative">
+                    {/* Mobile Menu Action Bar - Only visible when sidebar is closed on mobile */}
+                    {!sidebarOpen && isMobile && (
+                        <div className="py-5 mb-4 flex items-center space-x-4 text-[#0A7A2F] md:hidden">
+                            <button 
+                                onClick={() => setSidebarOpen(true)}
+                                className="w-14 h-14 flex items-center justify-center bg-white shadow-xl shadow-black/5 border border-slate-100 rounded-[2rem] active:scale-95 transition-all text-[#0A7A2F]"
+                            >
+                                <Menu size={28} />
+                            </button>
+                            <div className="flex flex-col leading-none">
+                                <span className="font-black text-2xl tracking-tighter uppercase">Menu</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Navigation</span>
+                            </div>
+                        </div>
+                    )}
                     <Outlet />
                 </div>
             </main>
 
             {/* Global Overlay for mobile when sidebar is open */}
             {isMobile && sidebarOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-[#0A7A2F]/20 backdrop-blur-sm z-40"
                     onClick={() => setSidebarOpen(false)}
                 ></div>

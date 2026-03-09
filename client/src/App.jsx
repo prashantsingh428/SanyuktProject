@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import MainRoutes from "./routes/MainRoutes";
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const App = () => {
 
   return (
     <>
+      <Toaster position="top-center" reverseOrder={false} />
       {!isAdminRoute && <Header />}
       <Box sx={{ pt: !isAdminRoute ? { xs: '60px', md: '80px' } : 0 }}>
         <MainRoutes />

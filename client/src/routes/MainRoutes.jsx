@@ -32,6 +32,7 @@ import Cart from '../pages/Cart.jsx'
 import Franchise from '../pages/Franchise.jsx'
 import FranchiseLogin from '../pages/FranchiseLogin.jsx';
 import OrderDetails from '../pages/OrderDetails.jsx'
+import ForgotPassword from '../pages/ForgotPassword.jsx'
 
 // ✅ Admin imports
 import AdminLayout from '../layouts/AdminLayout'
@@ -73,6 +74,7 @@ const MainRoutes = () => {
             <Route path='/checkout' element={<Checkout />} />
             <Route path='/franchise/list' element={<Franchise />} />
             <Route path='/franchise/login' element={<FranchiseLogin />} />
+            <Route path='/forgot-password' element={<ForgotPassword />} />
 
             <Route path='/my-account' element={<UserDashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
