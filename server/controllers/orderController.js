@@ -1,10 +1,12 @@
 const Order = require("../models/Order");
+const Product = require("../models/Product");
+const { processOrderMLM } = require("../utils/mlmOrderUtils");
 
 // ================= CREATE ORDER =================
 exports.createOrder = async (req, res) => {
     try {
         const {
-            product,
+            product: productId,
             quantity,
             shippingInfo,
             paymentMethod,
@@ -15,9 +17,18 @@ exports.createOrder = async (req, res) => {
             total
         } = req.body;
 
+        // Fetch product to get BV
+        const productData = await Product.findById(productId);
+        if (!productData) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        const orderBv = (productData.bv || 0) * (quantity || 1);
+        const orderPv = orderBv / 1000; // 1000 BV = 1 PV ratio based on package data
+
         const order = new Order({
             user: req.user._id,
-            product,
+            product: productId,
             quantity,
             shippingInfo,
             paymentMethod,
@@ -26,6 +37,8 @@ exports.createOrder = async (req, res) => {
             tax,
             discount,
             total,
+            bv: orderBv,
+            pv: orderPv,
             tracking: [{
                 status: 'pending',
                 message: 'Order placed successfully',
@@ -34,6 +47,12 @@ exports.createOrder = async (req, res) => {
         });
 
         await order.save();
+
+        // Trigger MLM Point Processing
+        // We do this asynchronously to not block the response, 
+        // but we catch any errors within the util.
+        processOrderMLM(req.user._id, orderBv, orderPv);
+
         res.status(201).json(order);
     } catch (error) {
         console.error("Order creation error:", error);

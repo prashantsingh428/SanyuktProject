@@ -14,6 +14,9 @@ import MyAccount from '../pages/MyAccount.jsx'
 import UserDashboardLayout from '../layouts/UserDashboardLayout.jsx'
 import DashboardOverview from '../pages/DashboardOverview.jsx'
 import DashboardPlaceholder from '../components/DashboardPlaceholder.jsx'
+import Construction from '../pages/Construction.jsx'
+import BinaryTreeView from '../pages/BinaryTreeView.jsx'
+import UserTable from '../components/UserTable.jsx'
 
 import Opportunities from '../pages/Opportunities.jsx'
 import ExchangePolicy from '../footerPages/ExchangePolicy.jsx'
@@ -31,6 +34,7 @@ import Checkout from '../pages/Checkout.jsx'
 import Cart from '../pages/Cart.jsx'
 import Franchise from '../pages/Franchise.jsx'
 import FranchiseLogin from '../pages/FranchiseLogin.jsx';
+import PackageUpgrade from '../pages/PackageUpgrade.jsx'
 import OrderDetails from '../pages/OrderDetails.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
 import FranchiseDashboard from '../pages/FranchiseDashboard.jsx'
@@ -44,6 +48,7 @@ import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
 import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
 import AdminOrders from '../pages/admin/Orders.jsx'
+import MLMManagement from '../pages/admin/MLMManagement.jsx'
 
 const MainRoutes = () => {
     return (
@@ -88,47 +93,47 @@ const MainRoutes = () => {
                 <Route path='cart' element={<MyAccount defaultTab={-1} />} />
 
                 {/* Placeholder Routes for unfinished sections */}
-                <Route path='downline' element={<DashboardPlaceholder title="My Downline" />} />
-                <Route path='downline/directs' element={<DashboardPlaceholder title="My Directs" />} />
-                <Route path='downline/left-team' element={<DashboardPlaceholder title="Left Team" />} />
-                <Route path='downline/right-team' element={<DashboardPlaceholder title="Right Team" />} />
-                <Route path='downline/all-team' element={<DashboardPlaceholder title="All Team" />} />
-                <Route path='downline/tree-view' element={<DashboardPlaceholder title="Tree View" />} />
+                <Route path='downline' element={<Construction title="My Downline" />} />
+                <Route path='downline/directs' element={<UserTable title="Direct Referrals" type="downline" endpoint="/mlm/get-directs" />} />
+                <Route path='downline/left-team' element={<Construction title="Left Team" />} />
+                <Route path='downline/right-team' element={<Construction title="Right Team" />} />
+                <Route path='downline/all-team' element={<Construction title="All Team" />} />
+                <Route path='downline/tree-view' element={<BinaryTreeView />} />
 
-                <Route path='bonus/first' element={<DashboardPlaceholder title="First Purchase Bonus" />} />
-                <Route path='bonus/first/silver' element={<DashboardPlaceholder title="Silver Matching" />} />
-                <Route path='bonus/first/gold' element={<DashboardPlaceholder title="Gold Matching" />} />
-                <Route path='bonus/first/diamond' element={<DashboardPlaceholder title="Diamond Matching" />} />
+                <Route path='bonus/first' element={<PackageUpgrade />} />
+                <Route path='bonus/first/silver' element={<PackageUpgrade filter="silver" />} />
+                <Route path='bonus/first/gold' element={<PackageUpgrade filter="gold" />} />
+                <Route path='bonus/first/diamond' element={<PackageUpgrade filter="diamond" />} />
 
-                <Route path='bonus/repurchase' element={<DashboardPlaceholder title="Repurchase Bonus" />} />
-                <Route path='bonus/repurchase/self' element={<DashboardPlaceholder title="Self Repurchase Income" />} />
-                <Route path='bonus/repurchase/level' element={<DashboardPlaceholder title="Repurchase Level Income" />} />
-                <Route path='bonus/repurchase/sponsor' element={<DashboardPlaceholder title="Sponsor Income" />} />
-                <Route path='bonus/repurchase/royalty' element={<DashboardPlaceholder title="Royalty Bonus" />} />
-                <Route path='bonus/repurchase/director' element={<DashboardPlaceholder title="Director Bonus" />} />
-                <Route path='bonus/repurchase/house' element={<DashboardPlaceholder title="House Fund" />} />
-                <Route path='bonus/repurchase/leadership' element={<DashboardPlaceholder title="Leadership Fund" />} />
-                <Route path='bonus/repurchase/car' element={<DashboardPlaceholder title="Car Fund" />} />
-                <Route path='bonus/repurchase/travel' element={<DashboardPlaceholder title="Travel Fund" />} />
-                <Route path='bonus/repurchase/bike' element={<DashboardPlaceholder title="Bike Fund" />} />
+                <Route path='bonus/repurchase' element={<Construction title="Repurchase Bonus" />} />
+                <Route path='bonus/repurchase/self' element={<Construction title="Self Repurchase Income" />} />
+                <Route path='bonus/repurchase/level' element={<Construction title="Repurchase Level Income" />} />
+                <Route path='bonus/repurchase/sponsor' element={<Construction title="Sponsor Income" />} />
+                <Route path='bonus/repurchase/royalty' element={<Construction title="Royalty Bonus" />} />
+                <Route path='bonus/repurchase/director' element={<Construction title="Director Bonus" />} />
+                <Route path='bonus/repurchase/house' element={<Construction title="House Fund" />} />
+                <Route path='bonus/repurchase/leadership' element={<Construction title="Leadership Fund" />} />
+                <Route path='bonus/repurchase/car' element={<Construction title="Car Fund" />} />
+                <Route path='bonus/repurchase/travel' element={<Construction title="Travel Fund" />} />
+                <Route path='bonus/repurchase/bike' element={<Construction title="Bike Fund" />} />
 
-                <Route path='wallet' element={<DashboardPlaceholder title="E-Wallet" />} />
-                <Route path='wallet/deduction-report' element={<DashboardPlaceholder title="Deduction Report" />} />
-                <Route path='wallet/withdrawal-history' element={<DashboardPlaceholder title="Withdrawal History" />} />
-                <Route path='wallet/all-transactions' element={<DashboardPlaceholder title="All Transaction Report" />} />
-                <Route path='wallet/daily-closing' element={<DashboardPlaceholder title="Daily Closing Report" />} />
+                <Route path='wallet' element={<Construction title="E-Wallet" />} />
+                <Route path='wallet/deduction-report' element={<Construction title="Deduction Report" />} />
+                <Route path='wallet/withdrawal-history' element={<Construction title="Withdrawal History" />} />
+                <Route path='wallet/all-transactions' element={<UserTable title="Transaction Report" type="income" endpoint="/mlm/admin/income-reports" />} />
+                <Route path='wallet/daily-closing' element={<Construction title="Daily Closing Report" />} />
 
-                <Route path='wallet/generation' element={<DashboardPlaceholder title="Generation Wallet" />} />
-                <Route path='wallet/generation/deduction-report' element={<DashboardPlaceholder title="Generation Deduction Report" />} />
-                <Route path='wallet/generation/withdrawal-history' element={<DashboardPlaceholder title="Generation Withdrawal History" />} />
-                <Route path='wallet/generation/all-transactions' element={<DashboardPlaceholder title="Generation All Transactions" />} />
-                <Route path='wallet/generation/monthly-closing' element={<DashboardPlaceholder title="Monthly Closing Report" />} />
+                <Route path='wallet/generation' element={<Construction title="Generation Wallet" />} />
+                <Route path='wallet/generation/deduction-report' element={<Construction title="Generation Deduction Report" />} />
+                <Route path='wallet/generation/withdrawal-history' element={<Construction title="Generation Withdrawal History" />} />
+                <Route path='wallet/generation/all-transactions' element={<Construction title="Generation All Transactions" />} />
+                <Route path='wallet/generation/monthly-closing' element={<Construction title="Monthly Closing Report" />} />
 
-                <Route path='folder' element={<DashboardPlaceholder title="My Folder" />} />
-                <Route path='folder/welcome-letter' element={<DashboardPlaceholder title="Welcome Letter" />} />
-                <Route path='folder/download-files' element={<DashboardPlaceholder title="Download Files" />} />
-                <Route path='folder/our-banker' element={<DashboardPlaceholder title="Our Banker" />} />
-                <Route path='folder/id-card' element={<DashboardPlaceholder title="ID Card" />} />
+                <Route path='folder' element={<Construction title="My Folder" />} />
+                <Route path='folder/welcome-letter' element={<Construction title="Welcome Letter" />} />
+                <Route path='folder/download-files' element={<Construction title="Download Files" />} />
+                <Route path='folder/our-banker' element={<Construction title="Our Banker" />} />
+                <Route path='folder/id-card' element={<Construction title="ID Card" />} />
             </Route>
 
             <Route path='/order-details/:id' element={<OrderDetails />} />
@@ -147,6 +152,7 @@ const MainRoutes = () => {
                 <Route path="franchise" element={<AdminFranchise />} />
                 <Route path="grievance" element={<AdminGrievance />} />
                 <Route path="orders" element={<AdminOrders />} />
+                <Route path="mlm" element={<MLMManagement />} />
 
 
             </Route>

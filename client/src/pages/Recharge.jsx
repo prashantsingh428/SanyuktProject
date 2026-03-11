@@ -232,7 +232,7 @@ const Recharge = () => {
                     </h2>
                     <div className="space-y-4 text-gray-600 text-lg leading-relaxed">
                         <p>
-                            Sanyukt Parivaar & Rich Life Company brings you convenient digital recharge services that help you manage your daily utilities effortlessly. Our recharge platform allows members and customers to perform quick recharges while creating additional earning opportunities for our business partners.
+                            Sanyukt Parivaar & Rich Life Private Limited brings you convenient digital recharge services that help you manage your daily utilities effortlessly. Our recharge platform allows members and customers to perform quick recharges while creating additional earning opportunities for our business partners.
                         </p>
                         <p>
                             With secure transactions and instant processing, our recharge services are designed for simplicity, speed, and reliability.

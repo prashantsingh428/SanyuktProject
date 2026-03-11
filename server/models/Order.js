@@ -35,6 +35,14 @@ const orderSchema = new mongoose.Schema({
     tax: Number,
     discount: Number,
     total: Number,
+    bv: {
+        type: Number,
+        default: 0
+    },
+    pv: {
+        type: Number,
+        default: 0
+    },
     status: {
         type: String,
         enum: ["pending", "processing", "shipped", "reached_store", "out_for_delivery", "delivered", "cancelled", "backorder"],

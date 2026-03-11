@@ -45,6 +45,7 @@ exports.protect = async (req, res, next) => {
         }
 
         if (!token) {
+            console.log("Auth Middleware: No token found in headers");
             return res.status(401).json({
                 success: false,
                 message: "Not authorized - No token provided"
@@ -52,7 +53,14 @@ exports.protect = async (req, res, next) => {
         }
 
         // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        const secret = process.env.JWT_SECRET || 'your-secret-key';
+        console.log("--- AUTH DEBUG ---");
+        console.log("Secret used (prefix):", secret.substring(0, 5));
+        console.log("Token received (prefix):", token ? token.substring(0, 10) + "..." : "NONE");
+        
+        const decoded = jwt.verify(token, secret);
+        console.log("Decoded ID:", decoded.id);
+        console.log("------------------");
 
         // Get user from token
         const user = await User.findById(decoded.id).select("-password");
@@ -68,9 +76,14 @@ exports.protect = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        console.error('Auth middleware error:', error);
+        console.error('Auth middleware error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack?.split('\n')[1] // First line of stack
+        });
 
         if (error.name === 'JsonWebTokenError') {
+            console.log("Auth Middleware: Invalid token error -", error.message);
             return res.status(401).json({
                 success: false,
                 message: "Not authorized - Invalid token"
@@ -78,6 +91,7 @@ exports.protect = async (req, res, next) => {
         }
 
         if (error.name === 'TokenExpiredError') {
+            console.log("Auth Middleware: Token expired error -", error.message);
             return res.status(401).json({
                 success: false,
                 message: "Not authorized - Token expired"

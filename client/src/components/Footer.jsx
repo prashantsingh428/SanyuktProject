@@ -217,7 +217,7 @@ const Footer = () => {
                         </LogoContainer>
 
                         <CompanyDescription>
-                            Sanyukt Parivaar & Rich Life Company is a direct selling and network marketing organization founded by experienced professionals. We empower individuals to achieve financial independence by promoting high-quality lifestyle, wellness, personal care, and home utility products through a transparent and rewarding MLM business model.
+                            Sanyukt Parivaar & Rich Life Private Limited is a direct selling and network marketing organization founded by experienced professionals. We empower individuals to achieve financial independence by promoting high-quality lifestyle, wellness, personal care, and home utility products through a transparent and rewarding MLM business model.
                         </CompanyDescription>
 
                         <SocialIconContainer>
@@ -268,7 +268,7 @@ const Footer = () => {
                                 <SectionTitle>Contact Us</SectionTitle>
                                 <Box sx={{ mb: 2 }}>
                                     <ContactText sx={{ fontWeight: 600, mb: 1, color: '#FFFFFF' }}>
-                                        Sanyukt Parivaar & Rich Life Company
+                                        Sanyukt Parivaar & Rich Life Private Limited
                                     </ContactText>
                                     <ContactText>
                                         Near Main Business Hub,<br />
@@ -294,7 +294,7 @@ const Footer = () => {
                         <SectionTitle>Contact Us</SectionTitle>
                         <Box sx={{ mb: 1 }}>
                             <ContactText sx={{ fontWeight: 600, mb: 0.5, color: '#FFFFFF', fontSize: '13px' }}>
-                                Sanyukt Parivaar & Rich Life Company
+                                Sanyukt Parivaar & Rich Life Private Limited
                             </ContactText>
                             <ContactText sx={{ fontSize: '13px' }}>
                                 Near Main Business Hub, India
@@ -316,7 +316,7 @@ const Footer = () => {
             {/* 11. FOOTER BOTTOM BAR */}
             <BottomBar>
                 <CopyrightText>
-                    © 2026 Sanyukt Parivaar & Rich Life Company. All Rights Reserved.
+                    © 2026 Sanyukt Parivaar & Rich Life Private Limited. All Rights Reserved.
                 </CopyrightText>
             </BottomBar>
         </FooterContainer>

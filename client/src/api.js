@@ -24,8 +24,11 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
+    console.log(`API [${config.method.toUpperCase()}] ${config.url} - Token found:`, !!token);
     if (token) {
         config.headers.Authorization = "Bearer " + token;
+    } else {
+        console.warn(`API [${config.method.toUpperCase()}] ${config.url} - NO TOKEN ATTACHED`);
     }
     return config;
 });

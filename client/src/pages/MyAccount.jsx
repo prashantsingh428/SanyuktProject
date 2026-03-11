@@ -1023,40 +1023,53 @@ const MyAccount = ({ defaultTab }) => {
                                                     </Grid>
                                                 </Grid>
                                             ) : (
-                                                // View mode — 3-column grid with card-style items
-                                                <Grid container spacing={2.5} sx={{ py: 2 }}>
+                                                // View mode — Formal Form Style
+                                                <Grid container spacing={4} sx={{ py: 3, px: 1 }}>
                                                     {[
-                                                        { label: 'User Name', value: formatValue(userData.userName), icon: <PersonIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
-                                                        { label: "Father's Name", value: formatValue(userData.fatherName), icon: <GroupsIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
-                                                        { label: 'Email Address', value: formatValue(userData.email), icon: <EmailIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
-                                                        { label: 'Phone', value: formatValue(userData.mobile), icon: <PhoneIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
-                                                        { label: 'Gender', value: formatValue(userData.gender), icon: <WcIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
-                                                        { label: 'Position', value: formatValue(userData.position), icon: <BadgeIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
+                                                        { label: 'Full User Name', value: formatValue(userData.userName), icon: <PersonIcon /> },
+                                                        { label: "Father's Name", value: formatValue(userData.fatherName), icon: <GroupsIcon /> },
+                                                        { label: 'Official Email Address', value: formatValue(userData.email), icon: <EmailIcon /> },
+                                                        { label: 'Contact Phone Number', value: formatValue(userData.mobile), icon: <PhoneIcon /> },
+                                                        { label: 'Gender', value: formatValue(userData.gender), icon: <WcIcon /> },
+                                                        { label: 'Position / Designation', value: formatValue(userData.position), icon: <BadgeIcon /> },
                                                     ].map((field, fi) => (
-                                                        <Grid item xs={12} key={fi}>
-                                                            <Box sx={{
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: 1.5,
-                                                                p: 2,
-                                                                borderRadius: '12px',
-                                                                bgcolor: '#fcfdfc',
-                                                                border: '1px solid rgba(10, 122, 47, 0.08)',
-                                                                height: '100%',
-                                                                width: '100%',
-                                                                transition: 'transform 0.2s, box-shadow 0.2s',
-                                                                '&:hover': {
-                                                                    transform: 'translateY(-2px)',
-                                                                    boxShadow: '0 4px 12px rgba(10,122,47,0.08)',
-                                                                    bgcolor: 'white'
-                                                                }
-                                                            }}>
-                                                                <Box sx={{ bgcolor: '#f0f9f1', p: 1, borderRadius: '8px', display: 'flex' }}>
-                                                                    {field.icon}
-                                                                </Box>
-                                                                <Box>
-                                                                    <Typography sx={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
-                                                                    <Typography sx={{ color: '#111', fontSize: '14px', fontWeight: 700 }}>{field.value}</Typography>
+                                                        <Grid item xs={12} sm={6} key={fi}>
+                                                            <Box sx={{ mb: 1 }}>
+                                                                <Typography sx={{ 
+                                                                    color: '#444', 
+                                                                    fontSize: '11px', 
+                                                                    fontWeight: 800, 
+                                                                    textTransform: 'uppercase', 
+                                                                    letterSpacing: '1px', 
+                                                                    mb: 1.2,
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: 1
+                                                                }}>
+                                                                    {React.cloneElement(field.icon, { sx: { fontSize: 16, color: '#0A7A2F' } })}
+                                                                    {field.label}
+                                                                </Typography>
+                                                                <Box sx={{
+                                                                    px: 2.5,
+                                                                    py: 1.8,
+                                                                    bgcolor: '#f8f9f8',
+                                                                    border: '1.5px solid #e0e6e1',
+                                                                    borderRadius: '12px',
+                                                                    transition: 'all 0.2s ease-in-out',
+                                                                    '&:hover': {
+                                                                        bgcolor: '#ffffff',
+                                                                        borderColor: '#0A7A2F',
+                                                                        boxShadow: '0 4px 12px rgba(10,122,47,0.06)'
+                                                                    }
+                                                                }}>
+                                                                    <Typography sx={{ 
+                                                                        color: '#111', 
+                                                                        fontSize: '14px', 
+                                                                        fontWeight: 700,
+                                                                        fontFamily: "'Inter', sans-serif"
+                                                                    }}>
+                                                                        {field.value}
+                                                                    </Typography>
                                                                 </Box>
                                                             </Box>
                                                         </Grid>
@@ -1074,37 +1087,50 @@ const MyAccount = ({ defaultTab }) => {
                                             </Typography>
                                         </Box>
                                         <Box sx={{ px: 3, py: 1.5 }}>
-                                            <Grid container spacing={2.5} sx={{ py: 2 }}>
+                                            <Grid container spacing={4} sx={{ py: 3, px: 1 }}>
                                                 {[
-                                                    { label: 'My Sponsor ID', value: formatValue(userData.memberId), icon: <FingerprintIcon sx={{ fontSize: 18, color: '#0A7A2F' }} /> },
-                                                    { label: 'Referrer ID', value: formatValue(userData.sponsorId), icon: <GroupsIcon sx={{ fontSize: 18, color: '#F7931E' }} /> },
-                                                    { label: 'Sponsor Name', value: formatValue(userData.sponsorName), icon: <PersonIcon sx={{ fontSize: 18, color: '#F7931E' }} /> },
-                                                    { label: 'State', value: formatValue(userData.state), icon: <FlagIcon sx={{ fontSize: 18, color: '#F7931E' }} /> },
+                                                    { label: 'Self Sponsor ID', value: formatValue(userData.memberId), icon: <FingerprintIcon /> },
+                                                    { label: 'Referrer Member ID', value: formatValue(userData.sponsorId), icon: <GroupsIcon /> },
+                                                    { label: 'Sponsor Full Name', value: formatValue(userData.sponsorName), icon: <PersonIcon /> },
+                                                    { label: 'Registered State', value: formatValue(userData.state), icon: <FlagIcon /> },
                                                 ].map((field, fi) => (
-                                                    <Grid item xs={12} key={fi}>
-                                                        <Box sx={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 1.5,
-                                                            p: 2,
-                                                            borderRadius: '12px',
-                                                            bgcolor: '#fffdf9',
-                                                            border: '1px solid rgba(247, 147, 30, 0.08)',
-                                                            height: '100%',
-                                                            width: '100%',
-                                                            transition: 'transform 0.2s, box-shadow 0.2s',
-                                                            '&:hover': {
-                                                                transform: 'translateY(-2px)',
-                                                                boxShadow: '0 4px 12px rgba(247,147,30,0.08)',
-                                                                bgcolor: 'white'
-                                                            }
-                                                        }}>
-                                                            <Box sx={{ bgcolor: '#fffbed', p: 1, borderRadius: '8px', display: 'flex' }}>
-                                                                {field.icon}
-                                                            </Box>
-                                                            <Box>
-                                                                <Typography sx={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>{field.label}</Typography>
-                                                                <Typography sx={{ color: '#111', fontSize: '14px', fontWeight: 700 }}>{field.value}</Typography>
+                                                    <Grid item xs={12} sm={6} key={fi}>
+                                                        <Box sx={{ mb: 1 }}>
+                                                            <Typography sx={{ 
+                                                                color: '#444', 
+                                                                fontSize: '11px', 
+                                                                fontWeight: 800, 
+                                                                textTransform: 'uppercase', 
+                                                                letterSpacing: '1px', 
+                                                                mb: 1.2,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: 1
+                                                            }}>
+                                                                {React.cloneElement(field.icon, { sx: { fontSize: 16, color: field.label === 'Self Sponsor ID' ? '#0A7A2F' : '#F7931E' } })}
+                                                                {field.label}
+                                                            </Typography>
+                                                            <Box sx={{
+                                                                px: 2.5,
+                                                                py: 1.8,
+                                                                bgcolor: field.label === 'Self Sponsor ID' ? '#f8f9f8' : '#fffbf7',
+                                                                border: `1.5px solid ${field.label === 'Self Sponsor ID' ? '#e0e6e1' : '#f5ebe0'}`,
+                                                                borderRadius: '12px',
+                                                                transition: 'all 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    bgcolor: '#ffffff',
+                                                                    borderColor: field.label === 'Self Sponsor ID' ? '#0A7A2F' : '#F7931E',
+                                                                    boxShadow: `0 4px 12px ${field.label === 'Self Sponsor ID' ? 'rgba(10,122,47,0.06)' : 'rgba(247,147,30,0.06)'}`
+                                                                }
+                                                            }}>
+                                                                <Typography sx={{ 
+                                                                    color: '#111', 
+                                                                    fontSize: '14px', 
+                                                                    fontWeight: 700,
+                                                                    fontFamily: "'Inter', sans-serif"
+                                                                }}>
+                                                                    {field.value}
+                                                                </Typography>
                                                             </Box>
                                                         </Box>
                                                     </Grid>

@@ -255,7 +255,7 @@ const ContactUs = () => {
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-gray-800 mb-1">Head Office</h3>
                                             <p className="text-gray-600 text-sm leading-relaxed">
-                                                Sanyukt Parivaar & Rich Life Company,<br />
+                                                Sanyukt Parivaar & Rich Life Private Limited,<br />
                                                 Near Main Business Hub, India
                                             </p>
                                         </div>

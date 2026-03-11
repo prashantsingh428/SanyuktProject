@@ -1,18 +1,16 @@
 const User = require("../models/User");
+const BinaryTree = require("../models/BinaryTree");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 const fs = require("fs");
 const path = require("path");
+const { findExtremePosition, distributeLevelIncome, distributeDirectIncome, updateTeamPV } = require("../utils/mlmUtils");
 
-const debugLog = (msg) => {
-    try {
-        const logPath = "/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/server/debug.log";
-        const timestamp = new Date().toISOString();
-        fs.appendFileSync(logPath, `[${timestamp}] ${msg}\n`);
-    } catch (e) {
-        console.error("Failed to write to debug log:", e);
-    }
+const PACKAGE_DATA = {
+    "599": { bv: 250, pv: 0.25, capping: 2000 },
+    "1299": { bv: 500, pv: 0.5, capping: 4000 },
+    "2699": { bv: 1000, pv: 1, capping: 10000 }
 };
 
 const generateOTP = () =>
@@ -33,11 +31,24 @@ exports.register = async (req, res) => {
         const otp = generateOTP();
 
         if (!user) {
-            // Generate a unique member ID
+            const pkg = PACKAGE_DATA[req.body.packageType] || { bv: 0, pv: 0, capping: 0 };
+
+            // Generate Member ID
             const generateMemberId = () => 'SPRL' + Math.floor(1000 + Math.random() * 9000).toString();
             let newMemberId = generateMemberId();
             while (await User.findOne({ memberId: newMemberId })) {
                 newMemberId = generateMemberId();
+            }
+
+            // MLM Placement Logic
+            let parentId = null;
+            let finalPosition = req.body.position;
+            if (req.body.sponsorId) {
+                const placement = await findExtremePosition(req.body.sponsorId, req.body.position || "Left");
+                if (placement) {
+                    parentId = placement.parentId;
+                    finalPosition = placement.position;
+                }
             }
 
             user = new User({
@@ -45,7 +56,12 @@ exports.register = async (req, res) => {
                 memberId: newMemberId,
                 password: hashedPassword,
                 otp,
-                otpExpire: Date.now() + 5 * 60 * 1000
+                otpExpire: Date.now() + 5 * 60 * 1000,
+                parentId: parentId,
+                position: finalPosition,
+                bv: pkg.bv,
+                pv: pkg.pv,
+                dailyCapping: pkg.capping
             });
         } else {
             user.password = hashedPassword;
@@ -60,6 +76,7 @@ exports.register = async (req, res) => {
         res.json({ message: "OTP Sent to Email" });
 
     } catch (error) {
+        console.error("Registration error:", error);
         res.status(500).json({ message: "Server Error" });
     }
 };
@@ -67,20 +84,59 @@ exports.register = async (req, res) => {
 
 // ================= VERIFY OTP =================
 exports.verifyOtp = async (req, res) => {
-    const { email, otp } = req.body;
+    try {
+        const { email, otp } = req.body;
 
-    const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
 
-    if (!user || user.otp !== otp || user.otpExpire < Date.now())
-        return res.status(400).json({ message: "Invalid or Expired OTP" });
+        if (!user || user.otp !== otp || user.otpExpire < Date.now())
+            return res.status(400).json({ message: "Invalid or Expired OTP" });
 
-    user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpire = undefined;
+        user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpire = undefined;
+        user.activeStatus = true;
 
-    await user.save();
+        // MLM Logic: Link child to parent and distribute income
+        if (user.parentId) {
+            const parent = await User.findById(user.parentId);
+            if (parent) {
+                if (user.position.toLowerCase() === 'left') {
+                    parent.left = user._id;
+                } else {
+                    parent.right = user._id;
+                }
+                await parent.save();
+            }
 
-    res.json({ message: "Account Verified Successfully" });
+            // Distribute Incomes
+            await distributeDirectIncome(user);
+            await distributeLevelIncome(user);
+            await updateTeamPV(user);
+        }
+
+        // Create/Update BinaryTree record for the user themselves
+        const sponsorObj = await User.findOne({ 
+            memberId: (user.sponsorId || "").toUpperCase() 
+        });
+        await BinaryTree.findOneAndUpdate(
+            { userId: user._id },
+            {
+                userId: user._id,
+                parentId: user.parentId,
+                sponsorId: sponsorObj?._id,
+                position: user.position || "Left"
+            },
+            { upsert: true, new: true }
+        );
+
+        await user.save();
+
+        res.json({ message: "Account Verified Successfully" });
+    } catch (error) {
+        console.error("verifyOtp error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
 };
 
 
@@ -109,22 +165,25 @@ exports.login = async (req, res) => {
         if (!match)
             return res.status(400).json({ message: "Wrong Password" });
 
+        const secret = process.env.JWT_SECRET || 'your-secret-key';
+        console.log("Signing token with secret (prefix):", secret.substring(0, 5));
+        
         const token = jwt.sign(
             { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
+            secret,
             { expiresIn: "1d" }
         );
 
-        debugLog(`Login match result for ${email}: ${match}`);
+        console.log("Login SUCCESS for user:", user._id);
 
         res.json({
             message: "Login Success",
             token,
-            user   // 🔥 FULL USER OBJECT
+            user
         });
 
     } catch (error) {
-        debugLog(`Login error for ${req.body.email}: ${error.message}`);
+        console.error(`Login error:`, error);
         res.status(500).json({ message: error.message });
     }
 };

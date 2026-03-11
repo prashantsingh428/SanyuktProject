@@ -34,10 +34,10 @@ const ProfileBanner = ({ userData }) => {
     };
 
     const details = [
-        { label: "Sponsor ID", value: userData.sponsorId || 'SPRL0000', icon: Users },
-        { label: "Joining Date", value: userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '08 Mar, 2026', icon: Calendar },
-        { label: "Current Rank", value: userData.rank || 'Platinum Member', icon: Award },
-        { label: "Regional Zone", value: userData.zone || 'North Zone', icon: Map },
+        { label: "Sponsor ID", value: userData.sponsorId || 'Not Set', icon: Users },
+        { label: "Joining Date", value: userData.joinDate ? new Date(userData.joinDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : (userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'), icon: Calendar },
+        { label: "Current Rank", value: userData.rank || 'Member', icon: Award },
+        { label: "Member Status", value: userData.activeStatus ? 'Active' : 'Inactive', icon: Activity },
     ];
 
     return (

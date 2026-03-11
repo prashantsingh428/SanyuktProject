@@ -135,6 +135,7 @@ const RegistrationForm = () => {
         block: '',
         villageCouncil: '',
         village: '',
+        packageType: 'none',
     });
 
     const [agreed, setAgreed] = useState(false);
@@ -401,6 +402,8 @@ const RegistrationForm = () => {
                             {/* Form Body */}
                             <form onSubmit={handleSubmit} noValidate>
                                 <div className="p-4 md:p-6 lg:p-8">
+
+
                                     <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                                         {/* Left Column */}
                                         <div className="space-y-4">
@@ -587,6 +590,8 @@ const RegistrationForm = () => {
                                             </div>
                                         </div>
                                     </div>
+
+
 
                                     {/* Address Section */}
                                     <div className="mt-6 space-y-4">

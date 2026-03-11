@@ -86,6 +86,60 @@ const userSchema = new mongoose.Schema(
             type: String,
             // required: true,  // 👈 Comment out
         },
+        joinDate: {
+            type: Date,
+            default: Date.now
+        },
+        activeStatus: {
+            type: Boolean,
+            default: false
+        },
+        packageType: {
+            type: String,
+            enum: ["none", "599", "1299", "2699"],
+            default: "none"
+        },
+        pv: {
+            type: Number,
+            default: 0
+        },
+        bv: {
+            type: Number,
+            default: 0
+        },
+        walletBalance: {
+            type: Number,
+            default: 0
+        },
+        // Binary Tree Relationships
+        parent: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
+        parentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
+        leftColor: { // Total PV/BV on left (optional, but good for caching)
+            pv: { type: Number, default: 0 },
+            bv: { type: Number, default: 0 }
+        },
+        rightColor: { // Total PV/BV on right
+            pv: { type: Number, default: 0 },
+            bv: { type: Number, default: 0 }
+        },
+        left: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
+        right: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
         isVerified: {
             type: Boolean,
             default: false
@@ -133,6 +187,46 @@ const userSchema = new mongoose.Schema(
         },
         kycMessage: {
             type: String
+        },
+        rank: {
+            type: String,
+            default: "Member"
+        },
+        leftTeamPV: {
+            type: Number,
+            default: 0
+        },
+        rightTeamPV: {
+            type: Number,
+            default: 0
+        },
+        totalMatchingBonus: {
+            type: Number,
+            default: 0
+        },
+        matchedPV: {
+            type: Number,
+            default: 0
+        },
+        totalDirectIncome: {
+            type: Number,
+            default: 0
+        },
+        totalLevelIncome: {
+            type: Number,
+            default: 0
+        },
+        totalGenerationIncome: {
+            type: Number,
+            default: 0
+        },
+        dailyCapping: {
+            type: Number,
+            default: 0
+        },
+        dailyPV: {
+            type: Number,
+            default: 0
         }
     },
     { timestamps: true }

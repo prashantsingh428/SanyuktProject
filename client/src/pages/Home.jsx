@@ -54,21 +54,21 @@ const HomePage = () => {
     const heroSlides = [
         {
             image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80",
-            title: "Welcome to Sanyukt Parivaar & Rich Life Company",
+            title: "Welcome to Sanyukt Parivaar & Rich Life Private Limited",
             subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Company",
-            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
+            description: "Sanyukt Parivaar & Rich Life Private Limited is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
         },
         {
             image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80",
-            title: "Welcome to Sanyukt Parivaar & Rich Life Company",
+            title: "Welcome to Sanyukt Parivaar & Rich Life Private Limited",
             subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Company",
-            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
+            description: "Sanyukt Parivaar & Rich Life Private Limited is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
         },
         {
             image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080&q=80",
-            title: "Welcome to Sanyukt Parivaar & Rich Life Company",
+            title: "Welcome to Sanyukt Parivaar & Rich Life Private Limited",
             subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Company",
-            description: "Sanyukt Parivaar & Rich Life Company is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
+            description: "Sanyukt Parivaar & Rich Life Private Limited is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
         }
     ];
 
@@ -658,8 +658,8 @@ const HomePage = () => {
                                             className="px-8 py-4 bg-[#F7931E] text-white font-bold rounded-full hover:bg-[#e07d0b] transition-all shadow-xl shadow-orange-900/20 flex items-center space-x-3 text-base"
                                         >
                                             <span>
-                                                {isLoggedIn 
-                                                    ? (userRole === 'admin' ? 'Admin Dashboard' : 'User Dashboard') 
+                                                {isLoggedIn
+                                                    ? (userRole === 'admin' ? 'Admin Dashboard' : 'User Dashboard')
                                                     : 'Join Now'
                                                 }
                                             </span>
@@ -702,10 +702,10 @@ const HomePage = () => {
                     <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
                         <div className="space-y-3 text-gray-700 leading-relaxed order-2 md:order-1">
                             <h3 className="text-lg md:text-xl font-semibold text-[#2F7A32] mb-3">
-                                Sanyukt Parivaar & Rich Life Company
+                                Sanyukt Parivaar & Rich Life Private Limited
                             </h3>
                             <p className="text-sm">
-                                Sanyukt Parivaar & Rich Life Company was founded with a clear vision — to create financial independence through ethical direct selling. We believe in growing together as one family, where every member gets equal opportunity, proper training, and long-term support.
+                                Sanyukt Parivaar & Rich Life Private Limited was founded with a clear vision — to create financial independence through ethical direct selling. We believe in growing together as one family, where every member gets equal opportunity, proper training, and long-term support.
                             </p>
                             <p className="text-sm">
                                 Our company focuses on personal development, leadership growth, and community success while promoting reliable lifestyle, wellness, and personal care products.
@@ -1013,7 +1013,7 @@ const HomePage = () => {
                                 A Powerful Business Opportunity
                             </h2>
                             <p className="text-gray-200 text-xs md:text-sm leading-relaxed">
-                                Sanyukt Parivaar & Rich Life Company offers a proven MLM business plan that allows individuals to earn through product sales, team building, and leadership development. Whether you are a student, professional, homemaker, or entrepreneur — this opportunity is open to all.
+                                Sanyukt Parivaar & Rich Life Private Limited offers a proven MLM business plan that allows individuals to earn through product sales, team building, and leadership development. Whether you are a student, professional, homemaker, or entrepreneur — this opportunity is open to all.
                             </p>
                             <div className="space-y-1">
                                 {businessHighlights.map((highlight, index) => (
@@ -1185,7 +1185,7 @@ const HomePage = () => {
                                 {
                                     icon: MapPin,
                                     title: 'Visit Us',
-                                    lines: ['Sanyukt Parivaar & Rich Life Company,  Near Main Business Hub, India'],
+                                    lines: ['Sanyukt Parivaar & Rich Life Private Limited,  Near Main Business Hub, India'],
                                     sub: 'Head Office',
                                     color: 'bg-blue-50 text-blue-600',
                                 },
@@ -1303,7 +1303,7 @@ const HomePage = () => {
                         Together We Grow, Together We Prosper
                     </h2>
                     <p className="text-sm mb-4 max-w-2xl mx-auto text-gray-600">
-                        At Sanyukt Parivaar & Rich Life Company, we don't just build income — we build people, confidence, and a better future.
+                        At Sanyukt Parivaar & Rich Life Private Limited, we don't just build income — we build people, confidence, and a better future.
                     </p>
                     <button
                         onClick={() => handleNavigation('/register')}

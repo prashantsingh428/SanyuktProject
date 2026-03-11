@@ -765,14 +765,14 @@ const Header = () => {
                                 <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
                             )}
                             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2 }}>
-                                <LogoMain>Sanyukt Parivaar <span style={{ fontSize: '0.8rem' }}>&</span> Rich Life Company</LogoMain>
+                                <LogoMain>Sanyukt Parivaar <span style={{ fontSize: '0.8rem' }}>&</span> Rich Life Private Limited</LogoMain>
                                 <LogoTagline>Together We Grow, Together We Prosper</LogoTagline>
                             </Box>
                         </LogoContainer>
 
                         {/* RIGHT - NAVIGATION (DESKTOP) */}
                         <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1, flexWrap: 'nowrap' }}>
-                            
+
                             <NavButton
                                 className={isActive('/') ? 'active' : ''}
                                 onClick={() => handleNavigation('/')}

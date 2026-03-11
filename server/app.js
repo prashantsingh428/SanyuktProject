@@ -31,6 +31,7 @@ app.use("/api/grievance", require("./routes/grievanceRoutes"));
 
 app.use("/api/recharge", require("./routes/rechargeRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/mlm", require("./routes/mlmRoutes"));
 
 app.use("/api/gallery", galleryRoutes)
 app.use("/api/events", eventRoutes)
