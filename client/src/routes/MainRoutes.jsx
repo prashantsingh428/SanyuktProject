@@ -34,6 +34,8 @@ import FranchiseLogin from '../pages/FranchiseLogin.jsx';
 import OrderDetails from '../pages/OrderDetails.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
 import FranchiseDashboard from '../pages/FranchiseDashboard.jsx'
+import Gallery from '../pages/Gallery.jsx';
+import Events from '../pages/Events.jsx'
 
 // ✅ Admin imports
 import AdminLayout from '../layouts/AdminLayout.jsx'
@@ -44,6 +46,8 @@ import AdminFranchise from '../pages/admin/Franchise.jsx'
 import AdminRoute from '../routes/AdminRoutes.jsx'
 import AdminGrievance from '../pages/admin/AdminGrievance.jsx'
 import AdminOrders from '../pages/admin/Orders.jsx'
+import AdminGallery from '../pages/admin/Gallery.jsx'
+import AdminEvents from '../pages/admin/Events.jsx'
 
 const MainRoutes = () => {
     return (
@@ -76,6 +80,9 @@ const MainRoutes = () => {
             <Route path='/franchise/login' element={<FranchiseLogin />} />
             <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='/franchise/dashboard' element={<FranchiseDashboard />} />
+            <Route path='/gallery' element={<Gallery />} />
+            <Route path='/events' element={<Events />} />
+
 
             <Route path='/my-account' element={<UserDashboardLayout />}>
                 <Route index element={<DashboardOverview />} />
@@ -147,6 +154,8 @@ const MainRoutes = () => {
                 <Route path="franchise" element={<AdminFranchise />} />
                 <Route path="grievance" element={<AdminGrievance />} />
                 <Route path="orders" element={<AdminOrders />} />
+                <Route path="seminar" element={<AdminEvents />} />
+                <Route path="gallery" element={<AdminGallery />} />
 
 
             </Route>
