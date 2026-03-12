@@ -27,4 +27,8 @@ const incomeHistorySchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+incomeHistorySchema.index({ userId: 1 });
+incomeHistorySchema.index({ type: 1 });
+incomeHistorySchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('IncomeHistory', incomeHistorySchema);

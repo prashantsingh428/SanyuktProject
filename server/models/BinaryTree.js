@@ -45,4 +45,10 @@ const binaryTreeSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Add indexes for tree traversal
+binaryTreeSchema.index({ parentId: 1 });
+binaryTreeSchema.index({ leftId: 1 });
+binaryTreeSchema.index({ rightId: 1 });
+binaryTreeSchema.index({ sponsorId: 1 });
+
 module.exports = mongoose.model("BinaryTree", binaryTreeSchema);

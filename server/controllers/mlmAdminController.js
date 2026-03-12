@@ -161,16 +161,20 @@ exports.getTeamList = async (req, res) => {
         let queue = [...rootIds];
         let visited = new Set();
 
+        // ✅ Optimization: Limit depth or use batching if team is huge
+        // For now, we fetch in larger chunks to reduce round-trips
         while (queue.length > 0) {
-            const currentId = queue.shift();
-            if (visited.has(currentId.toString())) continue;
-            visited.add(currentId.toString());
-
-            const user = await User.findById(currentId).select("userName memberId packageType activeStatus rank createdAt position");
-            if (user) {
+            const currentBatch = queue.splice(0, 50); // Process in batches of 50
+            const users = await User.find({ _id: { $in: currentBatch } })
+                .select("userName memberId packageType activeStatus rank createdAt position")
+                .lean();
+            
+            for (const user of users) {
+                if (visited.has(user._id.toString())) continue;
+                visited.add(user._id.toString());
                 team.push(user);
                 
-                const node = await BinaryTree.findOne({ userId: currentId });
+                const node = await BinaryTree.findOne({ userId: user._id }).select("leftId rightId").lean();
                 if (node) {
                     if (node.leftId) queue.push(node.leftId);
                     if (node.rightId) queue.push(node.rightId);

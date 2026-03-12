@@ -205,11 +205,14 @@ exports.getMLMStats = async (req, res) => {
         }
         console.log("BinaryTree record available:", tree ? "Yes" : "No");
 
-        // Calculate total product purchases
-        const orders = await Order.find({ user: user._id, status: { $ne: "cancelled" } });
-        const productPurchases = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+        // Optimized calculation for total product purchases using aggregate
+        const purchaseAggregate = await Order.aggregate([
+            { $match: { user: user._id, status: { $ne: "cancelled" } } },
+            { $group: { _id: null, totalSales: { $sum: "$total" } } }
+        ]);
+        const productPurchases = purchaseAggregate[0]?.totalSales || 0;
 
-        // Direct count
+        // Direct count is already indexed
         const directCount = await User.countDocuments({ sponsorId: user.memberId });
         
         const stats = {
@@ -217,6 +220,7 @@ exports.getMLMStats = async (req, res) => {
             pv: Number(user.pv || 0),
             bv: Number(user.bv || 0),
             directCount: Number(directCount || 0),
+            // ✅ Optimization: Use cached counts from BinaryTree instead of recursive BFS
             totalLeft: Number(tree ? tree.totalLeft : 0),
             totalRight: Number(tree ? tree.totalRight : 0),
             totalDownline: Number((tree ? tree.totalLeft : 0) + (tree ? tree.totalRight : 0)),
@@ -241,22 +245,9 @@ exports.getMLMStats = async (req, res) => {
             lifetimePV: {
                 current: Number(user.pv || 0),
                 target: 10200
-            },
-            currentSilverLeft: 0,
-            currentSilverRight: 0,
-            totalSilverLeft: 0,
-            totalSilverRight: 0,
-            currentGoldLeft: 0,
-            currentGoldRight: 0,
-            totalGoldLeft: 0,
-            totalGoldRight: 0,
-            currentDiamondLeft: 0,
-            currentDiamondRight: 0,
-            totalDiamondLeft: 0,
-            totalDiamondRight: 0
+            }
         };
 
-        console.log("Returning robust MLM stats for user:", user._id);
         res.json(stats);
     } catch (error) {
         console.error("getMLMStats error:", error);

@@ -232,4 +232,11 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// Add indexes for MLM relationship and performance optimization
+userSchema.index({ sponsorId: 1 });
+userSchema.index({ parentId: 1 });
+userSchema.index({ parent: 1 });
+userSchema.index({ role: 1 });
+userSchema.index({ activeStatus: 1 });
+
 module.exports = mongoose.model("User", userSchema);
