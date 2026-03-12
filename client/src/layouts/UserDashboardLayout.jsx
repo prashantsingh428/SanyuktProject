@@ -124,18 +124,7 @@ const UserDashboardLayout = () => {
                 { name: 'Daily Closing Report', path: '/my-account/wallet/daily-closing', id: 'wallet_daily' },
             ],
         },
-        {
-            name: 'Generation Wallet',
-            icon: Wallet,
-            path: '/my-account/wallet/generation',
-            id: 'gen_wallet',
-            children: [
-                { name: 'Deduction Report', path: '/my-account/wallet/generation/deduction-report', id: 'gen_deduction' },
-                { name: 'Withdrawal History', path: '/my-account/wallet/generation/withdrawal-history', id: 'gen_withdrawal' },
-                { name: 'All Transaction Report', path: '/my-account/wallet/generation/all-transactions', id: 'gen_all_txn' },
-                { name: 'Monthly Closing Report', path: '/my-account/wallet/generation/monthly-closing', id: 'gen_monthly' },
-            ],
-        },
+
         {
             name: 'My Folder',
             icon: Folder,
@@ -143,8 +132,7 @@ const UserDashboardLayout = () => {
             id: 'folder',
             children: [
                 { name: 'Welcome Letter', path: '/my-account/folder/welcome-letter', id: 'folder_welcome' },
-                { name: 'Download Files', path: '/my-account/folder/download-files', id: 'folder_downloads' },
-                { name: 'Our Banker', path: '/my-account/folder/our-banker', id: 'folder_banker' },
+                { name: 'Our Banker', path: '/banker', id: 'folder_banker' },
                 { name: 'ID Card', path: '/my-account/folder/id-card', id: 'folder_id' },
             ],
         },
@@ -285,8 +273,8 @@ const UserDashboardLayout = () => {
                                                         to={child.path}
                                                         onClick={() => isMobile && setSidebarOpen(false)}
                                                         className={`block px-4 py-1.5 text-[12px] rounded-lg transition-all ${childActive
-                                                                ? 'text-white font-black bg-white/10'
-                                                                : 'text-white/85 hover:text-white hover:bg-white/5 font-bold'
+                                                            ? 'text-white font-black bg-white/10'
+                                                            : 'text-white/85 hover:text-white hover:bg-white/5 font-bold'
                                                             }`}
                                                     >
                                                         {child.name}
