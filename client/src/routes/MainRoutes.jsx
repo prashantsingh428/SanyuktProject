@@ -39,16 +39,16 @@ import OrderDetails from '../pages/OrderDetails.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
 import FranchiseDashboard from '../pages/FranchiseDashboard.jsx'
 
-import SelfRepurchaseIncome from '../pages/RepurchaseBouns/SelfPurchaseIncome.jsx'
-import RepurchaseLevelIncome from '../pages/RepurchaseBouns/RepurchaseLevelIncome';
-import SponsorIncome from '../pages/RepurchaseBouns/SponsorIncome';
-import RoyaltyBonus from '../pages/RepurchaseBouns/RoyaltyBonus';
-import DirectorBonus from '../pages/RepurchaseBouns/DirectorBonus';
-import HouseFund from '../pages/RepurchaseBouns/HouseFund';
-import LeadershipFund from '../pages/RepurchaseBouns/LeadershipFund';
-import CarFund from '../pages/RepurchaseBouns/CarFund';
-import TravelFund from '../pages/RepurchaseBouns/TravelFund';
-import BikeFund from '../pages/RepurchaseBouns/BikeFund';
+import SelfRepurchaseIncome from '../pages/RepurchaseBonus/SelfRepurchaseIncome.jsx'
+import RepurchaseLevelIncome from '../pages/RepurchaseBonus/RepurchaseLevelIncome.jsx';
+import SponsorIncome from '../pages/RepurchaseBonus/SponsorIncome.jsx';
+import RoyaltyBonus from '../pages/RepurchaseBonus/RoyaltyBonus.jsx';
+import DirectorBonus from '../pages/RepurchaseBonus/DirectorBonus.jsx';
+import HouseFund from '../pages/RepurchaseBonus/HouseFund.jsx';
+import LeadershipFund from '../pages/RepurchaseBonus/LeadershipFund.jsx';
+import CarFund from '../pages/RepurchaseBonus/CarFund.jsx';
+import TravelFund from '../pages/RepurchaseBonus/TravelFund.jsx';
+import BikeFund from '../pages/RepurchaseBonus/BikeFund.jsx';
 
 
 import DeductionReport from '../pages/Wallet/DeductionReport';
