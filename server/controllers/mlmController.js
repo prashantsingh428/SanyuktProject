@@ -195,7 +195,7 @@ exports.getMLMStats = async (req, res) => {
         console.log("BinaryTree record available:", tree ? "Yes" : "No");
 
         // Calculate total product purchases
-        const orders = await Order.find({ user: user._id, status: "delivered" });
+        const orders = await Order.find({ user: user._id, status: { $ne: "cancelled" } });
         const productPurchases = orders.reduce((sum, order) => sum + (order.total || 0), 0);
 
         // Direct count
