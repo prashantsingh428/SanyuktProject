@@ -96,16 +96,17 @@ const LogoMain = styled('span')(({ theme }) => ({
 
 const LogoTagline = styled('span')(({ theme }) => ({
     fontFamily: '"Poppins", "Roboto", sans-serif',
-    fontSize: '0.55rem',
-    fontWeight: 500,
+    fontSize: '0.6rem',
+    fontWeight: 700,
     color: '#F7931E',
     whiteSpace: 'normal',
+    letterSpacing: '0.02em',
     [theme.breakpoints.up('md')]: {
-        fontSize: '0.65rem',
+        fontSize: '0.75rem',
         whiteSpace: 'nowrap',
     },
     [theme.breakpoints.up('lg')]: {
-        fontSize: '0.75rem',
+        fontSize: '0.85rem',
     },
 }));
 

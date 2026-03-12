@@ -54,9 +54,10 @@ const LogoTextContainer = styled(Box)({
 
 const LogoMain = styled('span')({
     fontFamily: '"Poppins", "Roboto", sans-serif',
-    fontWeight: 700,
-    fontSize: '1.2rem',
+    fontWeight: 800,
+    fontSize: '1.4rem',
     color: '#FFFFFF',
+    letterSpacing: '0.02em',
 });
 
 const CompanyDescription = styled(Typography)({
@@ -212,7 +213,8 @@ const Footer = () => {
                             ) : null}
                             <LogoTextContainer>
                                 <LogoMain>Sanyukt Parivaar</LogoMain>
-                                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#FFFFFF' }}>& Rich Life Company</Typography>
+                                <Typography sx={{ fontSize: '0.9rem', fontWeight: 700, color: '#FFFFFF', mb: 0.5 }}>& Rich Life Company</Typography>
+                                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#F7931E', letterSpacing: '0.02em' }}>Together We Grow, Together We Prosper</Typography>
                             </LogoTextContainer>
                         </LogoContainer>
 
@@ -267,11 +269,13 @@ const Footer = () => {
                             <Grid item xs={12} sm={6} sx={{ display: { xs: 'none', sm: 'block' } }}>
                                 <SectionTitle>Contact Us</SectionTitle>
                                 <Box sx={{ mb: 2 }}>
-                                    <ContactText sx={{ fontWeight: 600, mb: 1, color: '#FFFFFF' }}>
+                                    <ContactText sx={{ fontWeight: 700, mb: 1.5, color: '#FFFFFF', fontSize: '15px' }}>
                                         Sanyukt Parivaar & Rich Life Private Limited
                                     </ContactText>
-                                    <ContactText>
-                                        C/o- Vindeshwari Prasad, Bhatiniya, Gopinathpur, Harraiya, Basti - 272130, Uttar Pradesh
+                                    <ContactText sx={{ fontWeight: 500, fontSize: '13px', borderLeft: '2px solid #F7931E', pl: 1.5, mb: 2 }}>
+                                        C/o- Vindeshwari Prasad, Bhatiniya,<br />
+                                        Gopinathpur, Harraiya,<br />
+                                        Basti - 272130, Uttar Pradesh
                                     </ContactText>
                                 </Box>
                                 <Box>
@@ -291,12 +295,14 @@ const Footer = () => {
                     {/* CONTACT — full width row on xs only */}
                     <Grid item xs={12} sx={{ display: { xs: 'block', sm: 'none' }, pt: '0 !important' }}>
                         <SectionTitle>Contact Us</SectionTitle>
-                        <Box sx={{ mb: 1 }}>
-                            <ContactText sx={{ fontWeight: 600, mb: 0.5, color: '#FFFFFF', fontSize: '13px' }}>
+                        <Box sx={{ mb: 2 }}>
+                            <ContactText sx={{ fontWeight: 700, mb: 1, color: '#FFFFFF', fontSize: '14px' }}>
                                 Sanyukt Parivaar & Rich Life Private Limited
                             </ContactText>
-                            <ContactText sx={{ fontSize: '13px' }}>
-                                C/o- Vindeshwari Prasad, Bhatiniya, Gopinathpur, Harraiya, Basti - 272130, Uttar Pradesh
+                            <ContactText sx={{ fontSize: '13px', fontWeight: 500, opacity: 1, borderLeft: '2px solid #F7931E', pl: 1.5 }}>
+                                C/o- Vindeshwari Prasad, Bhatiniya,<br />
+                                Gopinathpur, Harraiya,<br />
+                                Basti - 272130, Uttar Pradesh
                             </ContactText>
                         </Box>
                         <ContactLine onClick={() => window.open('tel:+917880370057', '_self')}>
