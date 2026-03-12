@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import api from "../api"
+import api, { API_URL } from "../api"
 
 function Events() {
     const [events, setEvents] = useState([])
@@ -161,7 +161,7 @@ function Events() {
                                     {/* Image Container */}
                                     <div className="relative h-56 overflow-hidden">
                                         <img
-                                            src={`http://localhost:5001/uploads/events/${item.image}`}
+                                        src={`${API_URL}/uploads/events/${item.image}`}
                                             alt={item.title}
                                             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                             onError={(e) => {

@@ -1,9 +1,8 @@
-// FranchiseDashboard.jsx
 import React, { useState, useEffect } from 'react';
-import api from '../api';
+import api, { API_URL } from '../api';
 
 const FranchiseDashboard = ({ user, onLogout }) => {
-    const API_BASE_URL = api.defaults.baseURL?.replace(/\/api\/?$/, '') || 'http://localhost:5001';
+    const API_BASE_URL = API_URL;
     const getStoredFranchiseData = () => {
         try {
             return JSON.parse(localStorage.getItem('franchiseData') || '{}');

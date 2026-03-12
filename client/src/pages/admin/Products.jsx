@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../api";
+import api, { API_URL } from "../../api";
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -40,8 +40,7 @@ const AdminProducts = () => {
         "Grocery"
     ];
 
-    // ✅ फोटो दिखाने के लिए बेस URL
-    const BASE_URL = "http://localhost:5001";
+    // ✅ फोटो दिखाने के लिए बेस URL - now using imported API_URL
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -157,7 +156,7 @@ const AdminProducts = () => {
 
         // ✅ प्रीव्यू के लिए पूरा URL
         if (product.image) {
-            setImagePreview(`${BASE_URL}/uploads/${product.image}`);
+            setImagePreview(`${API_URL}/uploads/${product.image}`);
         }
 
         // ✅ IMPORTANT: selectedImage को null रखें
@@ -511,7 +510,7 @@ const AdminProducts = () => {
                                     {product.image ? (
                                         <img
                                             // ✅ सही URL बनाएं
-                                            src={`${BASE_URL}/uploads/${product.image}`}
+                                            src={`${API_URL}/uploads/${product.image}`}
                                             alt={product.name}
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             onError={(e) => {

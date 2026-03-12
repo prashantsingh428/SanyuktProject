@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
+import api, { API_URL } from '../api';
 import {
     Home, UserPlus, Users, ShoppingCart,
     Gift, Package, Wallet, Folder,
@@ -47,13 +48,9 @@ const UserDashboardLayout = () => {
 
     const fetchStats = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/mlm/get-stats`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setStats(data);
+            const response = await api.get('/mlm/get-stats');
+            if (response.data) {
+                setStats(response.data);
             }
         } catch (error) {
             console.error("Error fetching stats in layout:", error);

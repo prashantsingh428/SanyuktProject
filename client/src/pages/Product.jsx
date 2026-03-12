@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Star, ChevronUp, Trash2, ShieldCheck, Truck, RotateCcw, Info, Tag, Package } from 'lucide-react';
-import api from '../api';
+import api, { API_URL } from '../api';
 import { useCart } from '../context/CartContext';
 import {
     Dialog,
@@ -62,9 +62,6 @@ const ProductsPage = () => {
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-    // बेस URL
-    const BASE_URL = 'http://localhost:5001';
 
     // Fetch products from API
     const fetchProducts = async () => {
@@ -186,7 +183,7 @@ const ProductsPage = () => {
     const getImageUrl = (imageName) => {
         if (!imageName) return null;
         if (imageName.startsWith('http')) return imageName;
-        return `${BASE_URL}/uploads/${imageName}`;
+        return `${API_URL}/uploads/${imageName}`;
     };
 
     return (

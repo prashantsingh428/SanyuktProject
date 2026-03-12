@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, CreditCard, Truck, Shield, MapPin, Phone, Mail, User, Package, IndianRupee } from 'lucide-react';
-import api from '../api';
+import api, { API_URL } from '../api';
 import { Snackbar, Alert, Fade } from '@mui/material';
 
 const CheckoutPage = () => {
@@ -405,7 +405,7 @@ const CheckoutPage = () => {
                                 <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
                                     {product.image ? (
                                         <img
-                                            src={`http://localhost:5001/uploads/${product.image}`}
+                                            src={`${API_URL}/uploads/${product.image}`}
                                             alt={product.name}
                                             className="w-full h-full object-cover"
                                         />

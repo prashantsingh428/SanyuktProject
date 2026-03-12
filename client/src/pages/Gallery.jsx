@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import api from "../api"
+import api, { API_URL } from "../api"
 
 function Gallery() {
     const [gallery, setGallery] = useState([])
@@ -96,7 +96,7 @@ function Gallery() {
                             >
                                 <div className="relative w-full h-64 overflow-hidden">
                                     <img
-                                        src={`http://localhost:5001/uploads/gallery/${item.image}`}
+                                        src={`${API_URL}/uploads/gallery/${item.image}`}
                                         alt={`Gallery item ${index + 1}`}
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         loading="lazy"
@@ -154,7 +154,7 @@ function Gallery() {
                     >
                         <div className="relative max-w-6xl w-full max-h-[90vh] animate-scale-in">
                             <img
-                                src={`http://localhost:5001/uploads/gallery/${selectedImage.image}`}
+                                src={`${API_URL}/uploads/gallery/${selectedImage.image}`}
                                 alt="Selected gallery item"
                                 className="w-full h-full object-contain rounded-lg"
                             />

@@ -10,7 +10,8 @@ const app = express();
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5001",
-    "https://your-frontend-domain.com", // Replace with your Hostinger domain
+    "https://sanyuktparivarrichlifefamily.com",
+    "https://www.sanyuktparivarrichlifefamily.com",
 ];
 
 app.use(cors({

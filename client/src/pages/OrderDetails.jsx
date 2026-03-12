@@ -124,7 +124,7 @@
 //                                 <Box sx={{ w: 60, h: 60, bgcolor: '#eee', borderRadius: '8px', overflow: 'hidden' }}>
 //                                     {order.product?.image ? (
 //                                         <img
-//                                             src={`http://localhost:5001/uploads/${order.product.image}`}
+//                                             src={`${API_URL}/uploads/${order.product.image}`}
 //                                             alt={order.product.name}
 //                                             className="w-full h-full object-cover"
 //                                         />
@@ -200,7 +200,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Package, Truck, CheckCircle, Clock, MapPin, CreditCard, IndianRupee, ShieldCheck, Download, FileText } from 'lucide-react';
-import api from '../api';
+import api, { API_URL } from '../api';
 import { Box, Typography, Button, Paper, Stepper, Step, StepLabel, StepContent, Divider, Chip, Snackbar, Alert, CircularProgress } from '@mui/material';
 import html2pdf from 'html2pdf.js';
 import { jsPDF } from 'jspdf';
@@ -762,7 +762,7 @@ const OrderDetails = () => {
                                 <Box sx={{ width: 60, height: 60, bgcolor: '#eee', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {order.product?.image ? (
                                         <img
-                                            src={`http://localhost:5001/uploads/${order.product.image}`}
+                                            src={`${API_URL}/uploads/${order.product.image}`}
                                             alt={order.product.name}
                                             className="w-full h-full object-cover"
                                         />
