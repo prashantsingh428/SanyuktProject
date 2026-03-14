@@ -10,7 +10,10 @@ import {
     TrendingUp,
     UserCircle2,
     UserPlus,
-    Users
+    Users,
+    Download,
+    X,
+    Eye
 } from 'lucide-react';
 import api, { API_URL } from '../api';
 
@@ -44,6 +47,8 @@ const FranchiseDashboard = ({ user, onLogout }) => {
     const [loading, setLoading] = useState(false);
     const [dashboardId, setDashboardId] = useState(null);
     const [franchiseSession] = useState(() => getStoredFranchiseData());
+    const [showViewReportModal, setShowViewReportModal] = useState(false);
+    const [selectedReport, setSelectedReport] = useState(null);
 
     // Member Management State
     const [members, setMembers] = useState([]);
@@ -571,7 +576,6 @@ const FranchiseDashboard = ({ user, onLogout }) => {
     // Dashboard Stats
     const stats = [
         { label: 'Total Members', value: members.length.toString(), icon: '👥', change: '+12%', color: 'blue' },
-        { label: 'Today Joinings', value: '5', icon: '➕', change: '+5', color: 'purple' },
         { label: 'Total Business', value: '₹45.6L', icon: '💰', change: '+8%', color: 'blue' },
         { label: 'Commission', value: '₹1.2L', icon: '💵', change: '+15%', color: 'purple' }
     ];
@@ -649,19 +653,6 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         }
     };
 
-    const getDocumentIcon = (label) => {
-        switch (label) {
-            case 'PAN Card':
-                return CreditCard;
-            case 'Aadhaar Card':
-                return ShieldCheck;
-            case 'GST Certificate':
-                return FileBadge;
-            default:
-                return FileText;
-        }
-    };
-
     const formatCurrency = (value) => `Rs ${Number(value || 0).toLocaleString('en-IN')}`;
 
     const convertRowsToCsv = (rows) => {
@@ -686,17 +677,9 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         return csvLines.join('\r\n');
     };
 
-    const downloadCsvReport = (fileName, rows) => {
-        const csvContent = convertRowsToCsv(rows);
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+    const handleViewReport = (report) => {
+        setSelectedReport(report);
+        setShowViewReportModal(true);
     };
 
     // Income Data
@@ -717,7 +700,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
             title: 'Joining Report',
             icon: '📋',
             color: 'blue',
-            fileName: 'joining-report.csv',
+            description: 'Complete list of all member registrations with details',
             rows: (members.length ? members : recentJoinings).map((member, index) => ({
                 serialNo: index + 1,
                 memberId: member.id || 'N/A',
@@ -732,7 +715,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
             title: 'Income Report',
             icon: '💰',
             color: 'purple',
-            fileName: 'income-report.csv',
+            description: 'Detailed breakdown of all income transactions',
             rows: incomeHistory.map((item, index) => ({
                 serialNo: index + 1,
                 date: item.date,
@@ -746,7 +729,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
             title: 'Purchase Report',
             icon: '🛒',
             color: 'blue',
-            fileName: 'purchase-report.csv',
+            description: 'Product purchase history and inventory',
             rows: products.map((product, index) => ({
                 serialNo: index + 1,
                 productName: product.name,
@@ -759,7 +742,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
             title: 'Team Business',
             icon: '👥',
             color: 'purple',
-            fileName: 'team-business-report.csv',
+            description: 'Team performance and business volume analysis',
             rows: (members.length ? members : recentJoinings).map((member, index) => ({
                 serialNo: index + 1,
                 memberId: member.id || 'N/A',
@@ -773,7 +756,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
             title: 'Daily Report',
             icon: '📅',
             color: 'blue',
-            fileName: 'daily-report.csv',
+            description: 'Today\'s summary and key metrics',
             rows: [
                 {
                     generatedDate: new Date().toLocaleDateString('en-GB'),
@@ -790,7 +773,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
             title: 'Monthly Report',
             icon: '📊',
             color: 'purple',
-            fileName: 'monthly-report.csv',
+            description: 'Comprehensive monthly performance overview',
             rows: [
                 {
                     month: new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }),
@@ -1364,7 +1347,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                                     </div>
                                 </div>
 
-                                {/* Documents Section */}
+                                {/* Documents Section - Using Public Document Images */}
                                 <div className="mt-8">
                                     <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
                                         Documents
@@ -1373,7 +1356,13 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                                         {/* PAN Card */}
                                         <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
                                             <div className="flex items-start space-x-3">
-                                                <div className="relative w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-transparent"><CreditCard size={18} strokeWidth={2.2} className="absolute text-green-700" /></div>
+                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    <img
+                                                        src="/profile/pan.jpg"
+                                                        alt="PAN Card"
+                                                        className="w-8 h-8 object-contain"
+                                                    />
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-gray-800 text-sm">PAN Card</p>
                                                     <p className="text-xs text-gray-500 truncate mt-1">
@@ -1406,7 +1395,13 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                                         {/* Aadhaar Card */}
                                         <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
                                             <div className="flex items-start space-x-3">
-                                                <div className="relative w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-transparent"><ShieldCheck size={18} strokeWidth={2.2} className="absolute text-green-700" /></div>
+                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    <img
+                                                        src="/profile/adhar.jpg"
+                                                        alt="Aadhaar Card"
+                                                        className="w-8 h-8 object-contain"
+                                                    />
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-gray-800 text-sm">Aadhaar Card</p>
                                                     <p className="text-xs text-gray-500 truncate mt-1">
@@ -1439,7 +1434,13 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                                         {/* GST Certificate */}
                                         <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
                                             <div className="flex items-start space-x-3">
-                                                <div className="relative w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 text-transparent"><FileBadge size={18} strokeWidth={2.2} className="absolute text-green-700" /></div>
+                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    <img
+                                                        src="/profile/gst.jpg"
+                                                        alt="GST Certificate"
+                                                        className="w-8 h-8 object-contain"
+                                                    />
+                                                </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-gray-800 text-sm">GST Certificate</p>
                                                     <p className="text-xs text-gray-500 truncate mt-1">
@@ -2056,26 +2057,107 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">Reports</h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                            {[
-                                { title: 'Joining Report', icon: '📋', color: 'blue' },
-                                { title: 'Income Report', icon: '💰', color: 'purple' },
-                                { title: 'Purchase Report', icon: '🛒', color: 'blue' },
-                                { title: 'Team Business', icon: '👥', color: 'purple' },
-                                { title: 'Daily Report', icon: '📅', color: 'blue' },
-                                { title: 'Monthly Report', icon: '📊', color: 'purple' }
-                            ].map((report, i) => (
+                        {/* View Report Modal */}
+                        {showViewReportModal && selectedReport && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4 overflow-y-auto">
+                                <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+                                    <div className="flex justify-between items-center mb-4 sticky top-0 bg-white pt-2 pb-4 border-b">
+                                        <div>
+                                            <h3 className="text-2xl font-bold text-gray-800">{selectedReport.title}</h3>
+                                            <p className="text-sm text-gray-500 mt-1">{selectedReport.description}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setShowViewReportModal(false);
+                                                setSelectedReport(null);
+                                            }}
+                                            className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full"
+                                        >
+                                            <X size={24} />
+                                        </button>
+                                    </div>
+
+                                    <div className="mb-4 flex justify-between items-center">
+                                        <p className="text-sm text-gray-600">
+                                            Total Records: <span className="font-bold text-green-700">{selectedReport.rows.length}</span>
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    const csvContent = convertRowsToCsv(selectedReport.rows);
+                                                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                                    const url = URL.createObjectURL(blob);
+                                                    const link = document.createElement('a');
+                                                    link.href = url;
+                                                    link.download = `${selectedReport.title.toLowerCase().replace(/\s+/g, '-')}.csv`;
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                    URL.revokeObjectURL(url);
+                                                }}
+                                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center text-sm"
+                                            >
+                                                <Download size={14} className="mr-1" />
+                                                Download as CSV
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="overflow-x-auto border rounded-lg">
+                                        <table className="w-full text-sm">
+                                            <thead className="bg-gray-50">
+                                                <tr>
+                                                    {selectedReport.rows.length > 0 && Object.keys(selectedReport.rows[0]).map((header) => (
+                                                        <th key={header} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            {header.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-200">
+                                                {selectedReport.rows.map((row, idx) => (
+                                                    <tr key={idx} className="hover:bg-gray-50">
+                                                        {Object.values(row).map((value, i) => (
+                                                            <td key={i} className="px-4 py-3 text-gray-800">
+                                                                {String(value)}
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div className="mt-6 flex justify-end">
+                                        <button
+                                            onClick={() => {
+                                                setShowViewReportModal(false);
+                                                setSelectedReport(null);
+                                            }}
+                                            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {reportDefinitions.map((report, i) => (
                                 <div key={i} className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border-l-4 border-${report.color}-500`}>
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <span className="text-3xl mb-2 block">{report.icon}</span>
                                             <h3 className="font-semibold text-gray-800">{report.title}</h3>
+                                            <p className="text-xs text-gray-400 mt-1">{report.rows.length} records</p>
                                         </div>
                                         <button
-                                            onClick={() => downloadCsvReport(`${report.title.toLowerCase().replace(/\s+/g, '-')}.csv`, reportDefinitions.find((item) => item.title === report.title)?.rows || [])}
-                                            className="font-semibold text-blue-600 hover:text-blue-800"
+                                            onClick={() => handleViewReport(report)}
+                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center text-sm"
                                         >
-                                            Download →
+                                            <Eye size={14} className="mr-1" />
+                                            View
                                         </button>
                                     </div>
                                 </div>
@@ -2254,4 +2336,3 @@ const FranchiseDashboard = ({ user, onLogout }) => {
 };
 
 export default FranchiseDashboard;
-
