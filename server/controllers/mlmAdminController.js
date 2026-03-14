@@ -21,7 +21,7 @@ exports.getBinaryTree = async (req, res) => {
     try {
         const { userId } = req.params;
         const tree = await BinaryTree.findOne({ userId }).populate("userId", "userName memberId position rank");
-        
+
         if (!tree) return res.status(404).json({ message: "Tree not found" });
 
         // Recursive function to build tree data
@@ -78,7 +78,7 @@ exports.getMLMStats = async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const tree = await BinaryTree.findOne({ userId });
-        
+
         // Count direct referrals
         const directCount = await User.countDocuments({ sponsorId: user.memberId });
 
@@ -143,7 +143,7 @@ exports.getTeamList = async (req, res) => {
     try {
         const { type } = req.params; // 'left', 'right', 'all'
         const userId = req.params.userId || req.user._id;
-        
+
         const treeNode = await BinaryTree.findOne({ userId });
         if (!treeNode) return res.json([]);
 
@@ -168,12 +168,12 @@ exports.getTeamList = async (req, res) => {
             const users = await User.find({ _id: { $in: currentBatch } })
                 .select("userName memberId packageType activeStatus rank createdAt position")
                 .lean();
-            
+
             for (const user of users) {
                 if (visited.has(user._id.toString())) continue;
                 visited.add(user._id.toString());
                 team.push(user);
-                
+
                 const node = await BinaryTree.findOne({ userId: user._id }).select("leftId rightId").lean();
                 if (node) {
                     if (node.leftId) queue.push(node.leftId);
