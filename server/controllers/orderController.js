@@ -1,6 +1,9 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const Repurchase = require("../models/Repurchase");
 const { processOrderMLM } = require("../utils/mlmOrderUtils");
+// ✅ Import repurchase income processor
+const { processRepurchaseGenerationIncome } = require("./repurchaseController");
 
 // ================= CREATE ORDER =================
 exports.createOrder = async (req, res) => {
@@ -24,7 +27,7 @@ exports.createOrder = async (req, res) => {
         }
 
         const orderBv = (productData.bv || 0) * (quantity || 1);
-        const orderPv = orderBv / 1000; // 1000 BV = 1 PV ratio based on package data
+        const orderPv = orderBv / 1000;
 
         const order = new Order({
             user: req.user._id,
@@ -48,10 +51,23 @@ exports.createOrder = async (req, res) => {
 
         await order.save();
 
-        // Trigger MLM Point Processing
-        // We do this asynchronously to not block the response, 
-        // but we catch any errors within the util.
+        // ── Existing joining/matching MLM income ──
         processOrderMLM(req.user._id, orderBv, orderPv);
+
+        // ✅ FIX 7: Repurchase record banao (orderId ke saath)
+        // Aur phir generation income distribute karo
+        const newRepurchase = await Repurchase.create({
+            userId: req.user._id,
+            orderId: order._id,       // orderId ab model mein hai
+            amount: total,
+            bv: 300,                   // Plan ke hisaab se fixed 300 BV
+            status: 'completed',
+        });
+
+        // ── Repurchase generation income (async - response block nahi hoga) ──
+        processRepurchaseGenerationIncome(newRepurchase._id).catch(err =>
+            console.error("❌ Repurchase income error:", err.message)
+        );
 
         res.status(201).json(order);
     } catch (error) {
@@ -83,7 +99,6 @@ exports.getOrder = async (req, res) => {
 
         if (!order) return res.status(404).json({ message: "Order not found" });
 
-        // Ensure user owns order or is admin
         if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== "admin") {
             return res.status(403).json({ message: "Not authorized" });
         }
@@ -115,8 +130,6 @@ exports.updateOrderStatus = async (req, res) => {
         if (!order) return res.status(404).json({ message: "Order not found" });
 
         order.status = req.body.status;
-
-        // Add to tracking history
         order.tracking.push({
             status: req.body.status,
             message: req.body.message || `Order status updated to ${req.body.status}`,
