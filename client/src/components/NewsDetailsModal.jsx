@@ -46,7 +46,7 @@ const NewsDetailsModal = ({ isOpen, onClose, news }) => {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 md:p-6 pt-20 md:pt-24">
+                <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 md:p-6 pt-32 md:pt-40">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
