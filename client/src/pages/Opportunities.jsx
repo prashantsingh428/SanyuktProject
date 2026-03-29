@@ -81,11 +81,6 @@ const OpportunitiesPage = () => {
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#C8A96A] mb-3 animate-slide-up">
                         OPPORTUNITIES
                     </h1>
-                    <div className="flex items-center text-[#F5E6C8]/60 text-[10px] uppercase font-black tracking-widest flex-wrap justify-center">
-                        <Link to="/" className="hover:text-[#C8A96A] transition-colors">Home</Link>
-                        <ChevronRight className="w-4 h-4 mx-2 text-[#C8A96A]/40" />
-                        <span className="text-[#C8A96A]">OPPORTUNITIES</span>
-                    </div>
                 </div>
             </header>
 

@@ -198,11 +198,6 @@ const GrievancePage = () => {
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#C8A96A] mb-3 animate-fade-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                         Grievance
                     </h1>
-                    <div className="flex items-center text-[#F5E6C8]/60 text-xs md:text-sm flex-wrap justify-center font-bold tracking-[0.2em] uppercase">
-                        <Link to="/" className="hover:text-[#C8A96A] transition-colors">Home</Link>
-                        <ChevronRight className="w-4 h-4 mx-2" />
-                        <span className="text-[#C8A96A]">Grievance</span>
-                    </div>
                 </div>
             </header>
 

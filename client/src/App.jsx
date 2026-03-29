@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import Header from "./components/Header";
+import SubHeader from "./components/SubHeader";
 import Footer from "./components/Footer";
 import MainRoutes from "./routes/MainRoutes";
 import { Toaster } from 'react-hot-toast';
 
 const PUBLIC_HEADER_OFFSET = {
-  xs: '60px',
-  md: '80px',
+  xs: '102px', // 60px header + ~42px subheader
+  md: '122px', // 80px header + ~42px subheader
 };
 
 const App = () => {
@@ -25,7 +26,12 @@ const App = () => {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-      {!isAdminRoute && <Header />}
+      {!isAdminRoute && (
+        <>
+          <Header />
+          <SubHeader />
+        </>
+      )}
       <Box sx={{ pt: !isAdminRoute ? PUBLIC_HEADER_OFFSET : 0 }}>
         <MainRoutes />
       </Box>

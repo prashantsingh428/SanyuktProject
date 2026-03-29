@@ -71,16 +71,9 @@ const AboutUsPage = () => {
 
                 {/* Content Container */}
                 <div className="relative flex flex-col items-center justify-center text-center px-4">
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-[#C8A96A] mb-4 drop-shadow-lg animate-fade-in">
+                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-[#C8A96A] drop-shadow-lg animate-fade-in">
                         ABOUT US
                     </h1>
-
-                    {/* Breadcrumbs matching the aesthetic */}
-                    <div className="flex items-center text-[#F5E6C8]/90 text-sm md:text-base font-medium tracking-widest uppercase">
-                        <span onClick={() => navigate('/')} className="cursor-pointer hover:text-[#C8A96A] transition-colors">Vision</span>
-                        <ChevronRight className="w-4 h-4 mx-3 text-[#C8A96A]" />
-                        <span className="text-[#C8A96A]">Our About</span>
-                    </div>
                 </div>
             </header>
 

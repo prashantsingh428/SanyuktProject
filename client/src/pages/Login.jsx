@@ -212,15 +212,9 @@ const UserLogin = () => {
                             <div className="bg-[#121212] p-6 md:p-8 border-b border-[#C8A96A]/30 relative overflow-hidden text-center">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#C8A96A]/5 rounded-full blur-3xl"></div>
 
-                                <h2 className="text-3xl font-serif font-bold text-[#F5E6C8] mb-4 tracking-tight">
+                                <h2 className="text-3xl font-serif font-bold text-[#F5E6C8] mb-1 tracking-tight">
                                     User <span className="text-[#C8A96A]">Login</span>
                                 </h2>
-                                <div className="flex items-center justify-center space-x-3 text-[#C8A96A]/40">
-                                    <Home className="h-3 w-3" />
-                                    <Link to="/" className="text-[10px] font-black uppercase tracking-widest hover:text-[#C8A96A] transition-colors">Origins</Link>
-                                    <span className="w-1 h-1 rounded-full bg-[#C8A96A]/20"></span>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#C8A96A]">Access</span>
-                                </div>
                             </div>
 
                             {/* Form Body */}

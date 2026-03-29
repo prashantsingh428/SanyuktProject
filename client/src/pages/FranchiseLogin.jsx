@@ -282,19 +282,7 @@ const FranchiseLogin = () => {
             </AnimatePresence>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto relative z-10">
-                {/* Breadcrumb */}
-                <motion.div
-                    className="flex items-center space-x-2 text-[#F5E6C8]/50 mb-4"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <Home className="h-4 w-4" />
-                    <Link to="/" className="hover:text-[#C8A96A] transition-colors">Home</Link>
-                    <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
-                    <span className="text-[#C8A96A] font-bold">Franchise Login</span>
-                </motion.div>
+            <div className="max-w-7xl mx-auto relative z-10 pt-4">
 
                 {/* Main Grid */}
                 <div className="grid lg:grid-cols-2 gap-8 items-center">
