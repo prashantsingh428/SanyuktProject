@@ -64,7 +64,7 @@ const AboutUsPage = () => {
     return (
         <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] overflow-x-hidden">
             {/* Hero Banner Section */}
-            <header className="relative w-full min-h-[180px] md:min-h-[220px] bg-cover bg-center flex items-center justify-center pt-8 pb-4"
+            <header className="relative w-full min-h-[180px] md:min-h-[220px] bg-cover bg-center flex items-center justify-center pb-4"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')" }}>
                 {/* Solid overlay to dim the image, just like Legal Policies page */}
                 <div className="absolute inset-0 bg-black/70"></div>

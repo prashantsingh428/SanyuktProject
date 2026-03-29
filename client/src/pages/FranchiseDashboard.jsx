@@ -980,7 +980,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                                 </div>
                             </div>
 
-                            <div className="pt-20 px-8 pb-8">
+                            <div className="pt-4 px-8 pb-8">
                                 <div className="flex flex-wrap items-center justify-between mb-8 bg-gray-50 p-4 rounded-lg">
                                     <div className="flex items-center space-x-4">
                                         <div className="flex items-center space-x-2">

@@ -516,7 +516,7 @@ const Recharge = () => {
     ];
 
     return (
-        <div className='min-h-screen bg-[#0D0D0D] flex flex-col font-sans text-[#F5E6C8] pt-24'>
+        <div className='min-h-screen bg-[#0D0D0D] flex flex-col font-sans text-[#F5E6C8]'>
             {/* ── SUCCESS ALERT BANNER (Responsive) ── */}
             <AnimatePresence>
                 {showSuccessAlert && (

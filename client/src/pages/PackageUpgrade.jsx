@@ -464,7 +464,7 @@ const PackageUpgrade = () => {
                 )}
             </AnimatePresence>
 
-            <div className="pt-28 pb-12 px-4 max-w-7xl mx-auto min-h-screen bg-[#0D0D0D] font-sans selection:bg-[#C8A96A]/30">
+            <div className="pb-12 px-4 max-w-7xl mx-auto min-h-screen bg-[#0D0D0D] font-sans selection:bg-[#C8A96A]/30">
 
                 {/* ── Success Banner ── */}
                 <AnimatePresence>
