@@ -281,7 +281,7 @@ const UserLogin = () => {
                                                     {rememberMe && <CheckCircle className="w-full h-full text-[#0D0D0D] p-0.5" />}
                                                 </div>
                                             </div>
-                                            <span className="text-[#F5E6C8]/40 group-hover/check:text-[#C8A96A] transition-colors">Remamber</span>
+                                            <span className="text-[#F5E6C8]/40 group-hover/check:text-[#C8A96A] transition-colors">Remember</span>
                                         </label>
 
                                         <Link
