@@ -394,7 +394,7 @@ exports.profile = async (req, res) => {
     try {
         let user = req.user;
         if (!user.memberId) {
-            const generateMemberId = () => 'SPRL' + Math.floor(1000 + Math.random() * 9000).toString();
+            const generateMemberId = () => 'SPRL' + Math.floor(100000 + Math.random() * 900000).toString();
             let newMemberId = generateMemberId();
             while (await User.findOne({ memberId: newMemberId })) {
                 newMemberId = generateMemberId();
