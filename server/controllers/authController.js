@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
             const pkg = PACKAGE_DATA[req.body.packageType] || { bv: 0, pv: 0, capping: 0 };
 
             // Generate Member ID
-            const generateMemberId = () => 'SPRL' + Math.floor(1000 + Math.random() * 9000).toString();
+            const generateMemberId = () => 'SPRL' + Math.floor(100000 + Math.random() * 900000).toString();
             let newMemberId = generateMemberId();
             while (await User.findOne({ memberId: newMemberId })) {
                 newMemberId = generateMemberId();
