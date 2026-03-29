@@ -1,3 +1,4 @@
+
 const User = require("../models/User");
 const BinaryTree = require("../models/BinaryTree");
 const bcrypt = require("bcryptjs");
@@ -87,9 +88,9 @@ exports.register = async (req, res) => {
             });
         }
 
-        res.json({ 
-            success: true, 
-            message: "OTP Sent to Email. Please check your inbox (and spam folder)." 
+        res.json({
+            success: true,
+            message: "OTP Sent to Email. Please check your inbox (and spam folder)."
         });
 
     } catch (error) {
@@ -250,9 +251,9 @@ exports.forgotPassword = async (req, res) => {
             });
         }
 
-        res.json({ 
-            success: true, 
-            message: "OTP Sent for Reset. Please check your email." 
+        res.json({
+            success: true,
+            message: "OTP Sent for Reset. Please check your email."
         });
     } catch (error) {
         console.error(`[AUTH ERROR] Forgot password: ${error.message}`, error.stack);

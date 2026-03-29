@@ -8,8 +8,8 @@ import MainRoutes from "./routes/MainRoutes";
 import { Toaster } from 'react-hot-toast';
 
 const PUBLIC_HEADER_OFFSET = {
-  xs: '102px', // 60px header + ~42px subheader
-  md: '122px', // 80px header + ~42px subheader
+  xs: '135px', // 72px header + ~40px subheader + 23px gap
+  md: '165px', // 80px header + ~40px subheader + 45px gap
 };
 
 const App = () => {
