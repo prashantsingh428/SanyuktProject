@@ -106,6 +106,12 @@ const Recharge = () => {
     // Fetch User Stats (Balance) and Profile
     useEffect(() => {
         const fetchAllData = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                rechargeDebugLog("No token found, skipping authenticated data fetch");
+                return;
+            }
+
             try {
                 const [statsRes, userRes] = await Promise.all([
                     api.get("mlm/get-stats"),

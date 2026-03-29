@@ -61,9 +61,10 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2rem 0;
+  margin: 1rem 0;
   color: #C8A96A;
 }
+
 
 .luxury-divider::before,
 .luxury-divider::after {

@@ -109,7 +109,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* ABOUT US - CONTENT + IMAGE */}
-            <section className="py-8 px-4 max-w-7xl mx-auto">
+            <section className="py-4 px-4 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     {/* Left Content */}
                     <div className="space-y-4 animate-slide-right">
@@ -166,7 +166,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* MISSION & VISION SECTION */}
-            <section className="py-8 px-4 max-w-7xl mx-auto">
+            <section className="py-4 px-4 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Mission Card */}
                     <article className="group relative">
@@ -186,8 +186,8 @@ const AboutUsPage = () => {
                     <article className="group relative">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] opacity-0 group-hover:opacity-20 transition duration-500 blur"></div>
                         <div className="luxury-box p-6 h-full flex flex-col transition-all duration-500">
-                            <div className="w-16 h-16 bg-[#0D0D0D] border border-[#C8A96A]/30 aspect-square flex items-center justify-center mb-4 shadow-xl transform group-hover:-rotate-6 transition-transform">
-                                <Eye className="w-10 h-10 text-[#C8A96A]" />
+                            <div className="w-16 h-16 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center mb-4 shadow-xl transform group-hover:-rotate-6 transition-transform">
+                                <Eye className="w-10 h-10 text-[#0D0D0D]" />
                             </div>
                             <h3 className="text-3xl font-serif font-bold text-[#F5E6C8] mb-3">Future</h3>
                             <p className="text-[#F5E6C8]/60 leading-relaxed text-lg font-medium">
@@ -199,7 +199,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* CORE VALUES SECTION */}
-            <section className="py-8 px-4 max-w-7xl mx-auto relative overflow-hidden">
+            <section className="py-4 px-4 max-w-7xl mx-auto relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#C8A96A]/5 rounded-full blur-[120px] -z-10"></div>
 
                 <h2 className="text-2xl md:text-4xl font-serif font-bold text-center text-[#C8A96A] mb-4 animate-slide-up">
@@ -236,7 +236,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* Why Sanyukt Parivaar Section */}
-            <section className="py-8 px-4">
+            <section className="py-4 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                         {/* Left Content */}
@@ -300,7 +300,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* Final CTA Section */}
-            <section className="py-12 px-4 relative overflow-hidden">
+            <section className="py-6 px-4 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[#C8A96A] opacity-5"></div>
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#C8A96A]/30 to-transparent"></div>
 

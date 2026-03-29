@@ -17,7 +17,7 @@ const ProductsCarousel = ({
     handleNavigation
 }) => {
     return (
-        <section className="py-10 md:py-16 bg-[#121212] relative overflow-hidden" >
+        <section className="py-4 md:py-8 bg-[#121212] relative overflow-hidden" >
             <div className="container mx-auto px-4 relative z-10">
                 {/* Section Header */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">

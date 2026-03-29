@@ -525,7 +525,7 @@ const HomePage = () => {
 
                 {/* </RechargeSection> */}
 
-                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-1 mb-1 sm:mt-2 sm:mb-4 px-4 sm:px-5">
+                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 my-0.5 sm:my-1 px-4 sm:px-5">
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
 
                     <span
@@ -549,7 +549,7 @@ const HomePage = () => {
                     whyChoosePoints={whyChoosePoints}
                 />
 
-                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-2 mb-2 sm:my-6 px-4 sm:px-5">
+                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 my-1 sm:my-2 px-4 sm:px-5">
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
 
                     <span
@@ -623,7 +623,7 @@ const HomePage = () => {
                 <div className="luxury-divider"><span>OUR VISION</span></div>
 
                 {/* Final Trust Section */}
-                <section className="py-8 bg-[#0D0D0D] relative overflow-hidden" >
+                <section className="py-4 bg-[#0D0D0D] relative overflow-hidden" >
                     <div className="container mx-auto px-4 text-center relative z-10">
                         <h2 className="text-xl md:text-3xl font-serif font-bold mb-2 text-[#C8A96A] uppercase tracking-widest">
                             Together We Grow, <span className="text-[#F5E6C8]">Together We Prosper</span>

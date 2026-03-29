@@ -58,7 +58,7 @@ const NewsSection = () => {
 
     if (loading) {
         return (
-            <section className="py-12 bg-[#121212] relative overflow-hidden">
+            <section className="py-6 bg-[#121212] relative overflow-hidden">
                 <div className="container mx-auto px-4 max-w-6xl">
                     {/* Header Skeleton */}
                     <div className="h-6 w-full max-w-lg sm:w-96 skeleton-box shimmer mx-auto mb-2"></div>
@@ -87,7 +87,7 @@ const NewsSection = () => {
 
     if (!loading && newsItems.length === 0) {
         return (
-            <section className="py-12 bg-[#121212] text-center" >
+            <section className="py-6 bg-[#121212] text-center" >
                 <div className="container mx-auto px-4">
                     <h2 className="text-xl md:text-3xl font-serif font-bold text-[#F5E6C8] mb-1 uppercase tracking-widest">
                         Latest News & <span className="text-[#C8A96A]">Updates</span>
@@ -105,7 +105,7 @@ const NewsSection = () => {
         );
     }
     return (
-        <section className="py-10 md:py-16 bg-[#121212] relative overflow-hidden" >
+        <section className="py-4 md:py-8 bg-[#121212] relative overflow-hidden" >
             <div className="container mx-auto px-4 max-w-6xl">
                 <h2 className="text-xl md:text-3xl font-serif font-bold text-center text-[#F5E6C8] mb-1 uppercase tracking-widest">
                     Latest News & <span className="text-[#C8A96A]">Updates</span>

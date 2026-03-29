@@ -335,10 +335,10 @@ const Footer = () => {
                     alignItems: 'center',
                     gap: { xs: 1.5, md: 0 }
                 }}>
-                    <CopyrightText>
+                    <CopyrightText component="div">
                         © 2026 Sanyukt Parivaar & Rich Life Pvt.Ltd.. All Rights Reserved.
                     </CopyrightText>
-                    <CopyrightText sx={{ fontSize: '12px', display: 'flex', alignItems: 'center', opacity: 1, letterSpacing: '0.5px' }}>
+                    <CopyrightText component="div" sx={{ fontSize: '12px', display: 'flex', alignItems: 'center', opacity: 1, letterSpacing: '0.5px' }}>
                         POWERED BY
                         <Link
                             href="https://aigrowthexa.com"
