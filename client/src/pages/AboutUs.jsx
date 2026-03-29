@@ -185,7 +185,7 @@ const AboutUsPage = () => {
                                 <div className="w-12 h-12 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center shadow-xl transform group-hover:-rotate-6 transition-transform">
                                     <Eye className="w-6 h-6 text-[#0D0D0D]" />
                                 </div>
-                                <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#F5E6C8]">Future</h3>
+                                <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#C8A96A]">Future</h3>
                             </div>
                             <p className="text-[#F5E6C8]/60 leading-relaxed text-lg font-medium">
                                 To lead the global direct selling landscape by defining a sustainable lifestyle model. We inspire positive transformation and encourage high-performance entrepreneurship through innovation and responsible legacy-building.
