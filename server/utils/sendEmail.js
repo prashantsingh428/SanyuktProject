@@ -3,19 +3,29 @@ const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (to, subject, text) => {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is missing");
+  }
+
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+
   try {
-    const response = await resend.emails.send({
-      from: "no-reply@sanyuktparivarrichlifefamily.com",
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
       to,
       subject,
       text,
     });
 
-    console.log("Email sent:", response);
-    return response;
+    if (error) {
+      throw new Error(error.message || "Resend returned an error");
+    }
+
+    console.log("Email sent:", data);
+    return data;
 
   } catch (error) {
-    console.error("Email error:", error);
+    console.error("Email error:", error?.message || error);
     throw error;
   }
 };

@@ -77,9 +77,15 @@ exports.register = async (req, res) => {
         await user.save();
         console.log(`[AUTH] User saved, sending OTP to ${email}`);
 
-        sendEmail(email, "Registration OTP", `Your OTP is ${otp}`).catch(err => {
+        try {
+            await sendEmail(email, "Registration OTP", `Your OTP is ${otp}`);
+        } catch (err) {
             console.error("[AUTH] Registration OTP Email Failed:", err.message);
-        });
+            return res.status(502).json({
+                success: false,
+                message: `OTP could not be sent: ${err.message}`
+            });
+        }
 
         res.json({ 
             success: true, 
@@ -234,9 +240,15 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         console.log(`[AUTH] Password reset OTP generated for ${normalizedEmail}`);
-        sendEmail(normalizedEmail, "Reset Password OTP", `Your OTP is ${otp}`).catch(err => {
+        try {
+            await sendEmail(normalizedEmail, "Reset Password OTP", `Your OTP is ${otp}`);
+        } catch (err) {
             console.error("[AUTH] Forgot Password OTP Email Failed:", err.message);
-        });
+            return res.status(502).json({
+                success: false,
+                message: `OTP could not be sent: ${err.message}`
+            });
+        }
 
         res.json({ 
             success: true, 
@@ -301,7 +313,8 @@ exports.resendOtp = async (req, res) => {
         res.json({ message: "New OTP Sent Successfully" });
 
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        console.error("[AUTH] Resend OTP Failed:", error.message);
+        res.status(500).json({ message: error.message || "Server Error" });
     }
 };
 

@@ -250,8 +250,8 @@ const OpportunitiesPage = () => {
                             Register Now
                         </Link>
                         <Link to="/contact" className="px-4 py-2 font-black text-[9px] tracking-[0.3em] uppercase text-[#F5E6C8] border border-[#F5E6C8]/20 hover:border-[#C8A96A] hover:text-[#C8A96A] transition-all flex items-center justify-center bg-transparent relative overflow-hidden group">
-                           Contact Sales
-                           <div className="absolute inset-0 bg-[#C8A96A]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            Contact Sales
+                            <div className="absolute inset-0 bg-[#C8A96A]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                         </Link>
                     </div>
                 </div>

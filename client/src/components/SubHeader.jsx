@@ -18,7 +18,7 @@ const SubHeader = () => {
         if (path === '/products') return 'COLLECTIONS';
         if (path === '/opportunities') return 'FUTURE';
         if (path.includes('/legal')) return 'COMPLIANCE';
-        
+
         // Default: take the last segment and uppercase it
         const segments = path.split('/').filter(Boolean);
         if (segments.length === 0) return 'HOME';
@@ -33,8 +33,8 @@ const SubHeader = () => {
         <div className="fixed top-[72px] md:top-[80px] left-0 w-full bg-[#0D0D0D] border-b border-[#C8A96A]/30 py-3 z-[1050] shadow-lg">
             <div className="max-w-7xl mx-auto px-4 flex items-center justify-center space-x-3 text-[#C8A96A]">
                 <Home className="h-3.5 w-3.5 mb-0.5" />
-                <Link 
-                    to="/" 
+                <Link
+                    to="/"
                     className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] hover:text-[#F5E6C8] transition-colors"
                 >
                     Origins
