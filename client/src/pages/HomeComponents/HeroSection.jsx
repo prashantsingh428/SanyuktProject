@@ -14,10 +14,10 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1 }}
-                    className="flex flex-col h-auto md:flex-1"
+                    className="flex flex-col min-h-[85vh] md:flex-1 justify-center"
                 >
-                    <div className="container mx-auto px-4 sm:px-6 relative z-20 pt-4 pb-1 md:pt-10 md:pb-8 lg:pt-12 lg:pb-10">
-                        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start md:items-center w-full">
+                    <div className="container mx-auto px-4 sm:px-6 relative z-20 py-10 md:py-16 lg:py-20">
+                        <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start md:items-center w-full">
 
                             {/* Content Side */}
                             <motion.div
@@ -26,13 +26,13 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                                 transition={{ delay: 0.3, duration: 0.8 }}
                                 className="space-y-4 text-center md:text-left flex flex-col justify-center"
                             >
-                                <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-serif font-bold leading-tight text-[#F5E6C8] tracking-tight">
+                                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight text-[#F5E6C8] tracking-tight">
                                     {heroSlides[currentSlide].title}
                                 </h1>
-                                <h2 className="text-xs sm:text-xl md:text-2xl lg:text-3xl text-[#C8A96A] font-extrabold uppercase tracking-[0.2em] sm:tracking-[0.3em] mt-3">
+                                <h2 className="text-sm sm:text-lg md:text-xl lg:text-2xl text-[#C8A96A] font-extrabold uppercase tracking-[0.2em] sm:tracking-[0.3em] mt-4">
                                     {heroSlides[currentSlide].subtitle}
                                 </h2>
-                                <p className="text-xs sm:text-base md:text-lg lg:text-xl text-[#F5E6C8]/80 leading-relaxed font-normal max-w-2xl mx-auto md:mx-0">
+                                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-[#F5E6C8]/80 leading-relaxed font-normal max-w-xl mx-auto md:mx-0 mt-2">
                                     {heroSlides[currentSlide].description}
                                 </p>
                                 <div className="flex flex-wrap gap-4 pt-4 justify-center md:justify-start">
@@ -46,21 +46,21 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                                                 handleNavigation('/register');
                                             }
                                         }}
-                                        className="px-8 py-3 bg-[#C8A96A] text-[#0D0D0D] font-bold rounded-sm hover:bg-[#F5E6C8] transition-all duration-300 shadow-lg flex items-center space-x-2 text-xs uppercase tracking-widest"
+                                        className="px-10 py-4 bg-[#C8A96A] text-[#0D0D0D] font-bold rounded-sm hover:bg-[#F5E6C8] transition-all duration-300 shadow-lg flex items-center space-x-2 text-sm uppercase tracking-widest"
                                     >
-                                        <span>
+                                        <span className="font-black">
                                             {isLoggedIn
                                                 ? (userRole === 'admin' ? 'Admin Dashboard' : 'User Dashboard')
                                                 : 'Join Now'
                                             }
                                         </span>
-                                        <ArrowRight className="w-4 h-4" />
+                                        <ArrowRight className="w-5 h-5" />
                                     </motion.button>
                                     <motion.button
                                         whileHover={{ backgroundColor: 'rgba(200, 169, 106, 0.1)' }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => handleNavigation('/contact')}
-                                        className="px-8 py-3 border border-[#C8A96A]/50 text-[#C8A96A] font-bold rounded-sm transition-all duration-300 text-xs uppercase tracking-widest"
+                                        className="px-10 py-4 border border-[#C8A96A]/50 text-[#C8A96A] font-bold rounded-sm transition-all duration-300 text-sm uppercase tracking-widest"
                                     >
                                         Contact Us
                                     </motion.button>
@@ -74,7 +74,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                                 transition={{ delay: 0.5, duration: 0.8 }}
                                 className="relative flex"
                             >
-                                <div className="relative rounded-sm overflow-hidden shadow-2xl border border-[#C8A96A]/10 w-full aspect-[4/3] md:aspect-auto md:h-[400px] lg:h-[500px]">
+                                <div className="relative rounded-sm overflow-hidden shadow-2xl border border-[#C8A96A]/10 w-full aspect-[4/3] md:aspect-auto md:h-[500px] lg:h-[600px]">
                                     <img
                                         src={heroSlides[currentSlide].image}
                                         alt={`Slide ${currentSlide + 1}`}

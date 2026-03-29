@@ -116,7 +116,7 @@ const ContactLine = styled(Box)({
     gap: '8px',
     marginBottom: '10px',
     fontSize: '14px',
-    color: '#0A0A0A',
+    color: '#F5E6C8', // Changed from #0A0A0A for better visibility
     opacity: 0.9,
     fontFamily: '"Poppins", "Roboto", sans-serif',
     transition: 'color 0.2s ease-in-out',
@@ -287,11 +287,11 @@ const Footer = () => {
                                 <Box>
                                     <ContactLine onClick={() => window.open('tel:+917880370057', '_self')}>
                                         <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Phone:</Typography>
-                                        +91 78803 70057
+                                        <Typography sx={{ color: '#F5E6C8', fontSize: '13px' }}>+91 78803 70057</Typography>
                                     </ContactLine>
                                     <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
                                         <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Email:</Typography>
-                                        info@sanyuktparivaar.com
+                                        <Typography sx={{ color: '#F5E6C8', fontSize: '13px' }}>info@sanyuktparivaar.com</Typography>
                                     </ContactLine>
                                 </Box>
                             </Grid>
@@ -312,11 +312,11 @@ const Footer = () => {
                         </Box>
                         <ContactLine onClick={() => window.open('tel:+917880370057', '_self')}>
                             <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Phone:</Typography>
-                            +91 78803 70057
+                            <Typography sx={{ color: '#F5E6C8', fontSize: '13px' }}>+91 78803 70057</Typography>
                         </ContactLine>
                         <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
                             <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Email:</Typography>
-                            info@sanyuktparivaar.com
+                            <Typography sx={{ color: '#F5E6C8', fontSize: '13px' }}>info@sanyuktparivaar.com</Typography>
                         </ContactLine>
                     </Grid>
 
