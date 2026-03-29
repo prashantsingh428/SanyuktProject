@@ -165,10 +165,12 @@ const AboutUsPage = () => {
                     <article className="group relative">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] opacity-0 group-hover:opacity-20 transition duration-500 blur"></div>
                         <div className="luxury-box p-6 h-full flex flex-col transition-all duration-500">
-                            <div className="w-16 h-16 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center mb-4 shadow-xl shadow-gold-900/20 transform group-hover:rotate-6 transition-transform">
-                                <Target className="w-10 h-10 text-[#0D0D0D]" />
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center shadow-xl shadow-gold-900/20 transform group-hover:rotate-6 transition-transform">
+                                    <Target className="w-6 h-6 text-[#0D0D0D]" />
+                                </div>
+                                <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#C8A96A]">Ambition</h3>
                             </div>
-                            <h3 className="text-3xl font-serif font-bold text-[#C8A96A] mb-3">Ambition</h3>
                             <p className="text-[#F5E6C8]/60 leading-relaxed text-lg font-medium">
                                 Our mission is to architect a reliable platform for financial independence and personal development. We nurture our elite community through sophisticated training and leadership, maintaining absolute integrity in every transaction.
                             </p>
@@ -179,10 +181,12 @@ const AboutUsPage = () => {
                     <article className="group relative">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] opacity-0 group-hover:opacity-20 transition duration-500 blur"></div>
                         <div className="luxury-box p-6 h-full flex flex-col transition-all duration-500">
-                            <div className="w-16 h-16 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center mb-4 shadow-xl transform group-hover:-rotate-6 transition-transform">
-                                <Eye className="w-10 h-10 text-[#0D0D0D]" />
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center shadow-xl transform group-hover:-rotate-6 transition-transform">
+                                    <Eye className="w-6 h-6 text-[#0D0D0D]" />
+                                </div>
+                                <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#F5E6C8]">Future</h3>
                             </div>
-                            <h3 className="text-3xl font-serif font-bold text-[#F5E6C8] mb-3">Future</h3>
                             <p className="text-[#F5E6C8]/60 leading-relaxed text-lg font-medium">
                                 To lead the global direct selling landscape by defining a sustainable lifestyle model. We inspire positive transformation and encourage high-performance entrepreneurship through innovation and responsible legacy-building.
                             </p>
