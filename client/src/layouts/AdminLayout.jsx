@@ -14,6 +14,7 @@ const AdminLayout = () => {
         { path: '/admin/dashboard', label: 'Dashboard', icon: Home },
         { path: '/admin/users', label: 'Users', icon: Users },
         { path: '/admin/products', label: 'Products', icon: Package },
+        { path: '/admin/withdrawals', label: 'Withdrawal Mgmt', icon: IndianRupee },
         { path: '/admin/franchise', label: 'Franchise', icon: BarChart3 },
         { path: '/admin/grievance', label: 'Grievance', icon: BarChart3 },
         { path: '/admin/orders', label: 'Orders', icon: Package },

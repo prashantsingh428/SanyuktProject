@@ -4,6 +4,43 @@ const Deduction = require('../models/Deduction');
 const IncomeHistory = require('../models/IncomeHistory');
 const Transaction = require('../models/Transaction');
 
+exports.getAllWithdrawals = async (req, res) => {
+    try {
+        const { status, method, search } = req.query;
+        let query = {};
+
+        if (status && status !== 'All') query.status = status;
+        if (method && method !== 'All') query.method = method;
+
+        if (search) {
+            const users = await User.find({
+                $or: [
+                    { userName: { $regex: search, $options: 'i' } },
+                    { memberId: { $regex: search, $options: 'i' } },
+                    { mobile: { $regex: search, $options: 'i' } }
+                ]
+            }).select('_id');
+            const userIds = users.map(u => u._id);
+            query.$or = [
+                { userId: { $in: userIds } },
+                { referenceNo: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const withdrawals = await Withdrawal.find(query)
+            .populate('userId', 'userName memberId mobile')
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            withdrawals
+        });
+    } catch (err) {
+        console.error('GetAllWithdrawals Error:', err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
 exports.getDeductionReport = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -404,6 +441,31 @@ exports.updateWithdrawalStatus = async (req, res) => {
         const withdrawal = await Withdrawal.findById(id);
         if (!withdrawal) return res.status(404).json({ success: false, message: 'Withdrawal not found' });
 
+        // If status is changed to Rejected, REFUND the amount to user's wallet
+        if (status === 'Rejected' && withdrawal.status !== 'Rejected') {
+            const user = await User.findById(withdrawal.userId);
+            if (user) {
+                // The amount deducted initially was 'netAmount + tds + fee' = original 'amount'
+                // But withdrawal.amount is 'netAmount'. We need the original amount.
+                // Let's find associated deductions to get the full amount back.
+                const deductions = await Deduction.find({ relatedWithdrawalId: withdrawal._id });
+                const totalDeductions = deductions.reduce((sum, d) => sum + d.amount, 0);
+                const refundAmount = withdrawal.amount + totalDeductions;
+
+                user.walletBalance += refundAmount;
+                await user.save();
+
+                // Create a refund transaction/history entry
+                await IncomeHistory.create({
+                    userId: user._id,
+                    amount: refundAmount,
+                    type: 'Refund',
+                    description: `Refund for Rejected Withdrawal (${withdrawal.referenceNo})`,
+                    status: 'Processed'
+                });
+            }
+        }
+
         withdrawal.status = status;
         if (adminNote) withdrawal.adminNote = adminNote;
         if (status === 'Completed') withdrawal.processedDate = new Date();
@@ -416,6 +478,7 @@ exports.updateWithdrawalStatus = async (req, res) => {
             withdrawal
         });
     } catch (err) {
+        console.error('UpdateWithdrawalStatus Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
