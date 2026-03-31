@@ -3,6 +3,7 @@ require("dotenv").config({ path: path.join(__dirname, '.env') });
 
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const galleryRoutes = require("./routes/galleryRoutes")
 const eventRoutes = require("./routes/eventRoutes")
@@ -53,6 +54,22 @@ app.get("/api/health", (req, res) => {
         timestamp: new Date().toISOString(),
         env: process.env.NODE_ENV || "development"
     });
+});
+
+// Return a clean 503 while Mongo is still connecting/disconnected
+app.use("/api", (req, res, next) => {
+    if (req.path === "/health") {
+        return next();
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            success: false,
+            message: "Database is not connected yet. Please retry in a few seconds."
+        });
+    }
+
+    next();
 });
 
 // Routes

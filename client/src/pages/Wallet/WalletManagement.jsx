@@ -112,12 +112,12 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                             }
                         </div>
                         <div className="flex-1">
-                            <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest leading-none mb-1">Method</p>
+                            <p className="text-xs font-black text-[#C8A96A]/60 uppercase tracking-widest leading-none mb-1">Method</p>
                             <p className="font-bold text-[#F5E6C8]">{method}</p>
                         </div>
                         {method === 'Bank Transfer' && (
                             <div className="text-right">
-                                <p className="text-[10px] text-[#C8A96A]/40 font-black uppercase tracking-widest mb-1">{bankName}</p>
+                                <p className="text-xs text-[#C8A96A]/60 font-black uppercase tracking-widest mb-1">{bankName}</p>
                                 <p className="text-sm font-mono font-bold text-[#C8A96A]">
                                     ****{accountNumber?.slice(-4)}
                                 </p>
@@ -125,14 +125,14 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                         )}
                         {method === 'UPI' && (
                             <div className="text-right">
-                                <p className="text-[10px] text-[#C8A96A]/40 font-black uppercase tracking-widest mb-1">UPI ID</p>
+                                <p className="text-xs text-[#C8A96A]/60 font-black uppercase tracking-widest mb-1">UPI ID</p>
                                 <p className="text-sm font-mono font-bold text-[#C8A96A]">{upiId}</p>
                             </div>
                         )}
                     </div>
 
                     <div className="bg-[#1A1A1A] rounded-xl p-5 mb-5 border border-[#C8A96A]/10">
-                        <h3 className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em] mb-4">Amount Breakdown</h3>
+                        <h3 className="text-xs font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-4">Amount Breakdown</h3>
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-[#F5E6C8]/60 font-medium">Withdrawal Amount</span>
@@ -152,7 +152,7 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                             </div>
                             <div className="border-t border-[#C8A96A]/10 pt-3 mt-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-xs font-black text-[#C8A96A]/40 uppercase tracking-widest">Net Payable</span>
+                                    <span className="text-sm font-black text-[#C8A96A]/70 uppercase tracking-widest">Net Payable</span>
                                     <span className="text-2xl font-serif font-bold text-[#C8A96A]">₹{net.toLocaleString('en-IN')}</span>
                                 </div>
                             </div>
@@ -163,8 +163,8 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                         <div className="flex gap-3">
                             <Info className="w-5 h-5 text-[#C8A96A] shrink-0" />
                             <div>
-                                <p className="text-[10px] font-black text-[#C8A96A] uppercase tracking-widest mb-1">Important Information</p>
-                                <ul className="text-[9px] text-[#F5E6C8]/60 space-y-1 font-medium italic">
+                                <p className="text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-1">Important Information</p>
+                                <ul className="text-[11px] text-[#F5E6C8]/60 space-y-1 font-medium italic">
                                     <li className="flex items-start gap-1.5">• Amount will be deducted from wallet immediately</li>
                                     <li className="flex items-start gap-1.5">• Processing takes 24-48 hours after admin approval</li>
                                     <li className="flex items-start gap-1.5">• You'll receive SMS/email confirmation</li>
@@ -175,11 +175,11 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
 
                     <div className="flex gap-3">
                         <button onClick={onCancel} disabled={loading}
-                            className="flex-1 py-3.5 rounded-xl border border-[#C8A96A]/20 text-[#C8A96A]/60 font-bold text-[10px] uppercase tracking-widest hover:bg-[#C8A96A]/5 transition disabled:opacity-50">
+                            className="flex-1 py-3.5 rounded-xl border border-[#C8A96A]/20 text-[#C8A96A]/60 font-bold text-xs uppercase tracking-widest hover:bg-[#C8A96A]/5 transition disabled:opacity-50">
                             Cancel
                         </button>
                         <button onClick={onConfirm} disabled={loading}
-                            className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black text-[10px] uppercase tracking-[0.2em] hover:shadow-lg hover:shadow-[#C8A96A]/20 transition flex items-center justify-center gap-2 disabled:opacity-60">
+                            className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black text-xs uppercase tracking-[0.2em] hover:shadow-lg hover:shadow-[#C8A96A]/20 transition flex items-center justify-center gap-2 disabled:opacity-60">
                             {loading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -511,7 +511,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         <div className="flex flex-col items-center">
                             <Icon className={`w-3.5 h-3.5 mb-1.5 ${parsedTopupAmount === value ? 'text-[#C8A96A]' : 'text-[#C8A96A]/40 group-hover:text-[#C8A96A]'
                                 }`} />
-                            <span className="text-[8px] font-black text-[#C8A96A]/30 uppercase tracking-[0.2em] group-hover:text-[#C8A96A]/60">{label}</span>
+                            <span className="text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] group-hover:text-[#C8A96A]">{label}</span>
                             <span className="text-sm font-bold text-[#F5E6C8]">₹{value}</span>
                         </div>
                     </button>
@@ -520,7 +520,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
 
             {/* Amount Input */}
             <div>
-                <label className="block text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mb-3 ml-1 text-center">Enter Capital Amount</label>
+                <label className="block text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.3em] mb-3 ml-1 text-center">Enter Capital Amount</label>
                 <div className={`flex items-center luxury-box bg-[#0D0D0D] transition-all ${topupAmount && !isTopupValid
                     ? 'border-red-900/50 bg-red-950/20'
                     : 'border-[#C8A96A]/20 hover:border-[#C8A96A]/60'
@@ -554,7 +554,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
 
             {/* Payment Methods */}
             <div>
-                <p className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mb-4 ml-1 text-center">Proprietary Gateway</p>
+                <p className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.3em] mb-4 ml-1 text-center">Proprietary Gateway</p>
                 <div className="flex flex-wrap justify-center gap-3">
                     {paymentMethods.map(({ id, label, icon: Icon }) => (
                         <button
@@ -566,7 +566,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 }`}
                         >
                             <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+                            <span className="text-[11px] font-black uppercase tracking-widest">{label}</span>
                         </button>
                     ))}
                 </div>
@@ -579,7 +579,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                     className="p-5 border border-[#C8A96A]/20 bg-gradient-to-r from-[#C8A96A]/5 to-[#D4AF37]/5"
                 >
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em]">Manifested Vault Balance</span>
+                        <span className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.2em]">Manifested Vault Balance</span>
                         <span className="text-2xl font-serif font-bold text-[#C8A96A]">
                             ₹{(walletBalance + parsedTopupAmount).toLocaleString('en-IN')}
                         </span>
@@ -624,12 +624,12 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             : 'bg-[#0D0D0D] border-[#C8A96A]/10 text-[#C8A96A]/40 hover:border-[#C8A96A]/40'
                             }`}
                     >
-                        <span className="text-[10px] font-black tracking-widest uppercase">₹{a.toLocaleString('en-IN')}</span>
+                        <span className="text-xs font-black tracking-widest uppercase">₹{a.toLocaleString('en-IN')}</span>
                     </button>
                 ))}
                 <button
                     onClick={() => setWithdrawAmount(String(walletBalance))}
-                    className="px-5 py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] hover:shadow-gold-900/40 transition-all font-black text-[10px] uppercase tracking-widest"
+                    className="px-5 py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] hover:shadow-gold-900/40 transition-all font-black text-xs uppercase tracking-widest"
                 >
                     Liquidate All
                 </button>
@@ -637,7 +637,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
 
             {/* Amount Input */}
             <div>
-                <label className="block text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mb-3 ml-1 text-center">Enter Liquidation Amount</label>
+                <label className="block text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.3em] mb-3 ml-1 text-center">Enter Liquidation Amount</label>
                 <div className={`flex items-center luxury-box bg-[#0D0D0D] transition-all ${withdrawAmount && !isWithdrawValid
                     ? 'border-red-900/50 bg-red-950/20'
                     : 'border-[#C8A96A]/20 hover:border-[#C8A96A]/60'
@@ -676,7 +676,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="p-5 border border-[#C8A96A]/10 bg-[#1A1A1A]"
                 >
-                    <h3 className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em] mb-4 text-center">Settlement Structure</h3>
+                    <h3 className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.2em] mb-4 text-center">Settlement Structure</h3>
                     <div className="space-y-3">
                         <div className="flex justify-between text-xs">
                             <span className="text-[#F5E6C8]/60 font-medium">Liquidation Gross</span>
@@ -692,7 +692,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         </div>
                         <div className="border-t border-[#C8A96A]/10 pt-4 mt-2">
                             <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest">Net Settlement</span>
+                                <span className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-widest">Net Settlement</span>
                                 <span className="text-3xl font-serif font-bold text-[#C8A96A]">₹{net.toLocaleString('en-IN')}</span>
                             </div>
                         </div>
@@ -702,7 +702,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
 
             {/* Withdrawal Method Selection */}
             <div>
-                <p className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mb-4 ml-1 text-center">Settlement Channel</p>
+                <p className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.3em] mb-4 ml-1 text-center">Settlement Channel</p>
                 <div className="grid grid-cols-2 gap-4">
                     {[
                         { id: 'Bank Transfer', icon: Building2, label: 'Standard Bank', sub: 'NEFT/IMPS' },
@@ -722,7 +722,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${withdrawMethod === id ? 'text-[#C8A96A]' : 'text-[#F5E6C8]/60'}`}>
                                 {label}
                             </p>
-                            <p className="text-[10px] font-medium text-[#C8A96A]/30 italic">{sub}</p>
+                            <p className="text-[11px] font-medium text-[#C8A96A]/50 italic">{sub}</p>
                             {withdrawMethod === id && (
                                 <div className="absolute top-0 right-0 p-2">
                                     <div className="w-2 h-2 rounded-full bg-[#C8A96A] shadow-[0_0_8px_#C8A96A]" />
@@ -743,7 +743,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         className="space-y-4 overflow-hidden"
                     >
                         <div>
-                            <label className="block text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest mb-1.5 ml-1">Bank Institution</label>
+                            <label className="block text-xs font-black text-[#C8A96A]/70 uppercase tracking-widest mb-1.5 ml-1">Bank Institution</label>
                             <input
                                 type="text"
                                 value={bankName}
@@ -754,7 +754,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest mb-1.5 ml-1">Vault Number</label>
+                                <label className="block text-xs font-black text-[#C8A96A]/70 uppercase tracking-widest mb-1.5 ml-1">Vault Number</label>
                                 <input
                                     type="text"
                                     value={accountNumber}
@@ -764,7 +764,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest mb-1.5 ml-1">Routing Code</label>
+                                <label className="block text-xs font-black text-[#C8A96A]/70 uppercase tracking-widest mb-1.5 ml-1">Routing Code</label>
                                 <input
                                     type="text"
                                     value={ifscCode}
@@ -785,7 +785,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <label className="block text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest mb-1.5 ml-1">UPI Identifier</label>
+                        <label className="block text-xs font-black text-[#C8A96A]/70 uppercase tracking-widest mb-1.5 ml-1">UPI Identifier</label>
                         <input
                             type="text"
                             value={upiId}
@@ -859,14 +859,14 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             className="flex items-center gap-2 px-3 py-1.5 luxury-box border-[#C8A96A]/20 transition-all hover:bg-[#C8A96A]/5"
                         >
                             <RefreshCw className={`w-3.5 h-3.5 text-[#C8A96A] ${loadingBalance ? 'animate-spin' : ''}`} />
-                            <span className="text-[10px] font-black text-[#C8A96A] uppercase tracking-widest">Update</span>
+                            <span className="text-xs font-black text-[#C8A96A] uppercase tracking-widest">Update</span>
                         </button>
                     </div>
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 mt-8">
                     {/* Breadcrumb */}
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] mb-8">
+                    <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] mb-8">
                         <button onClick={() => navigate('/my-account')} className="text-[#C8A96A]/40 hover:text-[#C8A96A]">Account</button>
                         <span className="text-[#C8A96A]/20">/</span>
                         <span className="text-[#C8A96A]">Vault</span>
@@ -890,29 +890,29 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                         <div className="w-8 h-8 rounded-lg bg-[#C8A96A]/10 flex items-center justify-center text-[#C8A96A]">
                                             <Wallet className="w-4 h-4" />
                                         </div>
-                                        <span className="text-[10px] font-black text-[#C8A96A]/60 uppercase tracking-[0.3em]">Institutional Grade Liquidity</span>
+                                        <span className="text-xs font-black text-[#C8A96A]/80 uppercase tracking-[0.3em]">Institutional Grade Liquidity</span>
                                     </div>
                                     
                                     <div className="flex items-baseline gap-4 mb-8">
                                         <span className="text-6xl font-serif font-bold text-[#F5E6C8] tracking-tighter">
                                             ₹{walletBalance.toLocaleString('en-IN')}
                                         </span>
-                                        <div className="p-1 px-2 border border-[#C8A96A]/20 bg-[#C8A96A]/5 text-[10px] font-black text-[#C8A96A] uppercase tracking-widest">
+                                        <div className="p-1 px-2 border border-[#C8A96A]/20 bg-[#C8A96A]/5 text-xs font-black text-[#C8A96A] uppercase tracking-widest">
                                             Live Ledger
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-3 gap-4 border-t border-[#C8A96A]/10 pt-8">
                                         <div>
-                                            <p className="text-[8px] font-black text-[#C8A96A]/30 uppercase tracking-[0.2em] mb-1">Total Manifested</p>
+                                            <p className="text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-1">Total Manifested</p>
                                             <p className="text-xl font-bold text-[#F5E6C8]">₹{totalDeposits.toLocaleString('en-IN')}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[#C8A96A]/30 uppercase tracking-[0.2em] mb-1">Total Liquidated</p>
+                                            <p className="text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-1">Total Liquidated</p>
                                             <p className="text-xl font-bold text-[#F5E6C8]">₹{totalWithdrawals.toLocaleString('en-IN')}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[8px] font-black text-[#C8A96A]/30 uppercase tracking-[0.2em] mb-1">Lifetime Flow</p>
+                                            <p className="text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-1">Lifetime Flow</p>
                                             <p className="text-xl font-bold text-[#C8A96A]">₹{(totalDeposits + totalWithdrawals).toLocaleString('en-IN')}</p>
                                         </div>
                                     </div>
@@ -923,7 +923,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             <div className="luxury-box p-1.5 flex gap-2">
                                 <button
                                     onClick={() => setActiveTab('topup')}
-                                    className={`flex-1 py-4 px-6 font-black text-[10px] uppercase tracking-[0.3em] transition-all relative ${activeTab === 'topup' ? 'text-[#0D0D0D]' : 'text-[#C8A96A]/40 hover:text-[#C8A96A]'}`}
+                                    className={`flex-1 py-4 px-6 font-black text-xs uppercase tracking-[0.3em] transition-all relative ${activeTab === 'topup' ? 'text-[#0D0D0D]' : 'text-[#F5E6C8] hover:text-[#C8A96A]'}`}
                                 >
                                     {activeTab === 'topup' && (
                                         <motion.div layoutId="activeTabMain" className="absolute inset-0 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37]" />
@@ -935,7 +935,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('withdraw')}
-                                    className={`flex-1 py-4 px-6 font-black text-[10px] uppercase tracking-[0.3em] transition-all relative ${activeTab === 'withdraw' ? 'text-[#0D0D0D]' : 'text-[#C8A96A]/40 hover:text-[#C8A96A]'}`}
+                                    className={`flex-1 py-4 px-6 font-black text-xs uppercase tracking-[0.3em] transition-all relative ${activeTab === 'withdraw' ? 'text-[#0D0D0D]' : 'text-[#F5E6C8] hover:text-[#C8A96A]'}`}
                                 >
                                     {activeTab === 'withdraw' && (
                                         <motion.div layoutId="activeTabMain" className="absolute inset-0 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37]" />
@@ -959,9 +959,9 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
                                         <h3 className="text-lg font-serif font-bold text-[#F5E6C8] uppercase tracking-widest">Transaction Ledger</h3>
-                                        <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em] mt-1">Institutional Audit Trail</p>
+                                        <p className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.2em] mt-1">Institutional Audit Trail</p>
                                     </div>
-                                    <button onClick={() => navigate('/my-account/transactions')} className="text-[10px] font-black text-[#C8A96A] uppercase tracking-[0.2em] flex items-center gap-2 group">
+                                    <button onClick={() => navigate('/my-account/transactions')} className="text-xs font-black text-[#C8A96A] uppercase tracking-[0.2em] flex items-center gap-2 group">
                                         Full Ledger
                                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </button>
@@ -970,7 +970,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 {loadingTransactions ? (
                                     <div className="flex flex-col items-center justify-center py-20 grayscale opacity-50">
                                         <RefreshCw className="w-8 h-8 animate-spin text-[#C8A96A] mb-4" />
-                                        <span className="text-[10px] font-black text-[#C8A96A] uppercase tracking-widest">Syncing Data...</span>
+                                        <span className="text-xs font-black text-[#C8A96A] uppercase tracking-widest">Syncing Data...</span>
                                     </div>
                                 ) : recentTransactions.length > 0 ? (
                                     <div className="space-y-4">
@@ -982,14 +982,14 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs font-bold text-[#F5E6C8] uppercase tracking-wider">{tx.description}</p>
-                                                        <p className="text-[9px] font-medium text-[#C8A96A]/40 mt-0.5">{formatDate(tx.date)}</p>
+                                                        <p className="text-[11px] font-medium text-[#C8A96A]/60 mt-0.5">{formatDate(tx.date)}</p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <p className={`text-sm font-black ${tx.type === 'credit' ? 'text-green-500' : 'text-red-500'}`}>
                                                         {tx.type === 'credit' ? '+' : '-'} ₹{tx.amount.toLocaleString('en-IN')}
                                                     </p>
-                                                    <span className={`text-[8px] font-black uppercase tracking-widest mt-1 inline-block px-1.5 py-0.5 ${getStatusColor(tx.status)}`}>
+                                                    <span className={`text-[11px] font-black uppercase tracking-widest mt-1 inline-block px-1.5 py-0.5 ${getStatusColor(tx.status)}`}>
                                                         {tx.status}
                                                     </span>
                                                 </div>
@@ -999,7 +999,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 ) : (
                                     <div className="text-center py-20 border-2 border-dashed border-[#C8A96A]/10">
                                         <Receipt className="w-12 h-12 text-[#C8A96A]/10 mx-auto mb-4" strokeWidth={1} />
-                                        <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest">No Activity Records Found</p>
+                                        <p className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-widest">No Activity Records Found</p>
                                     </div>
                                 )}
                             </div>
@@ -1009,21 +1009,21 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         <div className="space-y-8">
                             {/* Settlement Insight */}
                             <div className="luxury-box p-6 bg-gradient-to-br from-[#1A1A1A] to-[#0D0D0D]">
-                                <h3 className="text-[10px] font-black text-[#C8A96A] uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+                                <h3 className="text-xs font-black text-[#C8A96A] uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
                                     <Shield className="w-3 h-3 text-[#D4AF37]" />
                                     Vault Parameters
                                 </h3>
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-end border-b border-[#C8A96A]/5 pb-3">
-                                        <span className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-widest">Floor Liquidation</span>
+                                        <span className="text-[11px] font-black text-[#C8A96A]/70 uppercase tracking-widest">Floor Liquidation</span>
                                         <span className="text-sm font-bold text-[#F5E6C8]">₹500</span>
                                     </div>
                                     <div className="flex justify-between items-end border-b border-[#C8A96A]/5 pb-3">
-                                        <span className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-widest">Ceiling Liquidation</span>
+                                        <span className="text-[11px] font-black text-[#C8A96A]/70 uppercase tracking-widest">Ceiling Liquidation</span>
                                         <span className="text-sm font-bold text-[#F5E6C8]">₹50,000</span>
                                     </div>
                                     <div className="flex justify-between items-end">
-                                        <span className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-widest">SLA Turnaround</span>
+                                        <span className="text-[11px] font-black text-[#C8A96A]/70 uppercase tracking-widest">SLA Turnaround</span>
                                         <span className="text-sm font-bold text-[#C8A96A]">12-24 Hours</span>
                                     </div>
                                 </div>
@@ -1039,7 +1039,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                 ].map((item, idx) => (
                                     <div key={idx} className="luxury-box p-4 text-center group hover:border-[#C8A96A]/40 transition-colors">
                                         <item.icon className="w-4 h-4 text-[#C8A96A]/40 mx-auto mb-2 group-hover:text-[#C8A96A] transition-colors" />
-                                        <p className="text-[8px] font-black text-[#C8A96A]/30 uppercase tracking-widest group-hover:text-[#C8A96A]/60">{item.label}</p>
+                                        <p className="text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-widest group-hover:text-[#C8A96A]">{item.label}</p>
                                     </div>
                                 ))}
                             </div>
@@ -1048,7 +1048,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             <div className="p-1 luxury-box bg-gradient-to-r from-[#C8A96A] to-[#D4AF37]">
                                 <button
                                     onClick={() => navigate('/contact')}
-                                    className="w-full py-4 bg-[#0D0D0D] text-[#C8A96A] hover:bg-transparent hover:text-[#0D0D0D] transition-all font-black text-[10px] uppercase tracking-[0.3em]"
+                                    className="w-full py-4 bg-[#0D0D0D] text-[#C8A96A] hover:bg-transparent hover:text-[#0D0D0D] transition-all font-black text-xs uppercase tracking-[0.3em]"
                                 >
                                     Concierge Support
                                 </button>
@@ -1056,7 +1056,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                         </div>
                     </div>
 
-                    <p className="text-center text-[9px] font-black text-[#C8A96A]/20 uppercase tracking-[0.4em] mt-12 pb-8">
+                    <p className="text-center text-xs font-black text-[#C8A96A]/40 uppercase tracking-[0.4em] mt-12 pb-8">
                         Lattice Protocol • Secure • Encrypted • Private
                     </p>
                 </div>

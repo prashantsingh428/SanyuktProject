@@ -18,7 +18,7 @@ const CheckoutPage = () => {
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-    
+
     // State for dropdowns
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
     const [stateSearch, setStateSearch] = useState('');
@@ -407,7 +407,7 @@ const CheckoutPage = () => {
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '');
                                             if (val.length <= 10) {
-                                                setShippingInfo({...shippingInfo, phone: val});
+                                                setShippingInfo({ ...shippingInfo, phone: val });
                                             }
                                         }}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent font-mono"
@@ -526,7 +526,7 @@ const CheckoutPage = () => {
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '');
                                             if (val.length <= 6) {
-                                                setShippingInfo({...shippingInfo, pincode: val});
+                                                setShippingInfo({ ...shippingInfo, pincode: val });
                                             }
                                         }}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent font-mono"

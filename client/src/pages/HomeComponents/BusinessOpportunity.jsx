@@ -3,18 +3,18 @@ import { Check } from 'lucide-react';
 
 const BusinessOpportunity = ({ businessHighlights, businessImage, handleNavigation }) => {
     return (
-        <section className="py-4 md:py-8 bg-[#121212] relative overflow-hidden border-y border-[#C8A96A]/10" >
+        <section className="py-3 md:py-6 bg-[#121212] relative overflow-hidden border-y border-[#C8A96A]/10" >
             <div className="container mx-auto px-4 max-w-5xl">
-                <div className="grid md:grid-cols-2 gap-6 items-center">
+                <div className="grid md:grid-cols-2 gap-4 items-center">
                     <div className="space-y-2 flex flex-col justify-center">
                         <h2 className="text-xl md:text-3xl font-serif font-bold text-[#F5E6C8] mb-1 leading-tight uppercase tracking-widest">
                             A Powerful <span className="text-[#C8A96A]">Business Opportunity</span>
                         </h2>
-                        <div className="w-16 h-[1px] bg-[#C8A96A]/40 mb-3"></div>
-                        <p className="text-[#F5E6C8]/70 text-xs font-light leading-relaxed mb-3">
+                        <div className="w-16 h-[1px] bg-[#C8A96A]/40 mb-2"></div>
+                        <p className="text-[#F5E6C8]/70 text-xs font-light leading-relaxed mb-2">
                             Offers a proven MLM business plan that allows individuals to earn through product sales, team building, and leadership development.
                         </p>
-                        <div className="space-y-1.5 mb-4">
+                        <div className="space-y-1 mb-3">
                             {businessHighlights.map((highlight, index) => (
                                 <div key={index} className="flex items-center space-x-2">
                                     <div className="w-4 h-4 bg-[#C8A96A]/10 border border-[#C8A96A]/30 flex items-center justify-center flex-shrink-0">

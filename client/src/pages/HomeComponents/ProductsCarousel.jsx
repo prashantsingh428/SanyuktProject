@@ -17,10 +17,10 @@ const ProductsCarousel = ({
     handleNavigation
 }) => {
     return (
-        <section className="py-4 md:py-8 bg-[#121212] relative overflow-hidden" >
+        <section className="py-2 md:py-5 bg-[#121212] relative overflow-hidden" >
             <div className="container mx-auto px-4 relative z-10">
                 {/* Section Header */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-4">
                     <div className="text-center md:text-left max-w-2xl">
                         <span className="text-[#C8A96A] font-bold text-[10px] tracking-widest uppercase mb-1 block">
                             Discover Quality
@@ -54,7 +54,7 @@ const ProductsCarousel = ({
                 {/* Products Carousel */}
                 <div
                     ref={carouselRef}
-                    className="flex gap-5 overflow-x-auto pb-8 pt-4 snap-x snap-mandatory scrollbar-hide no-scrollbar"
+                    className="flex gap-4 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-hide no-scrollbar"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {loading ? (
@@ -151,7 +151,7 @@ const ProductsCarousel = ({
 
                                         {/* Product Details */}
                                         <div
-                                            className="p-3.5 cursor-pointer group/details"
+                                            className="p-3 cursor-pointer group/details"
                                             onClick={() => onProductClick(product)}
                                         >
                                             <div className="flex items-center gap-1 mb-1">

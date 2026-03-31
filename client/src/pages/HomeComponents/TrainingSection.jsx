@@ -4,19 +4,19 @@ import { ArrowRight, Play } from 'lucide-react';
 
 const TrainingSection = ({ supportItems, trainingImage, handleNavigation }) => {
     return (
-        <section className="py-4 md:py-8 bg-[#0D0D0D] relative overflow-hidden" >
+        <section className="py-3 md:py-6 bg-[#0D0D0D] relative overflow-hidden" >
             <div className="container mx-auto px-4 max-w-5xl">
-                <div className="grid md:grid-cols-2 gap-6 items-center">
+                <div className="grid md:grid-cols-2 gap-5 items-center">
                     <div className="space-y-2 order-2 md:order-1 flex flex-col justify-center">
                         <h2 className="text-xl md:text-3xl font-serif font-bold text-[#C8A96A] relative inline-block pb-1 mb-1 tracking-widest uppercase">
                             Training & <span className="text-[#F5E6C8]">Support</span> System
                             <span className="absolute bottom-0 left-0 w-full h-[1px] bg-[#C8A96A]/40"></span>
                         </h2>
-                        <p className="text-[#F5E6C8]/70 text-xs font-light leading-relaxed mb-3">
+                        <p className="text-[#F5E6C8]/70 text-xs font-light leading-relaxed mb-2">
                             Knowledge and guidance for your success. We provide structured training programs, online resources, and continuous mentorship to help every partner grow confidently.
                         </p>
                         <h3 className="text-[10px] font-bold text-[#C8A96A] uppercase tracking-[3px] mt-2 mb-2">Support Includes</h3>
-                        <div className="grid grid-cols-1 gap-1.5 mb-4">
+                        <div className="grid grid-cols-1 gap-1 mb-3">
                             {supportItems.map((item, index) => (
                                 <div key={index} className="flex items-center space-x-2">
                                     <div className="w-1 h-1 bg-[#C8A96A] rounded-full"></div>

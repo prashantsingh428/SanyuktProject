@@ -3,7 +3,7 @@ import { Shield } from 'lucide-react';
 
 const AboutSection = ({ aboutImage, teamImages }) => {
     return (
-        <section className="py-12 md:py-16 lg:py-20 bg-[#0D0D0D] relative overflow-hidden">
+        <section className="py-10 md:py-14 bg-[#0D0D0D] relative border-y border-[#C8A96A]/10">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-2">
                     <h2 className="text-xl md:text-3xl lg:text-4xl font-serif font-bold text-[#C8A96A] inline-block relative pb-2 tracking-widest uppercase">
@@ -11,9 +11,9 @@ const AboutSection = ({ aboutImage, teamImages }) => {
                         <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#C8A96A]/40"></span>
                     </h2>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4 md:gap-8 items-center max-w-5xl mx-auto">
-                    <div className="space-y-3 text-gray-700 order-2 md:order-1 flex flex-col justify-center">
-                        <h3 className="text-lg md:text-2xl lg:text-3xl font-serif font-bold text-[#F5E6C8] mb-3 leading-tight uppercase tracking-tight">
+                <div className="grid md:grid-cols-2 gap-4 md:gap-6 items-center max-w-5xl mx-auto">
+                    <div className="space-y-2 text-gray-700 order-2 md:order-1 flex flex-col justify-center">
+                        <h3 className="text-lg md:text-2xl lg:text-3xl font-serif font-bold text-[#F5E6C8] mb-2 leading-tight uppercase tracking-tight">
                             Sanyukt Parivaar & <br />
                             <span className="text-[#C8A96A]">Rich Life Pvt.Ltd.</span>
                         </h3>
