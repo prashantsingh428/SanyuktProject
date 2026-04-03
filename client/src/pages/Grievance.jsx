@@ -191,10 +191,10 @@ const GrievancePage = () => {
     return (
         <div className="bg-[#0D0D0D] font-sans min-h-screen">
             {/* Hero Banner */}
-            <header className="relative min-h-[180px] md:min-h-[220px] bg-cover bg-center border-b border-[#C8A96A]/20 flex items-center justify-center pt-8 pb-4"
+            <header className="relative min-h-[240px] md:min-h-[300px] bg-cover bg-center border-b border-[#C8A96A]/20 flex items-center justify-center pt-24 md:pt-32 pb-8"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070')" }}>
                 <div className="absolute inset-0 bg-[#0D0D0D]/80 backdrop-blur-sm"></div>
-                <div className="relative flex flex-col items-center justify-center text-center px-4">
+                <div className="relative flex flex-col items-center justify-center text-center px-4 mt-8 md:mt-12">
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#C8A96A] mb-3 animate-fade-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                         Grievance
                     </h1>
