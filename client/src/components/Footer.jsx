@@ -43,7 +43,7 @@ const LogoContainer = styled(Box)({
 });
 
 const LogoImage = styled('img')({
-    height: '60px',
+    height: '80px',
     width: 'auto',
     objectFit: 'contain',
 });
@@ -215,12 +215,9 @@ const Footer = () => {
                     {/* COLUMN 1 - COMPANY INFO */}
                     <Grid item xs={12} md={4}>
                         <LogoContainer onClick={() => handleNavigation('/')} sx={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px' }}>
-                            {!logoError ? (
-                                <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
-                            ) : null}
-                            <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#C8A96A', letterSpacing: '0.05em', textTransform: 'uppercase', mt: 1 }}>
-                                Together We Grow, Together We Prosper
-                            </Typography>
+                            {!logoError && (
+                                <LogoImage src="/logo.png?v=20260403d" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                            )}
                         </LogoContainer>
 
                         <CompanyDescription>
@@ -363,4 +360,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

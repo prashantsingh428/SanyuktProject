@@ -53,6 +53,7 @@ const UserLogin = () => {
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
+                localStorage.setItem('loginTimestamp', Date.now().toString());
 
                 const userRole = response.data.user?.role || 'user';
                 setSuccessData({ email: formData.email, role: userRole });
@@ -64,7 +65,7 @@ const UserLogin = () => {
                     setCountdown(count);
                     if (count === 0) {
                         clearInterval(timer);
-                        navigate(userRole === 'admin' ? '/admin' : '/');
+                        navigate(userRole === 'admin' ? '/admin/dashboard' : '/my-account');
                     }
                 }, 1000);
             }

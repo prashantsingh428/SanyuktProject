@@ -89,7 +89,7 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                 exit={{ opacity: 0, scale: 0.95, y: 10 }}
                 className="relative luxury-box w-full max-w-md overflow-hidden bg-[#0D0D0D] shadow-2xl"
             >
-                <div className="px-6 py-5 bg-[#1A1A1A] border-b border-[#C8A96A]/20 text-[#C8A96A]">
+                <div className="px-6 py-4 bg-[#1A1A1A] border-b border-[#C8A96A]/20 text-[#C8A96A]">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-[#C8A96A]/10 rounded-xl">
@@ -103,8 +103,8 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                     </div>
                 </div>
 
-                <div className="p-6 bg-[#0D0D0D]">
-                    <div className="flex items-center gap-3 mb-6 p-3 bg-[#1A1A1A] rounded-xl border border-[#C8A96A]/10">
+                <div className="p-5 bg-[#0D0D0D]">
+                    <div className="flex items-center gap-3 mb-4 p-3 bg-[#1A1A1A] rounded-xl border border-[#C8A96A]/10">
                         <div className={`p-2.5 rounded-xl bg-[#C8A96A]/5 border border-[#C8A96A]/20`}>
                             {method === 'Bank Transfer'
                                 ? <Building2 className="w-5 h-5 text-[#C8A96A]" />
@@ -131,7 +131,7 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                         )}
                     </div>
 
-                    <div className="bg-[#1A1A1A] rounded-xl p-5 mb-5 border border-[#C8A96A]/10">
+                    <div className="bg-[#1A1A1A] rounded-xl p-5 mb-4 border border-[#C8A96A]/10">
                         <h3 className="text-xs font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-4">Amount Breakdown</h3>
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
@@ -159,7 +159,7 @@ const ConfirmWithdrawalModal = ({ data, onConfirm, onCancel, loading }) => {
                         </div>
                     </div>
 
-                    <div className="bg-[#C8A96A]/5 border border-[#C8A96A]/20 rounded-xl p-4 mb-5">
+                    <div className="bg-[#C8A96A]/5 border border-[#C8A96A]/20 rounded-xl p-3.5 mb-4">
                         <div className="flex gap-3">
                             <Info className="w-5 h-5 text-[#C8A96A] shrink-0" />
                             <div>
@@ -269,7 +269,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
 
             // Fetch withdrawal history
             try {
-                const withdrawRes = await api.get('/wallet/withdrawal-history?limit=3');
+                const withdrawRes = await api.get('/wallet/withdrawal-history?limit=6');
                 if (withdrawRes.data.success) setWithdrawalHistory(withdrawRes.data.withdrawals || []);
             } catch (wErr) {
                 console.warn('Withdrawals 404/Error:', wErr);
@@ -465,7 +465,10 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                 fetchWalletData();
             }
         } catch (err) {
-            toast.error(err?.response?.data?.message || 'Something went wrong. Please try again.');
+            console.error('Withdraw error:', err);
+            const errMsg = err?.response?.data?.message || 'Withdrawal failed. Please try again.';
+            const dbErr = err?.response?.data?.error;
+            toast.error(dbErr ? `${errMsg} Reason: ${dbErr}` : errMsg);
         } finally {
             setProcessingWithdraw(false);
         }
@@ -498,7 +501,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
     const renderTopupTab = () => (
         <div className="space-y-6">
             {/* Quick Topup Amounts */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {QUICK_TOPUP_AMOUNTS.map(({ value, label, icon: Icon, color }) => (
                     <button
                         key={value}
@@ -525,14 +528,14 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                     ? 'border-red-900/50 bg-red-950/20'
                     : 'border-[#C8A96A]/20 hover:border-[#C8A96A]/60'
                     }`}>
-                    <span className={`pl-6 font-serif font-bold text-2xl ${topupAmount ? 'text-[#C8A96A]' : 'text-[#C8A96A]/20'}`}>₹</span>
+                    <span className={`pl-4 md:pl-6 font-serif font-bold text-xl md:text-2xl ${topupAmount ? 'text-[#C8A96A]' : 'text-[#C8A96A]/20'}`}>₹</span>
                     <input
                         type="text"
                         inputMode="numeric"
                         placeholder="MIN ₹100"
                         value={topupAmount}
                         onChange={(e) => setTopupAmount(e.target.value.replace(/[^0-9]/g, ''))}
-                        className="w-full p-6 bg-transparent outline-none text-3xl font-serif font-bold text-[#F5E6C8] placeholder:text-[#C8A96A]/10 placeholder:font-sans placeholder:text-sm placeholder:tracking-widest"
+                        className="w-full p-4 md:p-6 bg-transparent outline-none text-xl md:text-3xl font-serif font-bold text-[#F5E6C8] placeholder:text-[#C8A96A]/10 placeholder:font-sans placeholder:text-sm placeholder:tracking-widest"
                     />
                     {topupAmount && (
                         <button onClick={() => setTopupAmount('')} className="pr-6 text-[#C8A96A]/40 hover:text-[#C8A96A]">
@@ -642,14 +645,14 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                     ? 'border-red-900/50 bg-red-950/20'
                     : 'border-[#C8A96A]/20 hover:border-[#C8A96A]/60'
                     }`}>
-                    <span className={`pl-6 font-serif font-bold text-2xl ${withdrawAmount ? 'text-[#C8A96A]' : 'text-[#C8A96A]/20'}`}>₹</span>
+                    <span className={`pl-4 md:pl-6 font-serif font-bold text-xl md:text-2xl ${withdrawAmount ? 'text-[#C8A96A]' : 'text-[#C8A96A]/20'}`}>₹</span>
                     <input
                         type="text"
                         inputMode="numeric"
                         placeholder="MIN ₹500"
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value.replace(/[^0-9]/g, ''))}
-                        className="w-full p-6 bg-transparent outline-none text-3xl font-serif font-bold text-[#F5E6C8] placeholder:text-[#C8A96A]/10 placeholder:font-sans placeholder:text-sm placeholder:tracking-widest"
+                        className="w-full p-4 md:p-6 bg-transparent outline-none text-xl md:text-3xl font-serif font-bold text-[#F5E6C8] placeholder:text-[#C8A96A]/10 placeholder:font-sans placeholder:text-sm placeholder:tracking-widest"
                     />
                     {withdrawAmount && (
                         <button onClick={() => setWithdrawAmount('')} className="pr-6 text-[#C8A96A]/40 hover:text-[#C8A96A]">
@@ -703,7 +706,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
             {/* Withdrawal Method Selection */}
             <div>
                 <p className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.3em] mb-4 ml-1 text-center">Settlement Channel</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {[
                         { id: 'Bank Transfer', icon: Building2, label: 'Standard Bank', sub: 'NEFT/IMPS' },
                         { id: 'UPI', icon: Smartphone, label: 'Instant UPI', sub: 'Lattice Verify' },
@@ -817,6 +820,75 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                 <Receipt className="w-5 h-5" />
                 Manifest Liquidation Request
             </button>
+
+            {/* Withdrawal History Section */}
+            <div className="mt-12 pt-12 border-t border-[#C8A96A]/10">
+                <div className="flex flex-col items-center justify-center text-center mb-10">
+                    <h3 className="text-sm font-black text-[#C8A96A] uppercase tracking-[0.3em]">Recent Settlement Activity</h3>
+                    <p className="text-[10px] text-[#C8A96A]/40 uppercase tracking-widest mt-1 italic">Track your fund liquidations</p>
+                    {loadingWithdrawals && <Loader2 className="w-4 h-4 animate-spin text-[#C8A96A]/40 mt-4" />}
+                </div>
+
+                {withdrawalHistory.length > 0 ? (
+                    <div className="space-y-4">
+                        {withdrawalHistory.slice(0, 5).map((item, idx) => (
+                            <div key={idx} className="p-4 bg-[#0D0D0D] border border-[#C8A96A]/5 rounded-sm hover:border-[#C8A96A]/20 transition-all">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${getStatusColor(item.status)}`}>
+                                            {item.status === 'Completed' ? <CheckCircle className="w-5 h-5" /> : 
+                                             item.status === 'Rejected' ? <X className="w-5 h-5" /> : 
+                                             <Clock className="w-5 h-5" />}
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-xs font-bold text-[#F5E6C8] uppercase tracking-wider">₹{item.amount.toLocaleString('en-IN')}</p>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${getStatusColor(item.status)}`}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] font-medium text-[#C8A96A]/60 mt-1 uppercase tracking-tighter">REF: {item.referenceNo}</p>
+                                            <p className="text-[10px] text-[#C8A96A]/40 italic">{formatDate(item.createdAt)} • {item.method}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-t-0 border-[#C8A96A]/5 pt-3 sm:pt-0">
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest leading-none mb-1">Net Settlement</p>
+                                            <p className="text-sm font-bold text-[#C8A96A]">₹{item.amount.toLocaleString('en-IN')}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {item.adminNote && (
+                                    <div className="mt-4 p-3 bg-[#C8A96A]/5 border-l-2 border-[#C8A96A] flex gap-3">
+                                        <Info className="w-4 h-4 text-[#C8A96A] shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-[10px] font-black text-[#C8A96A] uppercase tracking-widest mb-1">Administrative Feedback</p>
+                                            <p className="text-[11px] text-[#F5E6C8]/60 italic font-medium leading-relaxed">{item.adminNote}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                        
+                        {withdrawalHistory.length > 5 && (
+                            <div className="flex justify-center mt-8">
+                                <button
+                                    onClick={() => navigate('/my-account/transactions')}
+                                    className="px-8 py-3 luxury-box border-[#C8A96A]/20 transition-all hover:bg-[#C8A96A]/10 text-xs font-black text-[#C8A96A] uppercase tracking-[0.3em]"
+                                >
+                                    Read Full History
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : !loadingWithdrawals && (
+                    <div className="text-center py-10 grayscale opacity-20">
+                        <Clock className="w-10 h-10 mx-auto mb-3" strokeWidth={1} />
+                        <p className="text-xs font-black uppercase tracking-widest">No Recent Withdrawals</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 
@@ -879,7 +951,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="luxury-box p-8 relative overflow-hidden group"
+                                className="luxury-box p-5 md:p-8 relative overflow-hidden group"
                             >
                                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <Shield className="w-32 h-32 text-[#C8A96A]" strokeWidth={1} />
@@ -894,7 +966,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                     </div>
                                     
                                     <div className="flex items-baseline gap-4 mb-8">
-                                        <span className="text-6xl font-serif font-bold text-[#F5E6C8] tracking-tighter">
+                                        <span className="text-4xl md:text-6xl font-serif font-bold text-[#F5E6C8] tracking-tighter">
                                             ₹{walletBalance.toLocaleString('en-IN')}
                                         </span>
                                         <div className="p-1 px-2 border border-[#C8A96A]/20 bg-[#C8A96A]/5 text-xs font-black text-[#C8A96A] uppercase tracking-widest">
@@ -902,9 +974,9 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-3 gap-4 border-t border-[#C8A96A]/10 pt-8">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-[#C8A96A]/10 pt-8">
                                         <div>
-                                            <p className="text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-1">Total Manifested</p>
+                                            <p className="text-[10px] md:text-[11px] font-black text-[#C8A96A]/60 uppercase tracking-[0.2em] mb-1">Total Manifested</p>
                                             <p className="text-xl font-bold text-[#F5E6C8]">₹{totalDeposits.toLocaleString('en-IN')}</p>
                                         </div>
                                         <div>
@@ -949,14 +1021,14 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
 
                             <motion.div 
                                 layout
-                                className="luxury-box p-8 min-h-[400px]"
+                                className="luxury-box p-5 md:p-8 min-h-[400px]"
                             >
                                 {activeTab === 'topup' ? renderTopupTab() : renderWithdrawTab()}
                             </motion.div>
 
                             {/* Recent Transactions */}
-                            <div className="luxury-box p-8">
-                                <div className="flex items-center justify-between mb-8">
+                            <div className="luxury-box p-5 md:p-8">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                                     <div>
                                         <h3 className="text-lg font-serif font-bold text-[#F5E6C8] uppercase tracking-widest">Transaction Ledger</h3>
                                         <p className="text-xs font-black text-[#C8A96A]/70 uppercase tracking-[0.2em] mt-1">Institutional Audit Trail</p>

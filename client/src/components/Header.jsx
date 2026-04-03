@@ -19,6 +19,8 @@ import {
     Divider,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
+import InfoIcon from '@mui/icons-material/Info';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -148,11 +150,11 @@ const LogoContainer = styled(Box)(({ theme }) => ({
 }));
 
 const LogoImage = styled('img')(({ theme }) => ({
-    height: '64px',
+    height: '84px',
     width: 'auto',
     objectFit: 'contain',
     [theme.breakpoints.up('md')]: {
-        height: '85px',
+        height: '110px',
     },
 }));
 
@@ -561,12 +563,8 @@ const Header = () => {
             <Box sx={{ px: 2, pb: 2, borderBottom: '1px solid rgba(201,168,76,0.3)', mb: 1 }}>
                 <LogoContainer onClick={() => handleNavigation('/')}>
                     {!logoError && (
-                        <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                        <LogoImage src="/logo.png?v=20260403d" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
                     )}
-                    {/* <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2 }}>
-                        <LogoMain>Sanyukt Parivaar <span style={{ fontSize: '0.9rem' }}>&</span> Rich Life</LogoMain>
-                        <LogoTagline>Together We Grow, Together We Prosper</LogoTagline>
-                    </Box> */}
                 </LogoContainer>
             </Box>
 
@@ -839,7 +837,7 @@ const Header = () => {
                         }}>
                             <LogoContainer onClick={() => handleNavigation('/')}>
                                 {!logoError && (
-                                    <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                                    <LogoImage src="/logo.png?v=20260403d" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
                                 )}
                             </LogoContainer>
                         </Box>
@@ -892,7 +890,7 @@ const Header = () => {
                             <Box sx={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: { lg: 0.5, xl: 1.5 },
+                                gap: { lg: 2.5, xl: 4 },
                                 flexWrap: 'nowrap'
                             }}>
                                 <NavButton
@@ -1219,23 +1217,34 @@ const Header = () => {
 
 
 
-                        {/* RIGHT - HAMBURGER (MOBILE/TABLET) */}
+                        {/* RIGHT - MOBILE NAV ICONS & HAMBURGER */}
                         <Box sx={{
                             display: { xs: 'flex', lg: 'none' },
-                            width: '48px',
+                            alignItems: 'center',
                             flexShrink: 0,
                             justifyContent: 'flex-end',
-                            alignItems: 'center',
+                            gap: { xs: 0.5, sm: 1 },
                             zIndex: 10
                         }}>
+                            <IconButton onClick={() => handleNavigation('/')} sx={{ color: '#C9A84C', p: 1 }}>
+                                <HomeIcon sx={{ fontSize: '24px' }} />
+                            </IconButton>
+                            <IconButton onClick={() => handleNavigation('/company/about')} sx={{ color: '#C9A84C', p: 1 }}>
+                                <InfoIcon sx={{ fontSize: '24px' }} />
+                            </IconButton>
+                            <IconButton onClick={() => handleNavigation('/my-account/cart')} sx={{ color: '#C9A84C', p: 1 }}>
+                                <ShoppingCartIcon sx={{ fontSize: '24px' }} />
+                            </IconButton>
+
                             <IconButton
                                 color="inherit"
                                 aria-label="open drawer"
-                                edge="start"
+                                edge="end"
                                 onClick={handleDrawerToggle}
                                 sx={{
                                     color: '#C9A84C',
                                     p: 1,
+                                    ml: 1
                                 }}
                             >
                                 <MenuIcon sx={{ fontSize: { xs: '30px', sm: '32px' } }} />

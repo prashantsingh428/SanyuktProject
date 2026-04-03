@@ -242,18 +242,31 @@ exports.requestWithdrawal = async (req, res) => {
                 relatedWithdrawalId: withdrawal._id,
                 status: 'Processed'
             });
-        } catch (dbErr) {
-            // Error handling for DB records
-        }
 
-        res.json({
-            success: true,
-            message: 'Withdrawal request submitted successfully',
-            withdrawal: withdrawal || { amount: netAmount, referenceNo: 'PENDING' },
-            deductions: { tds: tdsAmount, processingFee }
-        });
+            return res.json({
+                success: true,
+                message: 'Withdrawal request submitted successfully',
+                withdrawal,
+                deductions: { tds: tdsAmount, processingFee }
+            });
+
+        } catch (dbErr) {
+            console.error('--- WITHDRAWAL DB FAILURE ---');
+            console.error(dbErr);
+
+            // ROLLBACK: Refund the user's balance
+            user.walletBalance += amount;
+            await user.save();
+
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to record withdrawal. Your balance has been refunded.',
+                error: dbErr.message
+            });
+        }
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Internal Server Error during withdrawal' });
+        console.error('General Withdrawal Error:', err);
+        res.status(500).json({ success: false, message: 'Internal Server Error during withdrawal process' });
     }
 };
 
@@ -472,6 +485,73 @@ exports.updateWithdrawalStatus = async (req, res) => {
 
         await withdrawal.save();
 
+        // ── SEND EMAIL NOTIFICATION ──────────────────────────────────────────
+        try {
+            const user = await User.findById(withdrawal.userId);
+            if (user && user.email) {
+                let subject = '';
+                let html = '';
+
+                if (status === 'Approved') {
+                    subject = `Withdrawal Request Approved - ${withdrawal.referenceNo}`;
+                    html = `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #C8A96A;">Withdrawal Approved</h2>
+                            <p>Dear ${user.userName || 'Member'},</p>
+                            <p>Your withdrawal request <strong>${withdrawal.referenceNo}</strong> has been approved by the administrator.</p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <p style="margin: 0;"><strong>Amount:</strong> ₹${withdrawal.amount.toLocaleString('en-IN')}</p>
+                                <p style="margin: 5px 0 0;"><strong>Method:</strong> ${withdrawal.method}</p>
+                            </div>
+                            <p>Funds are being processed and will be settled shortly. ${adminNote ? `<br><br><strong>Admin Note:</strong> ${adminNote}` : ''}</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #999;">This is an automated notification from Sanyukt Parivaar.</p>
+                        </div>
+                    `;
+                } else if (status === 'Completed') {
+                    subject = `Withdrawal Successfully Settled - ${withdrawal.referenceNo}`;
+                    html = `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #28a745;">Withdrawal Completed</h2>
+                            <p>Dear ${user.userName || 'Member'},</p>
+                            <p>Great news! Your withdrawal request <strong>${withdrawal.referenceNo}</strong> has been successfully settled.</p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <p style="margin: 0;"><strong>Settled Amount:</strong> ₹${withdrawal.amount.toLocaleString('en-IN')}</p>
+                                <p style="margin: 5px 0 0;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN')}</p>
+                            </div>
+                            <p>Please check your bank account or UPI for the funds. ${adminNote ? `<br><br><strong>Admin Note:</strong> ${adminNote}` : ''}</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #999;">Thank you for being a part of Sanyukt Parivaar.</p>
+                        </div>
+                    `;
+                } else if (status === 'Rejected') {
+                    subject = `Withdrawal Request Rejected - ${withdrawal.referenceNo}`;
+                    html = `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #dc3545;">Withdrawal Rejected</h2>
+                            <p>Dear ${user.userName || 'Member'},</p>
+                            <p>Your withdrawal request <strong>${withdrawal.referenceNo}</strong> has been rejected.</p>
+                            <p><strong>Reason:</strong> ${adminNote || 'Insufficient details or administrative policy.'}</p>
+                            <div style="background: #fff5f5; padding: 15px; border-radius: 5px; border: 1px solid #feb2b2; margin: 20px 0;">
+                                <p style="margin: 0; color: #c53030;"><strong>Important:</strong> The full amount has been refunded to your wallet account.</p>
+                            </div>
+                            <p>Please review the reason and submit a new request if necessary.</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #999;">Sanyukt Parivaar Support Team</p>
+                        </div>
+                    `;
+                }
+
+                if (html) {
+                    const sendEmail = require('../utils/sendEmail');
+                    await sendEmail(user.email, subject, `Your withdrawal status is now ${status}.`, html);
+                }
+            }
+        } catch (emailErr) {
+            console.error('Failed to send status update email:', emailErr);
+            // We don't return error here because the status update itself succeeded
+        }
+
         res.json({
             success: true,
             message: `Withdrawal status updated to ${status}`,
@@ -482,3 +562,4 @@ exports.updateWithdrawalStatus = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Home, Users, Package, BarChart3, LogOut,
-    Menu, X, Search, Bell, ChevronDown, Shield, Newspaper
+    Menu, X, Search, Bell, ChevronDown, Shield, Newspaper, IndianRupee
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -49,9 +49,9 @@ const AdminLayout = () => {
                 const user = JSON.parse(userStr);
                 return user.name || 'Admin';
             }
-            return 'Sayukt Parivar';
+            return 'Sanyukt Parivaar';
         } catch (error) {
-            return 'Sayukt Parivar';
+            return 'Sanyukt Parivaar';
         }
     };
 
@@ -68,7 +68,7 @@ const AdminLayout = () => {
                             <div className="w-10 h-10 bg-[#121212] border border-[#C8A96A]/40 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(200,169,106,0.15)]">
                                 <Shield className="h-6 w-6 text-[#C8A96A]" strokeWidth={1.5} />
                             </div>
-                            <span className="text-2xl font-serif font-bold text-[#F5E6C8] tracking-tight">Snyukt Parivar</span>
+                            <span className="text-2xl font-serif font-bold text-[#F5E6C8] tracking-tight">Sanyukt Parivaar</span>
                         </div>
                     ) : (
                         <div className="w-10 h-10 bg-[#121212] border border-[#C8A96A]/40 rounded-xl flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(200,169,106,0.15)]">

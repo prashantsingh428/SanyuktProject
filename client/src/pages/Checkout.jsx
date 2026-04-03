@@ -194,7 +194,7 @@ const CheckoutPage = () => {
                 currency: rpOrder.currency,
                 name: "Sanyukt Parivaar",
                 description: `Order for ${product.name}`,
-                image: `${API_URL}/logo.png`,
+                image: `${API_URL}/logo.png?v=20260403`,
                 order_id: rpOrder.id,
                 handler: async (response) => {
                     // 2. Verification and Order Finalization

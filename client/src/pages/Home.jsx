@@ -81,19 +81,19 @@ const HomePage = () => {
         {
             image: "/hero6.jpeg",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "Empowering Lives Since 2026",
+            subtitle: "Smart Solutions for a Smarter Future",
             description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
         },
         {
             image: "/hero1.png",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "Empowering Lives Since 2026",
+            subtitle: "Smart Solutions for a Smarter Future",
             description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
         },
         {
             image: "/hero2.png",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "Empowering Lives Since 2026",
+            subtitle: "Smart Solutions for a Smarter Future",
             description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
         }
     ];
@@ -737,11 +737,11 @@ const HomePage = () => {
                     handleNavigation={handleNavigation}
                 />
 
-                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-12 mb-4 px-4 sm:px-5">
+                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-4 mb-4 px-4 sm:px-5">
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
 
                     <span
-                        className="text-center text-xl sm:text-2xl md:text-[38px] italic font-medium text-[#d4a64a] leading-tight"
+                        className="text-center text-xl sm:text-2xl md:text-[32px] italic font-medium text-[#d4a64a] leading-tight"
                         style={{ fontFamily: '"Cormorant Garamond", serif' }}
                     >
                         Create a Life You Love with Your Family!
@@ -786,7 +786,7 @@ const HomePage = () => {
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
 
                     <span
-                        className="text-center text-xl sm:text-2xl md:text-[38px] italic font-medium text-[#d4a64a] leading-tight"
+                        className="text-center text-xl sm:text-2xl md:text-[32px] italic font-medium text-[#d4a64a] leading-tight"
                         style={{ fontFamily: '"Cormorant Garamond", serif' }}
                     >
                         Join Our Community!

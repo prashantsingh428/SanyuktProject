@@ -6,7 +6,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
     // Background Image Mode, Text on Left Vacant Side
 
     return (
-        <section className="relative h-[70vh] md:h-[80vh] overflow-hidden bg-[#0D0D0D] flex items-center">
+        <section className="relative h-screen overflow-hidden bg-[#0D0D0D] flex items-start pt-20 md:pt-32">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentSlide}
@@ -19,15 +19,15 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                     <img
                         src={heroSlides[currentSlide].image}
                         alt="Hero Background"
-                        className="w-full h-full object-cover object-[85%_center] md:object-center brightness-[0.75]"
+                        className="w-full h-full object-cover object-center brightness-[0.75]"
                     />
-                    {/* Gradient Overlay for Text Readability: Dark on left, transparent on right */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 md:via-black/50 to-transparent z-10"></div>
+                    {/* Gradient Overlay for Text Readability: Darker center for centered text */}
+                    <div className="absolute inset-0 bg-black/40 z-10"></div>
                 </motion.div>
             </AnimatePresence>
 
             {/* Navigation Arrows */}
-            <div className="absolute inset-0 z-30 flex items-center justify-between p-4 md:p-8 pointer-events-none">
+            <div className="absolute inset-0 z-50 flex items-center justify-between p-4 md:p-8 pointer-events-none">
                 <motion.button
                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(200, 169, 106, 0.4)' }}
                     whileTap={{ scale: 0.9 }}
@@ -46,26 +46,26 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                 </motion.button>
             </div>
 
-            <div className="container mx-auto px-4 sm:px-6 relative z-20 pb-12 md:pb-20">
-                <div className="max-w-4xl mx-auto md:mx-0">
-                    {/* Content Side - Centered on mobile, Left on desktop */}
+            <div className="container mx-auto px-4 sm:px-6 relative z-40">
+                <div className="max-w-4xl mx-auto">
+                    {/* Content Side - Centered */}
                     <motion.div
-                        initial={{ x: -60, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3, duration: 0.8 }}
-                        className="space-y-4 text-center md:text-left"
+                        className="space-y-5 text-center"
                     >
-                        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-tight text-[#F5E6C8] tracking-tight drop-shadow-2xl">
+                        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-serif font-bold leading-tight text-[#F5E6C8] tracking-tight drop-shadow-2xl">
                             {heroSlides[currentSlide].title}
                         </h1>
                         <h2 className="text-sm sm:text-lg md:text-xl lg:text-2xl text-[#C8A96A] font-extrabold uppercase tracking-[0.2em] sm:tracking-[0.3em] drop-shadow-lg">
                             {heroSlides[currentSlide].subtitle}
                         </h2>
-                        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed font-normal max-w-2xl mx-auto md:mx-0 drop-shadow-lg">
+                        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed font-normal max-w-3xl mx-auto drop-shadow-lg">
                             {heroSlides[currentSlide].description}
                         </p>
 
-                        <div className="flex flex-wrap gap-6 pt-6 justify-center md:justify-start">
+                        <div className="flex flex-wrap gap-4 pt-20 pb-32 md:pt-12 md:pb-0 justify-center">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -76,22 +76,22 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                                         handleNavigation('/login');
                                     }
                                 }}
-                                className="px-8 py-3.5 bg-[#C8A96A] text-[#0D0D0D] font-bold rounded-sm hover:bg-[#F5E6C8] transition-all duration-300 shadow-[0_10px_30px_rgba(200,169,106,0.3)] flex items-center space-x-3 text-sm uppercase tracking-widest group"
+                                className="px-10 py-4 bg-[#C8A96A] text-[#0D0D0D] font-bold rounded-sm hover:bg-[#F5E6C8] transition-all duration-300 shadow-[0_10px_30px_rgba(200,169,106,0.3)] flex items-center space-x-3 text-sm uppercase tracking-widest group"
                             >
-                                <span className="font-black text-[12px]">
+                                <span className="font-black text-[14px]">
                                     {isLoggedIn
                                         ? (userRole === 'admin' ? 'Admin Dashboard' : 'User Dashboard')
                                         : 'User Dashboard'
                                     }
                                 </span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </motion.button>
 
                             <motion.button
                                 whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: '#F5E6C8' }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => handleNavigation('/contact')}
-                                className="px-8 py-3.5 border border-white/50 text-white font-bold rounded-sm backdrop-blur-sm transition-all duration-300 text-[12px] uppercase tracking-widest hover:text-[#F5E6C8]"
+                                className="px-10 py-4 border border-white/50 text-white font-bold rounded-sm backdrop-blur-sm transition-all duration-300 text-[14px] uppercase tracking-widest hover:text-[#F5E6C8]"
                             >
                                 Contact Us
                             </motion.button>
@@ -101,7 +101,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
             </div>
 
             {/* Navigation Dots */}
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex gap-3">
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-50 flex gap-3">
                 {heroSlides.map((_, index) => (
                     <button
                         key={index}
@@ -114,7 +114,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
             </div>
 
             {/* Bottom edge fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0D0D0D] to-transparent z-20"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0D0D0D] to-transparent z-20 pointer-events-none"></div>
         </section>
     );
 };

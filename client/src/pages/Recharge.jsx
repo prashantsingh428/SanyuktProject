@@ -304,7 +304,6 @@ const Recharge = () => {
             }
 
             setDetectedOperatorInfo(null);
-            setMobileOperator("");
             if (showErrorToast) {
                 toast.error("Unable to auto-detect operator. Please select network manually.");
             }
@@ -972,8 +971,8 @@ const Recharge = () => {
                                                             </div>
                                                         )}
                                                         {!isDetectingOperator && !detectedOperatorInfo && hasTriedDetection && mobileNumber.length === 10 && (
-                                                            <div className='flex items-center justify-between mt-1'>
-                                                                <p className='text-[10px] text-yellow-500'>Auto-detection failed</p>
+                                                            <div className='flex items-center justify-between mt-1 gap-2'>
+                                                                <p className='text-[10px] text-[#F5E6C8]/40'>Auto-detection failed. Select circle manually.</p>
                                                                 <button
                                                                     type='button'
                                                                     onClick={handleManualDetection}
