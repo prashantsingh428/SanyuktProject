@@ -757,8 +757,7 @@ const Recharge = () => {
                 <div
                     className='absolute inset-0 bg-cover bg-center opacity-100'
                     style={{
-                        backgroundImage:
-                            "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070')",
+                        backgroundImage: "url('/hero2.png')",
                     }}
                 ></div>
                 <div className='absolute inset-0 bg-[#0D0D0D]/40 bg-gradient-to-r from-[#0D0D0D]/90 via-[#0D0D0D]/60 to-transparent'></div>
