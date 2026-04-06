@@ -127,6 +127,18 @@ const CheckoutPage = () => {
 
     const loadRazorpayScript = () => {
         return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+
+            const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+            if (existingScript) {
+                existingScript.addEventListener('load', () => resolve(true), { once: true });
+                existingScript.addEventListener('error', () => resolve(false), { once: true });
+                return;
+            }
+
             const script = document.createElement('script');
             script.src = 'https://checkout.razorpay.com/v1/checkout.js';
             script.onload = () => resolve(true);
@@ -241,11 +253,21 @@ const CheckoutPage = () => {
                 theme: {
                     color: "#C8A96A",
                 },
+                modal: {
+                    ondismiss: () => {
+                        setLoading(false);
+                    }
+                }
             };
 
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
-                setSnackbar({ open: true, message: 'Payment Failed: ' + response.error.description, severity: 'error' });
+                const reason =
+                    response?.error?.description ||
+                    response?.error?.reason ||
+                    response?.error?.code ||
+                    'Payment failed. Please try again.';
+                setSnackbar({ open: true, message: `Payment Failed: ${reason}`, severity: 'error' });
                 setLoading(false);
             });
             rzp.open();
