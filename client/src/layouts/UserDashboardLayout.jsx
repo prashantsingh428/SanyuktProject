@@ -170,29 +170,11 @@ const UserDashboardLayout = () => {
         <div className="min-h-screen bg-[#0D0D0D] flex">
             {/* Sidebar */}
             <aside
-                className={`fixed left-0 h-[calc(100vh-60px)] md:h-[calc(100vh-80px)] top-[60px] md:top-[80px] bg-[#1A1A1A] text-white transition-all duration-300 z-50 shadow-none overflow-y-auto no-scrollbar border-r border-white/5
+                className={`fixed left-0 h-[calc(100vh-88px)] md:h-[calc(100vh-115px)] top-[88px] md:top-[115px] bg-[#1A1A1A] text-white transition-all duration-300 z-50 shadow-none overflow-y-auto no-scrollbar border-r border-white/5
                     ${sidebarOpen ? 'w-72' : 'w-0 md:w-20 overflow-hidden'}`}
             >
                 <div className={`flex flex-col h-full transition-all duration-300 ${sidebarOpen ? 'p-0' : 'p-0 py-6'}`}>
-                    {/* Brand / Logo Area */}
-                    <div className={`flex items-center mb-6 pt-6 ${sidebarOpen ? 'px-6 justify-between' : 'justify-center'}`}>
-                        <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'flex-col space-y-4'}`}>
-                            <button
-                                onClick={() => setSidebarOpen(!sidebarOpen)}
-                                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all active:scale-95
-                                    ${sidebarOpen ? 'bg-white/5 hover:bg-white/10' : 'bg-[#C8A96A]/20 hover:bg-[#C8A96A]/30 border border-[#C8A96A]/20'}`}
-                                title={sidebarOpen ? "Toggle Menu" : "Open Menu"}
-                            >
-                                {sidebarOpen ? <Shield className="w-6 h-6 text-[#C8A96A]" /> : <Menu className="w-6 h-6 text-[#C8A96A]" />}
-                            </button>
-                            {sidebarOpen && (
-                                <Link to="/" className="leading-none text-white hover:opacity-80 transition-opacity flex flex-col pt-1">
-                                    <h2 className="font-black text-2xl whitespace-nowrap uppercase tracking-tighter">SANYUKT</h2>
-                                    <p className="text-[10px] text-[#C8A96A] uppercase tracking-[0.4em] font-black -mt-0.5">Parivaar</p>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
+
 
                     {/* Highly Compact Profile Summary */}
                     {sidebarOpen && (
@@ -356,7 +338,7 @@ const UserDashboardLayout = () => {
 
             {/* Main Content Area */}
             <main
-                className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-80px)] text-white
+                className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-88px)] md:min-h-[calc(100vh-115px)] text-white
                     ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}
             >
                 <div className="flex-1 px-4 md:px-8 pb-8 pt-0 animate-fadeIn relative">

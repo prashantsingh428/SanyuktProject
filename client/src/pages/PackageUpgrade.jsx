@@ -392,9 +392,12 @@ const PackageUpgrade = () => {
                 isPackage: true,
                 packageType: selectedPkg.id
             });
+            if (!orderData?.key) {
+                throw new Error('Payment key missing from server response');
+            }
 
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_SQbbsEM3Dlfgi2', // Updated to VITE_
+                key: orderData.key,
                 amount: orderData.amount,
                 currency: "INR",
                 name: "Sanyukt Parivaar",

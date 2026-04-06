@@ -585,6 +585,9 @@ const Recharge = () => {
                     rechargeNumber,
                 });
                 rechargeDebugLog("create-order response", orderData);
+                if (!orderData?.key) {
+                    throw new Error("Payment key missing from server response");
+                }
 
                 if (!orderData.success) {
                     toast.error("Failed to initiate order", { id: toastId });
@@ -595,8 +598,7 @@ const Recharge = () => {
                 toast.dismiss(toastId);
 
                 const options = {
-                    key:
-                        import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SQbbsEM3Dlfgi2",
+                    key: orderData.key,
                     amount: orderData.order.amount,
                     currency: "INR",
                     name: "Sanyukt Parivaar",

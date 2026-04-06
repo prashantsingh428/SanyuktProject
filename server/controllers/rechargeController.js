@@ -58,9 +58,9 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET
     });
-} else {
-    console.warn("[PAYMENT] Razorpay keys are missing. Recharge functionality will be disabled.");
 }
+console.log("[DEBUG] RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
+console.log("[DEBUG] RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET ? "Loaded" : "Missing");
 
 // FIXED: Generate proper 10-digit numeric order ID
 const generateOrderId = () => {
@@ -565,7 +565,8 @@ exports.createOrder = async (req, res) => {
         res.status(200).json({
             success: true,
             order,
-            transactionId: transaction._id
+            transactionId: transaction._id,
+            key: process.env.RAZORPAY_KEY_ID
         });
         rechargeDebugLog('createOrder success', {
             transactionId: transaction._id?.toString(),
@@ -602,7 +603,7 @@ exports.verifyPayment = async (req, res) => {
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
             .createHmac("sha256", secret)
-            .update(body.toString())
+            .update(body)
             .digest("hex");
         rechargeDebugLog('verifyPayment signature check', {
             expectedPrefix: expectedSignature.slice(0, 10),

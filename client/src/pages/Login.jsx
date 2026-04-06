@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, ChevronDown, User, Lock, Eye, EyeOff, CheckCircle, ArrowRight } from 'lucide-react';
-import api from '../api';
+import { loginUser } from '../services/api/auth';
 
 const UserLogin = () => {
     const navigate = useNavigate();
@@ -43,19 +43,17 @@ const UserLogin = () => {
         try {
             console.log('Login attempt:', formData);
 
-            const response = await api.post('/login', {
+            const data = await loginUser({
                 email: formData.email,
                 password: formData.password
             });
 
-            console.log('Login response:', response.data);
+            console.log('Login response:', data);
 
-            if (response.data.token) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+            if (data?.token) {
                 localStorage.setItem('loginTimestamp', Date.now().toString());
 
-                const userRole = response.data.user?.role || 'user';
+                const userRole = data.user?.role || 'user';
                 setSuccessData({ email: formData.email, role: userRole });
 
                 // Countdown then navigate
@@ -72,24 +70,14 @@ const UserLogin = () => {
 
         } catch (error) {
             console.error('Login error:', error);
-
-            if (error.response) {
-                // Server responded with error
-                setError(error.response.data.message || 'Invalid email or password');
-            } else if (error.request) {
-                // Request made but no response
-                setError(`No response from server. Check if backend is live at: ${api.defaults.baseURL}`);
-            } else {
-                // Something else happened
-                setError('An error occurred. Please try again.');
-            }
+            setError(error.message || 'Invalid email or password');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] selection:bg-[#C8A96A]/30 relative overflow-hidden">
+        <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] selection:bg-[#C8A96A]/30 relative overflow-hidden flex items-center justify-center">
 
             {/* ===== SUCCESS POPUP MODAL ===== */}
             {successData && (
@@ -157,7 +145,7 @@ const UserLogin = () => {
                 <div className="absolute bottom-[-5%] left-[-5%] w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[120px] animate-pulse delay-700"></div>
             </div>
 
-            <div className="max-w-6xl mx-auto relative z-10 px-4">
+            <div className="w-full max-w-6xl mx-auto relative z-10 px-4">
                 {/* Main Content Grid */}
                 <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center justify-center py-6 md:py-10">
                     {/* Left Side - Welcome Message */}
@@ -180,7 +168,7 @@ const UserLogin = () => {
                             </div>
                         )}
 
-                        <div className="luxury-box p-4 max-w-md w-full shadow-2xl flex items-start gap-4 group transition-all duration-500">
+                        <div className="hidden md:flex luxury-box p-4 max-w-md w-full shadow-2xl items-start gap-4 group transition-all duration-500">
                             <div className="bg-[#0D0D0D] p-3 rounded-2xl text-[#C8A96A] border border-[#C8A96A]/20 group-hover:bg-[#C8A96A] group-hover:text-[#0D0D0D] transition-all duration-500">
                                 <Lock className="w-6 h-6" />
                             </div>
@@ -193,7 +181,7 @@ const UserLogin = () => {
                         </div>
 
                         {/* Decorative Stats */}
-                        <div className="mt-8 grid grid-cols-2 gap-6 max-w-md w-full">
+                        <div className="hidden md:grid mt-8 grid-cols-2 gap-6 max-w-md w-full">
                             {[
                                 { val: '10K+', label: ' Sanyukt Parivaar Estates' },
                                 { val: '50+', label: 'Global Regions' }

@@ -16,9 +16,9 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET
     });
-} else {
-    console.warn("[PAYMENT] Razorpay keys are missing in orderController. Product payments will be disabled.");
 }
+console.log("[DEBUG] RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
+console.log("[DEBUG] RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET ? "Loaded" : "Missing");
 
 // ================= CREATE ORDER =================
 exports.createOrder = async (req, res) => {
@@ -43,11 +43,23 @@ exports.createOrder = async (req, res) => {
             const body = razorpay_order_id + "|" + razorpay_payment_id;
             const expectedSignature = crypto
                 .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-                .update(body.toString())
+                .update(body)
                 .digest("hex");
 
             if (expectedSignature !== razorpay_signature) {
                 return res.status(400).json({ message: "Invalid payment signature" });
+            }
+
+            // Verify actual amount paid matches what the client claims
+            try {
+                const orderDetails = await razorpay.orders.fetch(razorpay_order_id);
+                const actualPaid = orderDetails.amount / 100;
+                if (actualPaid !== Number(total)) {
+                    return res.status(400).json({ message: "Payment amount mismatch. Fraudulent request detected." });
+                }
+            } catch (err) {
+                console.error("Failed to fetch razorpay order:", err);
+                return res.status(500).json({ message: "Failed to verify transaction amount." });
             }
         }
 
@@ -158,7 +170,10 @@ exports.createRazorpayOrder = async (req, res) => {
         };
 
         const razorpayOrder = await razorpay.orders.create(options);
-        res.status(200).json(razorpayOrder);
+        res.status(200).json({
+            ...razorpayOrder,
+            key: process.env.RAZORPAY_KEY_ID
+        });
     } catch (error) {
         console.error("Razorpay order creation error:", error);
         res.status(500).json({ message: "Failed to create payment order" });

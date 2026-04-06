@@ -191,7 +191,7 @@ const DashboardOverview = () => {
     if (!userData) return null;
 
     return (
-        <div className="max-w-[1600px] mx-auto px-6 pb-12 pt-0 bg-[#0D0D0D] min-h-screen font-['Inter',sans-serif] text-white">
+        <div className="max-w-[1600px] mx-auto -mx-4 sm:mx-0 sm:px-6 pb-12 pt-0 bg-[#0D0D0D] min-h-screen font-['Inter',sans-serif] text-white overflow-hidden sm:overflow-visible">
             <div className="mb-8">
                 <ProfileBanner userData={userData} />
             </div>
@@ -200,7 +200,7 @@ const DashboardOverview = () => {
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="flex flex-col gap-10"
+                className="flex flex-col gap-10 px-4 sm:px-0"
             >
                 {/* --- SECTION 1: WALLETS & EARNINGS --- */}
                 <div>

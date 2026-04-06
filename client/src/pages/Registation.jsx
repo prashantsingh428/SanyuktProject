@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { addressData } from '../data/addressData';
+import { registerUser } from '../services/api/auth';
 
 const RegistrationForm = () => {
     const navigate = useNavigate();
@@ -152,9 +153,9 @@ const RegistrationForm = () => {
         try {
             const payload = { ...formData };
             if (profileImage) payload.profileImage = profileImage;
-            const response = await api.post("/register", payload);
+            const data = await registerUser(payload);
 
-            if (response.data) {
+            if (data) {
                 setSuccess("Registration successful! Redirecting to verification...");
 
                 localStorage.setItem('registrationEmail', formData.email);
@@ -170,13 +171,7 @@ const RegistrationForm = () => {
                 }, 1500);
             }
         } catch (error) {
-            if (error.response) {
-                setError(error.response.data.message || "Registration failed. Please try again.");
-            } else if (error.request) {
-                setError(`No response from server. Check if backend is live at: ${api.defaults.baseURL}`);
-            } else {
-                setError("An error occurred. Please try again.");
-            }
+            setError(error.message || "Registration failed. Please try again.");
         } finally {
             setLoading(false);
         }

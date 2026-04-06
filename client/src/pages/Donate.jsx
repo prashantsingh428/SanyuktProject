@@ -65,11 +65,14 @@ const Donate = () => {
                 setIsProcessing(false);
                 return;
             }
+            if (!data?.key) {
+                throw new Error("Payment key missing from server response");
+            }
 
             toast.dismiss(toastId);
 
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SQbbsEM3Dlfgi2",
+                key: data.key,
                 amount: data.order.amount,
                 currency: "INR",
                 name: "Sanyukt Parivaar",

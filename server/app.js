@@ -21,7 +21,7 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin === process.env.FRONTEND_URL || process.env.NODE_ENV !== 'production') {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin === process.env.FRONTEND_URL || (origin && origin.endsWith('.vercel.app')) || process.env.NODE_ENV !== 'production') {
             callback(null, true);
         } else {
             console.warn(`CORS blocked for origin: ${origin}`);
@@ -29,6 +29,8 @@ app.use(cors({
         }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 app.use(express.json({ limit: '10mb' }));
 
@@ -39,7 +41,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
     lastModified: true
 }));
 
-// Request Logger
+
 app.use((req, res, next) => {
     if (process.env.NODE_ENV !== 'test') {
         console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
