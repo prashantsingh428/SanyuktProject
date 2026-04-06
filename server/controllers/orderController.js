@@ -37,9 +37,14 @@ exports.createOrder = async (req, res) => {
             razorpay_payment_id,
             razorpay_signature
         } = req.body;
+        const effectivePaymentMethod = paymentMethod || (razorpay_payment_id ? "online" : "cod");
+        const validMethods = ["cod", "online", "upi", "card"];
+        if (!validMethods.includes(effectivePaymentMethod)) {
+            return res.status(400).json({ message: "Invalid payment method" });
+        }
 
         // Verify payment if online
-        if (paymentMethod !== 'cod') {
+        if (effectivePaymentMethod !== 'cod') {
             const body = razorpay_order_id + "|" + razorpay_payment_id;
             const expectedSignature = crypto
                 .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -54,7 +59,7 @@ exports.createOrder = async (req, res) => {
             try {
                 const orderDetails = await razorpay.orders.fetch(razorpay_order_id);
                 const actualPaid = orderDetails.amount / 100;
-                if (actualPaid !== Number(total)) {
+                if (Math.abs(actualPaid - Number(total)) > 0.01) {
                     return res.status(400).json({ message: "Payment amount mismatch. Fraudulent request detected." });
                 }
             } catch (err) {
@@ -77,7 +82,7 @@ exports.createOrder = async (req, res) => {
             product: productId,
             quantity,
             shippingInfo,
-            paymentMethod,
+            paymentMethod: effectivePaymentMethod,
             subtotal,
             shipping,
             tax,
@@ -87,10 +92,10 @@ exports.createOrder = async (req, res) => {
             pv: orderPv,
             razorpayOrderId: razorpay_order_id,
             razorpayPaymentId: razorpay_payment_id,
-            status: paymentMethod === 'cod' ? 'pending' : 'paid',
+            status: effectivePaymentMethod === 'cod' ? 'pending' : 'paid',
             tracking: [{
-                status: paymentMethod === 'cod' ? 'pending' : 'paid',
-                message: paymentMethod === 'cod' ? 'Order placed successfully' : 'Payment successful and order placed',
+                status: effectivePaymentMethod === 'cod' ? 'pending' : 'paid',
+                message: effectivePaymentMethod === 'cod' ? 'Order placed successfully' : 'Payment successful and order placed',
                 timestamp: new Date()
             }]
         });
@@ -102,18 +107,22 @@ exports.createOrder = async (req, res) => {
 
         // ✅ FIX 7: Repurchase record banao (orderId ke saath)
         // Aur phir generation income distribute karo
-        const newRepurchase = await Repurchase.create({
-            userId: req.user._id,
-            orderId: order._id,       // orderId ab model mein hai
-            amount: total,
-            bv: 300,                   // Plan ke hisaab se fixed 300 BV
-            status: 'completed',
-        });
+        // Keep repurchase side-effects non-blocking so successful payment/order never fails due MLM hooks.
+        try {
+            const newRepurchase = await Repurchase.create({
+                userId: req.user._id,
+                orderId: order._id,
+                amount: total,
+                bv: 300,
+                status: 'completed',
+            });
 
-        // ── Repurchase generation income (async - response block nahi hoga) ──
-        processRepurchaseGenerationIncome(newRepurchase._id).catch(err =>
-            console.error("❌ Repurchase income error:", err.message)
-        );
+            processRepurchaseGenerationIncome(newRepurchase._id).catch(err =>
+                console.error("❌ Repurchase income error:", err.message)
+            );
+        } catch (repurchaseErr) {
+            console.error("❌ Repurchase create skipped:", repurchaseErr.message);
+        }
 
         // ── Send Order Success Email ──
         try {
@@ -128,7 +137,7 @@ Order ID: #${orderIdShort}
 Product: ${productData.name}
 Quantity: ${quantity}
 Total Amount: ₹${total}
-Payment Method: ${paymentMethod.toUpperCase()}
+Payment Method: ${effectivePaymentMethod.toUpperCase()}
 Registered Contact: ${req.user.mobile || 'N/A'}
  
 You can track your order status in your mission hub: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/my-account/orders/${order._id}

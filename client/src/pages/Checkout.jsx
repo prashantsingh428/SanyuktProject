@@ -46,7 +46,9 @@ const CheckoutPage = () => {
     const [couponApplied, setCouponApplied] = useState(false);
     const [discount, setDiscount] = useState(0);
 
-    const availableMethods = product?.paymentMethods || ['cod', 'upi', 'card'];
+    const availableMethods = Array.isArray(product?.paymentMethods) && product.paymentMethods.length > 0
+        ? product.paymentMethods
+        : ['cod', 'upi', 'card'];
 
     // Set initial payment method
     useEffect(() => {
@@ -167,6 +169,10 @@ const CheckoutPage = () => {
             setSnackbar({ open: true, message: 'Pincode must be exactly 6 digits', severity: 'warning' });
             return;
         }
+        if (!paymentMethod) {
+            setSnackbar({ open: true, message: 'Please select a payment method', severity: 'warning' });
+            return;
+        }
 
         if (paymentMethod === 'cod') {
             await createOrder();
@@ -253,11 +259,16 @@ const CheckoutPage = () => {
     const createOrder = async (paymentDetails = {}) => {
         setLoading(true);
         try {
+            const productId = product?._id || product?.id;
+            if (!productId) {
+                throw new Error('Product identifier missing');
+            }
+            const normalizedPaymentMethod = paymentMethod || (paymentDetails?.razorpay_payment_id ? 'online' : 'cod');
             const orderData = {
-                product: product._id,
+                product: productId,
                 quantity: 1,
                 shippingInfo,
-                paymentMethod,
+                paymentMethod: normalizedPaymentMethod,
                 subtotal,
                 shipping,
                 tax,
