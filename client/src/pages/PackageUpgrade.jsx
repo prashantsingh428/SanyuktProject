@@ -392,6 +392,9 @@ const PackageUpgrade = () => {
                 isPackage: true,
                 packageType: selectedPkg.id
             });
+            if (!orderData || !orderData.id || !orderData.amount) {
+                throw new Error('Invalid payment order response from server');
+            }
             const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
             if (!razorpayKeyId) {
                 console.error("Razorpay key is missing in frontend env");
@@ -408,6 +411,13 @@ const PackageUpgrade = () => {
                 description: `Activate ${selectedPkg.name} Package`,
                 order_id: orderData.id,
                 handler: async (response) => {
+                    if (!response || !response.razorpay_payment_id) {
+                        console.error("Invalid Razorpay response", response);
+                        alert("Payment failed. Try again.");
+                        setActivating(false);
+                        return;
+                    }
+
                     try {
                         const verifyRes = await api.post('/package/activate', {
                             packageType: selectedPkg.id,
@@ -416,6 +426,9 @@ const PackageUpgrade = () => {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature
                         });
+                        if (!verifyRes?.data || typeof verifyRes.data !== 'object') {
+                            throw new Error('Invalid activation response from server');
+                        }
 
                         if (verifyRes.data.success) {
                             setStatus(prev => ({

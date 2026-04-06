@@ -187,6 +187,9 @@ const CheckoutPage = () => {
 
             // 1. Create order on server
             const { data: rpOrder } = await api.post('/orders/razorpay-order', { amount: total });
+            if (!rpOrder || !rpOrder.id || !rpOrder.amount || !rpOrder.currency) {
+                throw new Error('Invalid payment order response from server');
+            }
             const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
             if (!razorpayKeyId) {
                 console.error("Razorpay key is missing in frontend env");
@@ -204,12 +207,25 @@ const CheckoutPage = () => {
                 image: `${API_URL}/logo.png?v=20260403`,
                 order_id: rpOrder.id,
                 handler: async (response) => {
-                    // 2. Verification and Order Finalization
-                    await createOrder({
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature
-                    });
+                    if (!response || !response.razorpay_payment_id) {
+                        console.error("Invalid Razorpay response", response);
+                        alert("Payment failed. Try again.");
+                        setLoading(false);
+                        return;
+                    }
+
+                    try {
+                        // 2. Verification and Order Finalization
+                        await createOrder({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+                    } catch (err) {
+                        console.error('Order finalization failed:', err);
+                        setSnackbar({ open: true, message: 'Payment captured but order finalization failed. Please contact support.', severity: 'error' });
+                        setLoading(false);
+                    }
                 },
                 prefill: {
                     name: shippingInfo.fullName,

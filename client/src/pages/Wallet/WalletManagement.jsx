@@ -314,6 +314,9 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                 setProcessingTopup(false);
                 return;
             }
+            if (!orderData?.order?.id || !orderData?.order?.amount) {
+                throw new Error('Invalid payment order response from server.');
+            }
 
             // Mock mode check
             if (orderData.order.id.startsWith('order_mock_')) {
@@ -367,6 +370,13 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                 theme: { color: '#0A7A2F' },
 
                 handler: async (response) => {
+                    if (!response || !response.razorpay_payment_id) {
+                        console.error("Invalid Razorpay response", response);
+                        alert("Payment failed. Try again.");
+                        setProcessingTopup(false);
+                        return;
+                    }
+
                     try {
                         const { data: verifyData } = await api.post('/wallet/topup/verify', {
                             razorpay_order_id: response.razorpay_order_id,
@@ -374,6 +384,9 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                             razorpay_signature: response.razorpay_signature,
                             amount: parsedTopupAmount,
                         });
+                        if (!verifyData || typeof verifyData !== 'object') {
+                            throw new Error('Invalid verification response from server.');
+                        }
 
                         if (verifyData.success) {
                             setWalletBalance(verifyData.walletBalance);

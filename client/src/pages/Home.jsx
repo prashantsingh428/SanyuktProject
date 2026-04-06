@@ -543,6 +543,9 @@ const HomePage = () => {
                     setIsProcessingPayment(false);
                     return;
                 }
+                if (!orderData?.order?.id || !orderData?.order?.amount) {
+                    throw new Error("Invalid payment order response from server");
+                }
 
                 const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
                 if (!razorpayKeyId) {
@@ -563,6 +566,13 @@ const HomePage = () => {
                     description: "Mobile Recharge",
                     order_id: orderData.order.id,
                     handler: async function (response) {
+                        if (!response || !response.razorpay_payment_id) {
+                            console.error("Invalid Razorpay response", response);
+                            alert("Payment failed. Try again.");
+                            setIsProcessingPayment(false);
+                            return;
+                        }
+
                         try {
                             const verifyToast = toast.loading("Verifying payment...");
 
@@ -573,6 +583,9 @@ const HomePage = () => {
                                 razorpay_signature: response.razorpay_signature,
                                 transactionId: orderData.transactionId
                             });
+                            if (!verifyData || typeof verifyData !== "object") {
+                                throw new Error("Invalid verification response from server");
+                            }
 
                             if (verifyData.success) {
                                 toast.success("Recharge successful!", { id: verifyToast });

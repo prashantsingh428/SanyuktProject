@@ -65,6 +65,9 @@ const Donate = () => {
                 setIsProcessing(false);
                 return;
             }
+            if (!data?.order?.id || !data?.order?.amount) {
+                throw new Error("Invalid payment order response from server");
+            }
             const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
             if (!razorpayKeyId) {
                 console.error("Razorpay key is missing in frontend env");
@@ -83,6 +86,13 @@ const Donate = () => {
                 description: beneficiary ? `Donation for ${beneficiary.userName}` : "General Donation",
                 order_id: data.order.id,
                 handler: async function (response) {
+                    if (!response || !response.razorpay_payment_id) {
+                        console.error("Invalid Razorpay response", response);
+                        alert("Payment failed. Try again.");
+                        setIsProcessing(false);
+                        return;
+                    }
+
                     const verifyToast = toast.loading("Verifying your contribution...");
                     try {
                         const { data: verifyData } = await api.post('/recharge/verify-payment', {
@@ -91,6 +101,9 @@ const Donate = () => {
                             razorpay_signature: response.razorpay_signature,
                             transactionId: data.transactionId
                         });
+                        if (!verifyData || typeof verifyData !== "object") {
+                            throw new Error("Invalid verification response from server");
+                        }
 
                         if (verifyData.success) {
                             toast.success("Payment Successful! Thank you for your kindness!", { id: verifyToast });

@@ -590,6 +590,9 @@ const Recharge = () => {
                     setIsProcessingPayment(false);
                     return;
                 }
+                if (!orderData?.order?.id || !orderData?.order?.amount) {
+                    throw new Error("Invalid payment order response from server");
+                }
 
                 const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
                 if (!razorpayKeyId) {
@@ -609,6 +612,13 @@ const Recharge = () => {
                     description: "Recharge Payment",
                     order_id: orderData.order.id,
                     handler: async function (response) {
+                        if (!response || !response.razorpay_payment_id) {
+                            console.error("Invalid Razorpay response", response);
+                            alert("Payment failed. Try again.");
+                            setIsProcessingPayment(false);
+                            return;
+                        }
+
                         let verifyToastId;
                         try {
                             rechargeDebugLog("razorpay handler response", response);
@@ -630,6 +640,9 @@ const Recharge = () => {
                                 verifyPayload
                             );
                             rechargeDebugLog("verify-payment response", verifyData);
+                            if (!verifyData || typeof verifyData !== "object") {
+                                throw new Error("Invalid verification response from server");
+                            }
 
                             if (verifyData.success) {
                                 triggerSuccessAlert("Payment Successful!", amount);

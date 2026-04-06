@@ -214,14 +214,14 @@ const DashboardOverview = () => {
                         />
                         <ModernWalletCard
                             title="Total PV"
-                            value={Number(stats?.pv || 0).toString()}
+                            value={Number(stats?.pv || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             color="#C8A96A"
                             icon={CreditCard}
                             showCurrency={false}
                         />
                         <ModernWalletCard
                             title="Total BV"
-                            value={Number(stats?.bv || 0).toString()}
+                            value={Number(stats?.bv || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             color="#C8A96A"
                             icon={PieChart}
                             showCurrency={false}
@@ -272,7 +272,7 @@ const DashboardOverview = () => {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Total Product Purchases</span>
-                                    <h4 className="text-3xl font-black tracking-tighter">₹ {Number(stats?.productPurchases || 0).toLocaleString()}</h4>
+                                    <h4 className="text-3xl font-black tracking-tighter">₹ {Number(stats?.productPurchases || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}</h4>
                                 </div>
                             </div>
                             <button
@@ -291,7 +291,7 @@ const DashboardOverview = () => {
                         <div className="flex flex-col gap-6 h-full">
                             <ModernWalletCard
                                 title="Today PV Points"
-                                value={`${Number(stats?.dailyPV?.current || 0)} / ${Number(stats?.dailyPV?.target || 320)}`}
+                                value={`${Number(stats?.dailyPV?.current || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })} / ${Number(stats?.dailyPV?.target || 320)}`}
                                 icon={Zap}
                                 color="#C8A96A"
                                 showCurrency={false}
@@ -299,7 +299,7 @@ const DashboardOverview = () => {
                             />
                             <ModernWalletCard
                                 title="Total PV Points"
-                                value={`${Number(stats?.lifetimePV?.current || 0)} / ${Number(stats?.lifetimePV?.target || 10200)}`}
+                                value={`${Number(stats?.lifetimePV?.current || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })} / ${Number(stats?.lifetimePV?.target || 10200)}`}
                                 icon={Trophy}
                                 color="#C8A96A"
                                 showCurrency={false}
@@ -315,14 +315,14 @@ const DashboardOverview = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <BusinessMatrixCard
                             title="PV Left / Right"
-                            lValue={Number(stats?.pvLeft || 0).toString()}
-                            rValue={Number(stats?.pvRight || 0).toString()}
+                            lValue={Number(stats?.pvLeft || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
+                            rValue={Number(stats?.pvRight || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             icon={Target}
                         />
                         <BusinessMatrixCard
                             title="Total PV L / R"
-                            lValue={Number(stats?.totalPvLeft || 0).toString()}
-                            rValue={Number(stats?.totalPvRight || 0).toString()}
+                            lValue={Number(stats?.totalPvLeft || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
+                            rValue={Number(stats?.totalPvRight || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             icon={Activity}
                         />
                         <BusinessMatrixCard
