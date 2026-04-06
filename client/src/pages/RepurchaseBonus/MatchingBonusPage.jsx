@@ -72,14 +72,14 @@ const StatCard = ({ label, value, icon: Icon, badge, delay }) => (
                 <Icon className="w-5 h-5" strokeWidth={1.5} />
             </div>
             {badge && (
-                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A96A]/5 text-[7px] font-black text-[#C8A96A] uppercase tracking-[0.2em] border border-[#C8A96A]/20">
+                <span className="px-3 py-1 rounded-full bg-[#C8A96A]/5 text-[10px] font-black text-[#C8A96A] uppercase tracking-[0.2em] border border-[#C8A96A]/20">
                     {badge}
                 </span>
             )}
         </div>
         <div>
-            <p className="text-2xl font-serif font-bold text-[#F5E6C8] tracking-tight mb-1">{value}</p>
-            <p className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em]">{label}</p>
+            <p className="text-3xl font-serif font-bold text-[#F5E6C8] tracking-tight mb-1">{value}</p>
+            <p className="text-[11px] font-black text-[#C8A96A]/50 uppercase tracking-[0.2em]">{label}</p>
         </div>
         <div className="absolute top-0 right-0 w-16 h-16 bg-[#C8A96A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
     </motion.div>
@@ -116,8 +116,8 @@ const TransactionDetailModal = ({ isOpen, onClose, transaction, cfg }) => {
                         <div className={`h-32 bg-gradient-to-br ${cfg.color} p-8 flex items-end justify-between relative`}>
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#C8A96A]/10 blur-2xl rounded-full -mr-12 -mt-12" />
                             <div className="relative z-10">
-                                <p className="text-[#F5E6C8]/60 text-[9px] font-black uppercase tracking-[0.3em] mb-1">Settlement Verified</p>
-                                <h2 className="text-4xl font-serif font-bold text-[#F5E6C8] tracking-tighter leading-none">₹{transaction.bonusAmount.toLocaleString()}</h2>
+                                <p className="text-[#F5E6C8]/70 text-[11px] font-black uppercase tracking-[0.3em] mb-1">Settlement Verified</p>
+                                <h2 className="text-5xl font-serif font-bold text-[#F5E6C8] tracking-tighter leading-none">₹{transaction.bonusAmount.toLocaleString()}</h2>
                             </div>
                             <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 border border-[#C8A96A]/20 flex items-center justify-center rounded-full hover:bg-[#C8A96A]/10 transition">
                                 <X className="w-4 h-4 text-[#C8A96A]" />
@@ -131,8 +131,8 @@ const TransactionDetailModal = ({ isOpen, onClose, transaction, cfg }) => {
                                             <item.icon className="w-4 h-4" strokeWidth={1.5} />
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em] mb-0.5">{item.label}</p>
-                                            <p className="text-xs font-bold text-[#F5E6C8] leading-relaxed italic">{item.value}</p>
+                                            <p className="text-[10px] font-black text-[#C8A96A]/50 uppercase tracking-[0.2em] mb-0.5">{item.label}</p>
+                                            <p className="text-sm font-bold text-[#F5E6C8] leading-relaxed italic">{item.value}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -140,8 +140,8 @@ const TransactionDetailModal = ({ isOpen, onClose, transaction, cfg }) => {
                             
                             <div className="pt-6 flex items-center gap-3">
                                 <div className="flex-1 flex items-center gap-3 px-5 py-3 bg-[#C8A96A]/5 border border-[#C8A96A]/20 rounded-2px">
-                                    <CheckCircle className="w-3.5 h-3.5 text-[#C8A96A]" strokeWidth={2.5} />
-                                    <span className="text-[9px] font-black text-[#C8A96A] uppercase tracking-[0.2em]">Credited to Vault</span>
+                                    <CheckCircle className="w-4 h-4 text-[#C8A96A]" strokeWidth={2.5} />
+                                    <span className="text-[11px] font-black text-[#C8A96A] uppercase tracking-[0.2em]">Credited to Vault</span>
                                 </div>
                                 <button
                                     onClick={onClose}
@@ -253,10 +253,10 @@ const MatchingBonusPage = ({ type }) => {
                         </motion.button>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <span className="text-2xl filter grayscale opacity-50">{cfg.emoji}</span>
-                                <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#F5E6C8] uppercase tracking-tight leading-none">{cfg.label}</h1>
+                                <span className="text-3xl filter grayscale opacity-50">{cfg.emoji}</span>
+                                <h1 className="text-4xl md:text-6xl font-serif font-bold text-[#F5E6C8] uppercase tracking-tight leading-none">{cfg.label}</h1>
                             </div>
-                            <p className="text-[9px] md:text-xs text-[#C8A96A]/60 font-black uppercase tracking-[0.4em]">{cfg.price} Package · Daily Cap {cfg.capping}</p>
+                            <p className="text-xs md:text-base text-[#C8A96A]/70 font-black uppercase tracking-[0.4em]">{cfg.price} Package · Daily Cap {cfg.capping}</p>
                         </div>
                     </div>
                     <div className="luxury-box px-6 py-4 flex items-center gap-4 shadow-gold-900/20">
@@ -264,8 +264,8 @@ const MatchingBonusPage = ({ type }) => {
                             <Icon className="w-5 h-5" strokeWidth={1.5} />
                         </div>
                         <div>
-                            <p className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] leading-tight mb-1">Elevation Status</p>
-                            <p className={`text-xs font-bold ${userHasPackage ? 'text-[#C8A96A]' : 'text-white/20'} uppercase tracking-widest`}>
+                            <p className="text-[11px] font-black text-[#C8A96A]/50 uppercase tracking-[0.3em] leading-tight mb-1">Elevation Status</p>
+                            <p className={`text-sm font-bold ${userHasPackage ? 'text-[#C8A96A]' : 'text-white/20'} uppercase tracking-widest`}>
                                 {userHasPackage ? 'Fully Manifested' : 'Pending Activation'}
                             </p>
                         </div>
@@ -284,8 +284,8 @@ const MatchingBonusPage = ({ type }) => {
                         <div className="relative z-10 h-full flex flex-col justify-between">
                             <div className="flex justify-between items-start mb-8">
                                 <div>
-                                    <p className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mb-1">Internal Merit Balance</p>
-                                    <h4 className="text-5xl font-serif font-bold tracking-tighter text-[#F5E6C8]">{personalPV.toLocaleString()} <span className="text-lg text-[#C8A96A]/60 font-sans">PV</span></h4>
+                                    <p className="text-[11px] font-black text-[#C8A96A]/50 uppercase tracking-[0.3em] mb-1">Internal Merit Balance</p>
+                                    <h4 className="text-6xl font-serif font-bold tracking-tighter text-[#F5E6C8]">{personalPV.toLocaleString()} <span className="text-xl text-[#C8A96A]/60 font-sans">PV</span></h4>
                                 </div>
                                 <div className="p-4 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl shadow-2xl">
                                     <Icon className="w-8 h-8 text-[#C8A96A]" strokeWidth={1} />
@@ -293,12 +293,12 @@ const MatchingBonusPage = ({ type }) => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-[#0D0D0D] border border-[#C8A96A]/10 rounded-xl p-5 hover:border-[#C8A96A]/30 transition-colors">
-                                    <p className="text-[8px] text-[#C8A96A]/40 uppercase tracking-widest font-black mb-1">Carry Yield</p>
-                                    <p className="text-xl font-bold text-[#F5E6C8]">{carryForwardBV.toLocaleString()} <span className="text-[10px] opacity-40 font-medium">BV</span></p>
+                                    <p className="text-[11px] text-[#C8A96A]/50 uppercase tracking-widest font-black mb-1">Carry Yield</p>
+                                    <p className="text-2xl font-bold text-[#F5E6C8]">{carryForwardBV.toLocaleString()} <span className="text-sm opacity-40 font-medium">BV</span></p>
                                 </div>
                                 <div className="bg-[#0D0D0D] border border-[#C8A96A]/10 rounded-xl p-5 hover:border-[#C8A96A]/30 transition-colors">
-                                    <p className="text-[8px] text-[#C8A96A]/40 uppercase tracking-widest font-black mb-1">Matched Accumulation</p>
-                                    <p className="text-xl font-bold text-[#F5E6C8]">{matchedPV.toLocaleString()} <span className="text-[10px] opacity-40 font-medium">PV</span></p>
+                                    <p className="text-[11px] text-[#C8A96A]/50 uppercase tracking-widest font-black mb-1">Matched Accumulation</p>
+                                    <p className="text-2xl font-bold text-[#F5E6C8]">{matchedPV.toLocaleString()} <span className="text-sm opacity-40 font-medium">PV</span></p>
                                 </div>
                             </div>
                         </div>
@@ -343,22 +343,22 @@ const MatchingBonusPage = ({ type }) => {
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-serif font-bold text-[#F5E6C8] tracking-tighter">{cappingPct.toFixed(0)}%</span>
-                                    <span className="text-[8px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mt-1">Utilized</span>
+                                    <span className="text-4xl font-serif font-bold text-[#F5E6C8] tracking-tighter">{cappingPct.toFixed(0)}%</span>
+                                    <span className="text-[11px] font-black text-[#C8A96A]/50 uppercase tracking-[0.3em] mt-1">Utilized</span>
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="text-[#C8A96A]/40 font-black uppercase tracking-[0.2em] text-[8px]">Manifested Today</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-[#C8A96A]/50 font-black uppercase tracking-[0.2em] text-[10px]">Manifested Today</span>
                                     <span className="text-[#F5E6C8] font-bold">₹{cappingUsed.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between items-center text-xs">
-                                    <span className="text-[#C8A96A]/40 font-black uppercase tracking-[0.2em] text-[8px]">Diurnal Limit</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-[#C8A96A]/50 font-black uppercase tracking-[0.2em] text-[10px]">Diurnal Limit</span>
                                     <span className="text-[#F5E6C8] font-bold">₹{cappingLimit.toLocaleString()}</span>
                                 </div>
                                 <div className="pt-4 border-t border-[#C8A96A]/10 flex justify-between items-center">
-                                    <span className="text-[#C8A96A]/40 font-black uppercase tracking-[0.2em] text-[8px]">Available Ceiling</span>
-                                    <span className="text-[#C8A96A] font-bold">₹{Math.max(0, cappingLimit - todayEarned).toLocaleString()}</span>
+                                    <span className="text-[#C8A96A]/50 font-black uppercase tracking-[0.2em] text-[10px]">Available Ceiling</span>
+                                    <span className="text-[#C8A96A] font-bold text-sm">₹{Math.max(0, cappingLimit - todayEarned).toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>
@@ -382,10 +382,10 @@ const MatchingBonusPage = ({ type }) => {
                             <div className="relative">
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
-                                        <p className="text-[9px] text-[#C8A96A]/40 font-black uppercase tracking-[0.2em] mb-1">Lateral Node (L)</p>
-                                        <h4 className="text-2xl font-bold text-[#F5E6C8] tracking-tight">{leftBV.toLocaleString()} <span className="text-[10px] text-[#C8A96A]/40 font-medium">BV</span></h4>
+                                        <p className="text-[11px] text-[#C8A96A]/50 font-black uppercase tracking-[0.2em] mb-1">Lateral Node (L)</p>
+                                        <h4 className="text-3xl font-bold text-[#F5E6C8] tracking-tight">{leftBV.toLocaleString()} <span className="text-sm text-[#C8A96A]/50 font-medium">BV</span></h4>
                                     </div>
-                                    <span className="text-[9px] font-black text-[#C8A96A]/30 tracking-widest">{(leftBV / Math.max(leftBV + rightBV, 1) * 100).toFixed(0)}%</span>
+                                    <span className="text-[11px] font-black text-[#C8A96A]/40 tracking-widest">{(leftBV / Math.max(leftBV + rightBV, 1) * 100).toFixed(0)}%</span>
                                 </div>
                                 <div className="h-1.5 w-full bg-[#C8A96A]/5 rounded-full overflow-hidden border border-[#C8A96A]/10">
                                     <motion.div 
@@ -396,8 +396,8 @@ const MatchingBonusPage = ({ type }) => {
                                     />
                                 </div>
                                 <div className="mt-6 p-5 bg-[#0D0D0D] rounded-xl border border-[#C8A96A]/10">
-                                    <p className="text-[8px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em] mb-1">Strategic Insight</p>
-                                    <p className="text-[10px] font-medium text-[#F5E6C8]/60 italic leading-relaxed">
+                                    <p className="text-[10px] font-black text-[#C8A96A]/50 uppercase tracking-[0.2em] mb-1">Strategic Insight</p>
+                                    <p className="text-xs font-medium text-[#F5E6C8]/70 italic leading-relaxed">
                                         {leftBV < rightBV ? "Cultivate lateral node (L) to maximize binary manifest." : "Lateral performance is optimal. Sustain node integrity."}
                                     </p>
                                 </div>
@@ -406,10 +406,10 @@ const MatchingBonusPage = ({ type }) => {
                             <div className="relative">
                                 <div className="flex justify-between items-end mb-4">
                                     <div>
-                                        <p className="text-[9px] text-[#C8A96A]/40 font-black uppercase tracking-[0.2em] mb-1">Lateral Node (R)</p>
-                                        <h4 className="text-2xl font-bold text-[#F5E6C8] tracking-tight">{rightBV.toLocaleString()} <span className="text-[10px] text-[#C8A96A]/40 font-medium">BV</span></h4>
+                                        <p className="text-[11px] text-[#C8A96A]/50 font-black uppercase tracking-[0.2em] mb-1">Lateral Node (R)</p>
+                                        <h4 className="text-3xl font-bold text-[#F5E6C8] tracking-tight">{rightBV.toLocaleString()} <span className="text-sm text-[#C8A96A]/50 font-medium">BV</span></h4>
                                     </div>
-                                    <span className="text-[9px] font-black text-[#C8A96A]/30 tracking-widest">{(rightBV / Math.max(leftBV + rightBV, 1) * 100).toFixed(0)}%</span>
+                                    <span className="text-[11px] font-black text-[#C8A96A]/40 tracking-widest">{(rightBV / Math.max(leftBV + rightBV, 1) * 100).toFixed(0)}%</span>
                                 </div>
                                 <div className="h-1.5 w-full bg-[#C8A96A]/5 rounded-full overflow-hidden border border-[#C8A96A]/10">
                                     <motion.div 
@@ -420,8 +420,8 @@ const MatchingBonusPage = ({ type }) => {
                                     />
                                 </div>
                                 <div className="mt-6 p-5 bg-[#0D0D0D] rounded-xl border border-[#C8A96A]/10">
-                                    <p className="text-[8px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em] mb-1">Strategic Insight</p>
-                                    <p className="text-[10px] font-medium text-[#F5E6C8]/60 italic leading-relaxed">
+                                    <p className="text-[10px] font-black text-[#C8A96A]/50 uppercase tracking-[0.2em] mb-1">Strategic Insight</p>
+                                    <p className="text-xs font-medium text-[#F5E6C8]/70 italic leading-relaxed">
                                         {rightBV < leftBV ? "Cultivate lateral node (R) to maximize binary manifest." : "Lateral performance is optimal. Sustain node integrity."}
                                     </p>
                                 </div>
@@ -432,11 +432,11 @@ const MatchingBonusPage = ({ type }) => {
                                 <div className="w-10 h-10 rounded-xl bg-[#0D0D0D] border border-[#C8A96A]/10 flex items-center justify-center text-[#C8A96A]/40">
                                     <Info className="w-5 h-5" strokeWidth={1.5} />
                                 </div>
-                                <p className="text-[9px] text-[#C8A96A]/40 font-bold uppercase tracking-widest italic leading-relaxed">Network lattice updates in real-time correlation.</p>
+                                <p className="text-xs text-[#C8A96A]/40 font-bold uppercase tracking-widest italic leading-relaxed">Network lattice updates in real-time correlation.</p>
                             </div>
-                            <div className="text-center sm:text-right">
-                                <p className="text-[9px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em] mb-1">Carry Manifest</p>
-                                <p className="text-xl font-serif font-bold text-[#F5E6C8]">{carryForwardBV.toLocaleString()} <span className="text-xs font-sans font-medium text-[#C8A96A]/60 tracking-tight">BV</span></p>
+                             <div className="text-center sm:text-right">
+                                <p className="text-[11px] font-black text-[#C8A96A]/50 uppercase tracking-[0.3em] mb-1">Carry Manifest</p>
+                                <p className="text-2xl font-serif font-bold text-[#F5E6C8]">{carryForwardBV.toLocaleString()} <span className="text-sm font-sans font-medium text-[#C8A96A]/60 tracking-tight">BV</span></p>
                             </div>
                         </div>
                     </motion.div>
@@ -470,7 +470,7 @@ const MatchingBonusPage = ({ type }) => {
                             <thead className="bg-[#121212] border-b border-[#C8A96A]/10">
                                 <tr>
                                     {['Identifier', 'Timestamp', 'Matched Volume', 'Bonus Accrued', 'Manifest Status', 'Details'].map(h => (
-                                        <th key={h} className="px-8 py-5 text-left text-[8px] font-black text-[#C8A96A]/40 uppercase tracking-[0.3em]">{h}</th>
+                                        <th key={h} className="px-8 py-5 text-left text-[11px] font-black text-[#C8A96A]/50 uppercase tracking-[0.3em]">{h}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -493,18 +493,18 @@ const MatchingBonusPage = ({ type }) => {
                                             className="hover:bg-[#C8A96A]/5 transition-colors cursor-pointer group"
                                         >
                                             <td className="px-8 py-6">
-                                                <span className="text-[9px] font-black text-[#F5E6C8]/60 tracking-wider">#MB-{row._id.slice(-8).toUpperCase()}</span>
+                                                <span className="text-xs font-black text-[#F5E6C8]/70 tracking-wider">#MB-{row._id.slice(-8).toUpperCase()}</span>
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex flex-col">
-                                                    <span className="text-xs font-bold text-[#F5E6C8]">{new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                                                    <span className="text-[8px] text-[#C8A96A]/40 font-black uppercase tracking-widest mt-0.5">{new Date(row.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                    <span className="text-sm font-bold text-[#F5E6C8]">{new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                                    <span className="text-[10px] text-[#C8A96A]/50 font-black uppercase tracking-widest mt-0.5">{new Date(row.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`w-1.5 h-1.5 rounded-full ${cfg.accentBg}`} />
-                                                    <span className="text-xs font-bold text-[#F5E6C8]">{row.matchedPV} PV</span>
+                                                    <span className="text-sm font-bold text-[#F5E6C8]">{row.matchedPV} PV</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
@@ -512,14 +512,14 @@ const MatchingBonusPage = ({ type }) => {
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-2 px-3 py-1 bg-[#C8A96A]/10 text-[#C8A96A] rounded-full border border-[#C8A96A]/30 w-fit">
-                                                    <CheckCircle className="w-2.5 h-2.5" />
-                                                    <span className="text-[7px] font-black uppercase tracking-widest">Credited</span>
+                                                    <CheckCircle className="w-3 h-3" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">Credited</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6 text-right">
-                                                <button className="flex items-center gap-2.5 text-[8px] font-black uppercase tracking-widest text-[#C8A96A]/40 group-hover:text-[#C8A96A] transition-all">
+                                                <button className="flex items-center gap-2.5 text-[11px] font-black uppercase tracking-widest text-[#C8A96A]/50 group-hover:text-[#C8A96A] transition-all">
                                                     Inspect
-                                                    <ArrowRight className="w-2.5 h-2.5" />
+                                                    <ArrowRight className="w-3 h-3" />
                                                 </button>
                                             </td>
                                         </tr>

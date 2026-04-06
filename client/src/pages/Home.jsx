@@ -79,12 +79,6 @@ const HomePage = () => {
     // Hero slides data
     const heroSlides = [
         {
-            image: "/hero6.jpeg",
-            title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "Smart Solutions for a Smarter Future",
-            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
-        },
-        {
             image: "/hero1.png",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
             subtitle: "Smart Solutions for a Smarter Future",
@@ -92,6 +86,18 @@ const HomePage = () => {
         },
         {
             image: "/hero2.png",
+            title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
+            subtitle: "Smart Solutions for a Smarter Future",
+            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
+        },
+        {
+            image: "/hero3.png",
+            title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
+            subtitle: "Smart Solutions for a Smarter Future",
+            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
+        },
+        {
+            image: "/hero4.jpeg",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
             subtitle: "Smart Solutions for a Smarter Future",
             description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
@@ -729,6 +735,9 @@ const HomePage = () => {
         return stars;
     };
 
+
+
+
     const carouselRef = React.useRef(null);
     const scroll = (direction) => {
         const container = carouselRef.current;
@@ -744,7 +753,6 @@ const HomePage = () => {
             });
         }
     };
-
 
     return (
         <div className="min-h-screen bg-[#0D0D0D] font-sans">

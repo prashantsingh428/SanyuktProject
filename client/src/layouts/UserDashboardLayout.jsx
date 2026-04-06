@@ -178,7 +178,7 @@ const UserDashboardLayout = () => {
 
                     {/* Highly Compact Profile Summary */}
                     {sidebarOpen && (
-                        <div className="mb-6 px-6 flex items-center gap-4">
+                        <div className="mb-6 px-6 pt-10 flex items-center gap-4">
                             <div className="relative shrink-0">
                                 <div className="w-14 h-14 rounded-full border-2 border-[#C8A96A]/30 p-0.5 bg-[#0D0D0D] overflow-hidden">
                                     <img

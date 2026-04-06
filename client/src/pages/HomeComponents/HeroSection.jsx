@@ -19,7 +19,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                     <img
                         src={heroSlides[currentSlide].image}
                         alt="Hero Background"
-                        className="w-full h-full object-cover object-center brightness-[0.75]"
+                        className="w-full h-full object-cover object-[center_30%] brightness-[0.75]"
                     />
                     {/* Gradient Overlay for Text Readability: Darker center for centered text */}
                     <div className="absolute inset-0 bg-black/40 z-10"></div>
