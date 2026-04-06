@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from "../api";
+import api, { API_URL } from "../api";
 import CartPage from './Cart';
 
 // Material-UI imports
@@ -935,7 +935,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                                                                                             <Button size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: '6px', borderColor: '#C8A96A', color: '#C8A96A', fontWeight: 600 }} onClick={() => navigate(`/order-details/${order._id}`)}>Details</Button>
                                                                                             {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
-                                                                                                <Button size="small" variant="contained" sx={{ textTransform: 'none', borderRadius: '6px', bgcolor: '#C8A96A', fontWeight: 600, boxShadow: 'none' }} onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
+                                                                                                <Button size="small" variant="contained" sx={{ textTransform: 'none', borderRadius: '6px', bgcolor: '#C8A96A', fontWeight: 600, boxShadow: 'none' }} onClick={() => window.open(`${API_URL}/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
                                                                                             )}
                                                                                         </Box>
                                                                                     </TableCell>
@@ -968,7 +968,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                             <Box sx={{ display: 'flex', gap: 1 }}>
                                                                                 <Button size="small" variant="text" sx={{ color: '#C8A96A', fontWeight: 700, minWidth: 'auto', p: 0.5 }} onClick={() => navigate(`/order-details/${order._id}`)}>Details</Button>
                                                                                 {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
-                                                                                    <Button size="small" variant="text" sx={{ color: '#C8A96A', fontWeight: 700, minWidth: 'auto', p: 0.5 }} onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
+                                                                                    <Button size="small" variant="text" sx={{ color: '#C8A96A', fontWeight: 700, minWidth: 'auto', p: 0.5 }} onClick={() => window.open(`${API_URL}/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
                                                                                 )}
                                                                             </Box>
                                                                         </Box>
