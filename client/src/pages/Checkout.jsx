@@ -187,12 +187,16 @@ const CheckoutPage = () => {
 
             // 1. Create order on server
             const { data: rpOrder } = await api.post('/orders/razorpay-order', { amount: total });
-            if (!rpOrder?.key) {
-                throw new Error('Payment key missing from server response');
+            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKeyId) {
+                console.error("Razorpay key is missing in frontend env");
+                alert("Payment configuration error. Please contact support.");
+                setLoading(false);
+                return;
             }
 
             const options = {
-                key: rpOrder.key,
+                key: razorpayKeyId,
                 amount: rpOrder.amount,
                 currency: rpOrder.currency,
                 name: "Sanyukt Parivaar",

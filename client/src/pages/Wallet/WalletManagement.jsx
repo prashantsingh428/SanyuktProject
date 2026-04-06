@@ -344,8 +344,16 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                 return;
             }
 
+            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKeyId) {
+                console.error("Razorpay key is missing in frontend env");
+                alert("Payment configuration error. Please contact support.");
+                setProcessingTopup(false);
+                return;
+            }
+
             const options = {
-                key: orderData.key,
+                key: razorpayKeyId,
                 amount: orderData.order.amount,
                 currency: 'INR',
                 name: 'Sanyukt Parivar',

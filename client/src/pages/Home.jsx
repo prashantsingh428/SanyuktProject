@@ -543,15 +543,20 @@ const HomePage = () => {
                     setIsProcessingPayment(false);
                     return;
                 }
-                if (!orderData?.key) {
-                    throw new Error("Payment key missing from server response");
+
+                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+                if (!razorpayKeyId) {
+                    console.error("Razorpay key is missing in frontend env");
+                    alert("Payment configuration error. Please contact support.");
+                    setIsProcessingPayment(false);
+                    return;
                 }
 
                 toast.dismiss(toastId);
 
                 // 2. Open Razorpay Checkout Widget
                 const options = {
-                    key: orderData.key,
+                    key: razorpayKeyId,
                     amount: orderData.order.amount,
                     currency: "INR",
                     name: "Sanyukt Parivaar",

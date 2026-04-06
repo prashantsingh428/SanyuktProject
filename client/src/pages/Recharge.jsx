@@ -585,12 +585,16 @@ const Recharge = () => {
                     rechargeNumber,
                 });
                 rechargeDebugLog("create-order response", orderData);
-                if (!orderData?.key) {
-                    throw new Error("Payment key missing from server response");
-                }
-
                 if (!orderData.success) {
                     toast.error("Failed to initiate order", { id: toastId });
+                    setIsProcessingPayment(false);
+                    return;
+                }
+
+                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+                if (!razorpayKeyId) {
+                    console.error("Razorpay key is missing in frontend env");
+                    alert("Payment configuration error. Please contact support.");
                     setIsProcessingPayment(false);
                     return;
                 }
@@ -598,7 +602,7 @@ const Recharge = () => {
                 toast.dismiss(toastId);
 
                 const options = {
-                    key: orderData.key,
+                    key: razorpayKeyId,
                     amount: orderData.order.amount,
                     currency: "INR",
                     name: "Sanyukt Parivaar",

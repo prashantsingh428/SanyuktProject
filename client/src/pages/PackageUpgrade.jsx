@@ -392,12 +392,16 @@ const PackageUpgrade = () => {
                 isPackage: true,
                 packageType: selectedPkg.id
             });
-            if (!orderData?.key) {
-                throw new Error('Payment key missing from server response');
+            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKeyId) {
+                console.error("Razorpay key is missing in frontend env");
+                alert("Payment configuration error. Please contact support.");
+                setActivating(false);
+                return;
             }
 
             const options = {
-                key: orderData.key,
+                key: razorpayKeyId,
                 amount: orderData.amount,
                 currency: "INR",
                 name: "Sanyukt Parivaar",

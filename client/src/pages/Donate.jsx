@@ -65,14 +65,18 @@ const Donate = () => {
                 setIsProcessing(false);
                 return;
             }
-            if (!data?.key) {
-                throw new Error("Payment key missing from server response");
+            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKeyId) {
+                console.error("Razorpay key is missing in frontend env");
+                alert("Payment configuration error. Please contact support.");
+                setIsProcessing(false);
+                return;
             }
 
             toast.dismiss(toastId);
 
             const options = {
-                key: data.key,
+                key: razorpayKeyId,
                 amount: data.order.amount,
                 currency: "INR",
                 name: "Sanyukt Parivaar",
