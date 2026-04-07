@@ -1,6 +1,6 @@
 import React from 'react';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ChevronRight, CheckCircle, Users, Target, Eye, TrendingUp, Shield, Star, Heart, Award, MapPin, Phone, Mail, Globe, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const AboutUsPage = () => {
@@ -8,17 +8,6 @@ const AboutUsPage = () => {
     // Sample image URLs (replace with actual images)
     const seminarImage = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
     const teamImage = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const trainingImage = "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-
-    // Mission & Vision images
-    const missionImage = "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const visionImage = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-
-    // Why Sanyukt Parivaar images
-    const familyImage = "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const successImage = "https://images.unsplash.com/photo-1552581234-26160f608093?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const trainingImage2 = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const growthImage = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2015&q=80";
 
     // Core Values images
     const integrityImage = "https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80";
@@ -307,7 +296,7 @@ const AboutUsPage = () => {
                         <span className="text-[#C8A96A]">Join a Growing Community That Believes in Shared Success</span>
                     </h2>
 
-                    <motion.button
+                    <Motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => navigate('/register')}
@@ -315,7 +304,7 @@ const AboutUsPage = () => {
                     >
                         <span className="relative z-10 uppercase tracking-[0.2em] text-sm">Join Sanyukt Parivaar Today</span>
                         <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                    </motion.button>
+                    </Motion.button>
                 </div>
             </section>
         </div >

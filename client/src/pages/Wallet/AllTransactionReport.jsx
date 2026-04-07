@@ -10,7 +10,6 @@ const AllTransactionReport = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [transactions, setTransactions] = useState([]);
-    const [totalRecords, setTotalRecords] = useState(0);
     const [search, setSearch] = useState('');
     const [filterType, setFilterType] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
@@ -24,9 +23,8 @@ const AllTransactionReport = () => {
             });
             if (res.data.success) {
                 setTransactions(res.data.transactions || []);
-                setTotalRecords(res.data.totalRecords || 0);
             }
-        } catch (err) {
+        } catch {
             setError('Transaction ledger synchronization failed.');
         } finally {
             setLoading(false);

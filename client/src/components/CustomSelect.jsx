@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
-const CustomSelect = ({ name, value, onChange, options, placeholder, required }) => {
+const CustomSelect = ({ value, onChange, options, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
@@ -40,7 +40,7 @@ const CustomSelect = ({ name, value, onChange, options, placeholder, required })
 
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 5, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -62,7 +62,7 @@ const CustomSelect = ({ name, value, onChange, options, placeholder, required })
                                 </div>
                             ))}
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
         </div>

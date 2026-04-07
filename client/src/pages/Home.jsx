@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import api from '../api';
 import { devSharedFetch } from '../utils/devSharedFetch';
@@ -22,7 +21,6 @@ const BusinessOpportunity = React.lazy(() => import('./HomeComponents/BusinessOp
 const TrainingSection = React.lazy(() => import('./HomeComponents/TrainingSection'));
 const NewsSection = React.lazy(() => import('./HomeComponents/NewsSection'));
 const QuickServices = React.lazy(() => import('./HomeComponents/QuickServices'));
-// const ContactFormSection = React.lazy(() => import('./HomeComponents/ContactFormSection'));
 
 import ProductDetailsModal from '../components/ProductDetailsModal';
 import PaymentMethodModal from '../components/PaymentMethodModal';
@@ -47,7 +45,6 @@ const HomePage = () => {
     const [operator, setOperator] = useState('');
     const [amount, setAmount] = useState('');
     const [showPlansModal, setShowPlansModal] = useState(false);
-    const [planTab, setPlanTab] = useState('All');
     const [circle, setCircle] = useState('10');
     const [planCircles, setPlanCircles] = useState([]);
     const [mobilePlans, setMobilePlans] = useState([]);
@@ -61,20 +58,12 @@ const HomePage = () => {
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     // E-commerce state
-    const [viewMode, setViewMode] = useState('grid');
-    const [wishlist, setWishlist] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const { addToCart: contextAddToCart, removeFromCart, isInCart } = useCart();
     const [showCartNotification, setShowCartNotification] = useState(false);
     const [addedToCartProduct, setAddedToCartProduct] = useState('');
 
-    // Contact form state
-    const [contactForm, setContactForm] = useState({
-        firstName: '', lastName: '', email: '', phone: '', enquiryType: 'Product Enquiry', message: ''
-    });
-    const [contactSubmitting, setContactSubmitting] = useState(false);
-    const [contactSuccess, setContactSuccess] = useState(false);
 
     // Hero slides data
     const heroSlides = [
@@ -115,17 +104,6 @@ const HomePage = () => {
         "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60&q=80"
     ];
 
-    // Category images
-    const skinCareImage = "https://images.pexels.com/photos/6621360/pexels-photo-6621360.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop";
-    const hairCareImage = "https://images.pexels.com/photos/3993447/pexels-photo-3993447.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop";
-
-    // Product Images from Pexels
-    const productImages = [
-        "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop",
-        "https://images.pexels.com/photos/5946066/pexels-photo-5946066.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop",
-        "https://images.pexels.com/photos/6955177/pexels-photo-6955177.jpeg",
-        "https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-    ];
 
     // Business opportunity image
     const businessImage = "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80";
@@ -245,7 +223,7 @@ const HomePage = () => {
                     const parsedUser = JSON.parse(user);
                     setIsLoggedIn(true);
                     setUserRole(parsedUser.role || 'user');
-                } catch (e) {
+                } catch {
                     setIsLoggedIn(false);
                 }
             } else {
@@ -522,16 +500,6 @@ const HomePage = () => {
             }
         } else if (method === 'online') {
             // Razorpay logic
-            const loadScript = (src) => {
-                return new Promise((resolve) => {
-                    const script = document.createElement("script");
-                    script.src = src;
-                    script.onload = () => resolve(true);
-                    script.onerror = () => resolve(false);
-                    document.body.appendChild(script);
-                });
-            };
-
             try {
                 setIsProcessingPayment(true);
                 const toastId = toast.loading("Initiating secure payment...");
@@ -639,11 +607,6 @@ const HomePage = () => {
         }
     };
 
-    const selectPlan = (planAmount) => {
-        setAmount(planAmount);
-        setShowPlansModal(false);
-    };
-
     const openPlanPopup = () => {
         setShowPlansModal(true);
     };
@@ -652,13 +615,6 @@ const HomePage = () => {
         setImageErrors(prev => ({ ...prev, [productName]: true }));
     };
 
-    const toggleWishlist = (productName) => {
-        setWishlist(prev =>
-            prev.includes(productName)
-                ? prev.filter(p => p !== productName)
-                : [...prev, productName]
-        );
-    };
 
     const addToCart = (product) => {
         contextAddToCart(product);
@@ -682,26 +638,6 @@ const HomePage = () => {
         navigate('/checkout', { state: { product } });
     };
 
-    const handleContactSubmit = async (e) => {
-        e.preventDefault();
-        const { firstName, message } = contactForm;
-        if (!firstName.trim() || !message.trim()) {
-            toast.error('Please fill in your name and message.');
-            return;
-        }
-        setContactSubmitting(true);
-        try {
-            const { data } = await api.post('/contact', contactForm);
-            toast.success(data.message || 'Message sent successfully!');
-            setContactSuccess(true);
-            setContactForm({ firstName: '', lastName: '', email: '', phone: '', enquiryType: 'Product Enquiry', message: '' });
-            setTimeout(() => setContactSuccess(false), 3000);
-        } catch (err) {
-            toast.error(err?.response?.data?.message || 'Failed to send message. Please try again.');
-        } finally {
-            setContactSubmitting(false);
-        }
-    };
 
     const calculateDiscount = (mrp, dp) => {
         const mrpValue = typeof mrp === 'string' ? parseInt(mrp.replace('₹', '')) : mrp;
@@ -873,14 +809,6 @@ const HomePage = () => {
                 />
 
                 <NewsSection />
-
-                {/* <ContactFormSection
-                    contactForm={contactForm}
-                    setContactForm={setContactForm}
-                    handleContactSubmit={handleContactSubmit}
-                    contactSubmitting={contactSubmitting}
-                    contactSuccess={contactSuccess}
-                /> */}
 
                 <div className="luxury-divider"><span>OUR VISION</span></div>
 

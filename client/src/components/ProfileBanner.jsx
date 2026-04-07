@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import {
     Users, Calendar, Star, Activity,
     Copy, Mail, Map, Award, User,
@@ -14,7 +14,7 @@ const ProfileBanner = ({ userData }) => {
         if (!text) return;
         try {
             await navigator.clipboard.writeText(text);
-        } catch (err) {
+        } catch {
             const textArea = document.createElement("textarea");
             textArea.value = text;
             document.body.appendChild(textArea);
@@ -41,7 +41,7 @@ const ProfileBanner = ({ userData }) => {
     ];
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             className="w-full bg-[#1A1A1A] rounded-none sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-y border-x-0 sm:border-x border-white/10 overflow-hidden relative"
@@ -126,7 +126,7 @@ const ProfileBanner = ({ userData }) => {
                 </div>
             </div>
             <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5"></div>
-        </motion.div>
+        </Motion.div>
     );
 };
 

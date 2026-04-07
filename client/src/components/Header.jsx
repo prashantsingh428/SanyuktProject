@@ -194,7 +194,7 @@ const LogoTagline = styled('span')(({ theme }) => ({
 }));
 
 // NavButton with exact styling
-const NavButton = styled(Button)(({ theme }) => ({
+const NavButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -217,7 +217,7 @@ const NavButton = styled(Button)(({ theme }) => ({
 }));
 
 // Register Button (#C9A84C, White text)
-const RegisterButton = styled(Button)(({ theme }) => ({
+const RegisterButton = styled(Button)(() => ({
     className: 'luxury-button',
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
@@ -236,7 +236,7 @@ const RegisterButton = styled(Button)(({ theme }) => ({
     transition: 'all 0.3s ease',
 }));
 
-const LoginButton = styled(Button)(({ theme }) => ({
+const LoginButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -255,7 +255,7 @@ const LoginButton = styled(Button)(({ theme }) => ({
 }));
 
 // My Account Button (Yellow/Orange theme color)
-const MyAccountButton = styled(Button)(({ theme }) => ({
+const MyAccountButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -276,7 +276,7 @@ const MyAccountButton = styled(Button)(({ theme }) => ({
 }));
 
 // Admin Dashboard Button (Orange/Different color - for admins)
-const AdminDashboardButton = styled(Button)(({ theme }) => ({
+const AdminDashboardButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -487,11 +487,6 @@ const Header = () => {
         setAnchorElUser(null);
     };
 
-
-    const handleAdminDashboardClick = () => {
-        handleUserMenuClose();
-        navigate('/admin/dashboard');
-    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');

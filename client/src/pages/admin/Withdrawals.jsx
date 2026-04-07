@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import api from '../../api';
 import toast from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const AdminWithdrawals = () => {
     const [withdrawals, setWithdrawals] = useState([]);
@@ -261,14 +261,14 @@ const AdminWithdrawals = () => {
             <AnimatePresence>
                 {showDetailModal && selectedWithdrawal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div 
+                        <Motion.div 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setShowDetailModal(false)}
                             className="absolute inset-0 bg-black/80 backdrop-blur-md"
                         />
-                        <motion.div 
+                        <Motion.div 
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -391,7 +391,7 @@ const AdminWithdrawals = () => {
                                     </div>
                                 )}
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     </div>
                 )}
             </AnimatePresence>

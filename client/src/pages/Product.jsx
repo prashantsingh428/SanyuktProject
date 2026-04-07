@@ -4,20 +4,8 @@ import { Search, ShoppingCart, Star, ChevronUp, Trash2, ShieldCheck, Truck, Rota
 import api, { API_URL } from '../api';
 import { useCart } from '../context/CartContext';
 import {
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-    Typography,
-    Box,
-    Button,
     Snackbar,
     Alert,
-    Divider,
-    Chip,
-    Fade,
-    useMediaQuery,
-    useTheme
 } from '@mui/material';
 import { X as CloseIcon } from 'lucide-react';
 import ProductDetailsModal from '../components/ProductDetailsModal';
@@ -26,7 +14,6 @@ const ProductsPage = () => {
     const navigate = useNavigate();
 
     const { cartItems, addToCart, isInCart, removeFromCart } = useCart();
-    const [expandedProduct, setExpandedProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -59,10 +46,6 @@ const ProductsPage = () => {
     // Modal State
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDescExpanded, setIsDescExpanded] = useState(false);
-
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
     // Fetch products from API
     const fetchProducts = async () => {
@@ -139,7 +122,6 @@ const ProductsPage = () => {
 
     // Toggle product details
     const openProductModal = (product) => {
-        setIsDescExpanded(false); // Reset expansion state
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
@@ -168,23 +150,6 @@ const ProductsPage = () => {
         if (!oldPrice || oldPrice <= price) return null;
         const discount = ((oldPrice - price) / oldPrice) * 100;
         return Math.round(discount);
-    };
-
-    // Render rating stars
-    const renderRatingStars = (rating) => {
-        const stars = [];
-        const roundedRating = Math.round(rating * 2) / 2;
-
-        for (let i = 1; i <= 5; i++) {
-            if (i <= roundedRating) {
-                stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
-            } else if (i - 0.5 === roundedRating) {
-                stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400 opacity-50" />);
-            } else {
-                stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />);
-            }
-        }
-        return stars;
     };
 
     // Format currency

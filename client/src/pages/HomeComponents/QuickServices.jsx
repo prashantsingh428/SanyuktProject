@@ -1,6 +1,6 @@
 import React from 'react';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
     Store,
     ShoppingCart,
@@ -59,7 +59,7 @@ const QuickServices = () => {
                 {/* Single row on desktop, 2-col on mobile */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 max-w-5xl mx-auto">
                     {services.map((service, index) => (
-                        <motion.div
+                        <Motion.div
                             key={service.id}
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
@@ -99,7 +99,7 @@ const QuickServices = () => {
 
                             {/* Animated line at bottom */}
                             <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-[#C8A96A] group-hover:w-full transition-all duration-500" />
-                        </motion.div>
+                        </Motion.div>
                     ))}
                 </div>
             </div>

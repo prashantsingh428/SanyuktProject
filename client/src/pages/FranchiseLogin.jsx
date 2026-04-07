@@ -17,7 +17,7 @@ import {
     Users,
     Star
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const FranchiseLogin = () => {
     const navigate = useNavigate();
@@ -100,7 +100,7 @@ const FranchiseLogin = () => {
 
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
-                <motion.div
+                <Motion.div
                     className="absolute -top-40 -right-40 w-80 h-80 bg-[#C8A96A]/10 rounded-full mix-blend-screen filter blur-3xl opacity-30"
                     animate={{
                         x: [0, 30, 0],
@@ -112,7 +112,7 @@ const FranchiseLogin = () => {
                         ease: "easeInOut"
                     }}
                 />
-                <motion.div
+                <Motion.div
                     className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#D4AF37]/10 rounded-full mix-blend-screen filter blur-3xl opacity-25"
                     animate={{
                         x: [0, -30, 0],
@@ -125,7 +125,7 @@ const FranchiseLogin = () => {
                         delay: 1
                     }}
                 />
-                <motion.div
+                <Motion.div
                     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#C8A96A]/5 rounded-full mix-blend-screen filter blur-3xl opacity-20"
                     animate={{
                         scale: [1, 1.2, 1],
@@ -139,7 +139,7 @@ const FranchiseLogin = () => {
             </div>
 
             {/* Floating Elements */}
-            <motion.div
+            <Motion.div
                 className="absolute top-20 left-20 hidden lg:block"
                 animate={{
                     y: [0, 20, 0],
@@ -153,9 +153,9 @@ const FranchiseLogin = () => {
                 <div className="luxury-box glass-morphism p-3 shadow-2xl">
                     <Store className="h-6 w-6 text-[#C8A96A]" />
                 </div>
-            </motion.div>
+            </Motion.div>
 
-            <motion.div
+            <Motion.div
                 className="absolute bottom-20 right-20 hidden lg:block"
                 animate={{
                     y: [0, -20, 0],
@@ -169,18 +169,18 @@ const FranchiseLogin = () => {
                 <div className="luxury-box glass-morphism p-3 shadow-2xl">
                     <TrendingUp className="h-6 w-6 text-[#C8A96A]" />
                 </div>
-            </motion.div>
+            </Motion.div>
 
             {/* Success Modal */}
             <AnimatePresence>
                 {showSuccess && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md px-4"
                     >
-                        <motion.div
+                        <Motion.div
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -191,7 +191,7 @@ const FranchiseLogin = () => {
 
                             <div className="p-8 text-center">
                                 {/* Success Icon with Animation */}
-                                <motion.div
+                                <Motion.div
                                     className="flex justify-center mb-6"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
@@ -200,29 +200,29 @@ const FranchiseLogin = () => {
                                     <div className="w-20 h-20 rounded-full bg-[#0D0D0D] border border-[#C8A96A]/30 flex items-center justify-center shadow-gold-900/20 shadow-2xl animate-pulse">
                                         <CheckCircle className="h-10 w-10 text-[#C8A96A]" />
                                     </div>
-                                </motion.div>
+                                </Motion.div>
 
                                 {/* Success Message */}
-                                <motion.h3
+                                <Motion.h3
                                     className="text-2xl font-serif font-bold text-[#F5E6C8] mb-2 tracking-tight"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
                                 >
                                     Welcome Back!
-                                </motion.h3>
+                                </Motion.h3>
 
-                                <motion.p
+                                <Motion.p
                                     className="text-[#C8A96A]/60 mb-6 text-xs font-bold uppercase tracking-widest italic"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
                                 >
                                     <span className="text-[#F5E6C8] normal-case tracking-normal not-italic font-bold">{franchiseName}</span> — Franchise Partner
-                                </motion.p>
+                                </Motion.p>
 
                                 {/* Franchise Info Card */}
-                                <motion.div
+                                <Motion.div
                                     className="bg-[#0D0D0D] rounded-2xl p-5 mb-6 border border-[#C8A96A]/10 text-left"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -245,10 +245,10 @@ const FranchiseLogin = () => {
                                             </span>
                                         </div>
                                     </div>
-                                </motion.div>
+                                </Motion.div>
 
                                 {/* Redirect Message */}
-                                <motion.div
+                                <Motion.div
                                     className="flex items-center justify-between text-[11px] text-[#F5E6C8]/40 mb-3 font-black uppercase tracking-widest"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -259,25 +259,25 @@ const FranchiseLogin = () => {
                                         <Sparkles className="h-4 w-4 text-[#C8A96A]" />
                                         <span className="text-[#C8A96A]">2s</span>
                                     </div>
-                                </motion.div>
+                                </Motion.div>
 
                                 {/* Progress Bar */}
-                                <motion.div
+                                <Motion.div
                                     className="h-1.5 bg-[#0D0D0D] rounded-full overflow-hidden border border-[#C8A96A]/10"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.7 }}
                                 >
-                                    <motion.div
+                                    <Motion.div
                                         className="h-full rounded-full bg-gradient-to-r from-[#C8A96A] to-[#D4AF37]"
                                         initial={{ width: "0%" }}
                                         animate={{ width: "100%" }}
                                         transition={{ duration: 2, ease: "linear" }}
                                     />
-                                </motion.div>
+                                </Motion.div>
                             </div>
-                        </motion.div>
-                    </motion.div>
+                        </Motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
 
@@ -287,19 +287,19 @@ const FranchiseLogin = () => {
                 {/* Main Grid */}
                 <div className="grid lg:grid-cols-2 gap-8 items-center">
                     {/* Left Side - Hero Section (hidden on mobile) */}
-                    <motion.div
+                    <Motion.div
                         className="hidden lg:block text-center lg:text-left"
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                     >
-                        <motion.div
+                        <Motion.div
                             className="inline-flex items-center gap-2 bg-[#C8A96A]/10 border border-[#C8A96A]/20 px-4 py-1.5 rounded-full mb-3"
                             whileHover={{ scale: 1.05 }}
                         >
                             <Store className="h-4 w-4 text-[#C8A96A]" />
                             <span className="text-sm font-bold text-[#C8A96A]">Franchise Partner Portal</span>
-                        </motion.div>
+                        </Motion.div>
 
                         <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-[#F5E6C8] mb-3 tracking-tight uppercase">
                             <span className="text-[#C8A96A]">Welcome Back,</span>
@@ -313,22 +313,22 @@ const FranchiseLogin = () => {
 
                         {/* Stats Cards */}
                         <div className="grid grid-cols-2 gap-3 max-w-[280px] mx-auto lg:mx-0 mb-6">
-                            <motion.div
+                            <Motion.div
                                 className="luxury-box glass-morphism p-3 shadow-2xl transition-all duration-300"
                                 whileHover={{ scale: 1.05, y: -5 }}
                             >
                                 <Users className="h-5 w-5 text-[#C8A96A] mb-1" />
                                 <p className="text-xl font-black text-[#F5E6C8] tracking-tight">500+</p>
                                 <p className="text-[10px] text-[#F5E6C8] font-black uppercase tracking-widest">Active Franchises</p>
-                            </motion.div>
-                            <motion.div
+                            </Motion.div>
+                            <Motion.div
                                 className="luxury-box glass-morphism p-3 shadow-2xl transition-all duration-300"
                                 whileHover={{ scale: 1.05, y: -5 }}
                             >
                                 <TrendingUp className="h-5 w-5 text-[#C8A96A] mb-1" />
                                 <p className="text-xl font-black text-[#F5E6C8] tracking-tight">₹50K+</p>
                                 <p className="text-[10px] text-[#F5E6C8] font-black uppercase tracking-widest">Avg. Monthly</p>
-                            </motion.div>
+                            </Motion.div>
                         </div>
 
                         {/* Features */}
@@ -339,7 +339,7 @@ const FranchiseLogin = () => {
                                 "Performance analytics",
                                 "24/7 support assistance"
                             ].map((feature, index) => (
-                                <motion.div
+                                <Motion.div
                                     key={index}
                                     className="flex items-center gap-3"
                                     initial={{ opacity: 0, x: -20 }}
@@ -350,13 +350,13 @@ const FranchiseLogin = () => {
                                         <CheckCircle className="h-2.5 w-2.5 text-[#C8A96A]" />
                                     </div>
                                     <span className="text-[#F5E6C8] font-black text-[11px] uppercase tracking-wide">{feature}</span>
-                                </motion.div>
+                                </Motion.div>
                             ))}
                         </div>
-                    </motion.div>
+                    </Motion.div>
 
                     {/* Right Side - Login Form */}
-                    <motion.div
+                    <Motion.div
                         className="w-full max-w-sm mx-auto lg:mx-0 shadow-2xl"
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -364,7 +364,7 @@ const FranchiseLogin = () => {
                     >
                         <div className="luxury-box w-full group transition-all duration-700">
                             <div className="bg-[#121212] p-5 md:p-6 border-b border-[#C8A96A]/30 relative overflow-hidden text-center">
-                                <motion.div
+                                <Motion.div
                                     className="absolute inset-0 bg-[#C8A96A]/5"
                                     animate={{
                                         x: ['-100%', '100%'],
@@ -391,14 +391,14 @@ const FranchiseLogin = () => {
                                     {/* Error Message */}
                                     <AnimatePresence>
                                         {error && (
-                                            <motion.div
+                                            <Motion.div
                                                 className="bg-red-500/10 border border-red-500/20 text-red-400 px-5 py-4 rounded-2xl text-[11px] font-bold"
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -10 }}
                                             >
                                                 {error}
-                                            </motion.div>
+                                            </Motion.div>
                                         )}
                                     </AnimatePresence>
 
@@ -473,7 +473,7 @@ const FranchiseLogin = () => {
                                     </div>
 
                                     {/* Login Button */}
-                                    <motion.button
+                                    <Motion.button
                                         type="submit"
                                         disabled={isLoading}
                                         className="luxury-button w-full relative z-10 flex items-center justify-center p-4 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -496,7 +496,7 @@ const FranchiseLogin = () => {
                                                 </>
                                             )}
                                         </span>
-                                    </motion.button>
+                                    </Motion.button>
 
                                     {/* Register Link */}
                                     <div className="text-center pt-2">
@@ -512,7 +512,7 @@ const FranchiseLogin = () => {
                                     </div>
 
                                     {/* Demo Credentials */}
-                                    <motion.div
+                                    <Motion.div
                                         className="mt-4 p-5 bg-[#0D0D0D] rounded-2xl border border-[#C8A96A]/10"
                                         whileHover={{ scale: 1.02 }}
                                     >
@@ -524,11 +524,11 @@ const FranchiseLogin = () => {
                                             <p><span className="font-black text-[#C8A96A]">Franchise ID:</span> FRANCHISE123</p>
                                             <p><span className="font-black text-[#C8A96A]">Password:</span> franchise123</p>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 </div>
                             </form>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             </div>
 

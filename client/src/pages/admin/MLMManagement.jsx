@@ -34,13 +34,13 @@ import {
     CreditCard,
     PieChart
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import api from '../../api';
 import toast from 'react-hot-toast';
 
 // --- Reusable Modern Card Component (matching client dashboard) ---
 const ModernStatsCard = ({ title, value, color, icon: Icon, subtitle, showCurrency = false }) => (
-    <motion.div
+    <Motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-[#1A1A1A] rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-white/5 flex flex-col relative overflow-hidden group hover:shadow-xl hover:shadow-black/40 transition-all duration-300 h-full"
@@ -64,7 +64,7 @@ const ModernStatsCard = ({ title, value, color, icon: Icon, subtitle, showCurren
             </div>
         </div>
         <div className={`absolute top-0 right-0 w-24 h-24 opacity-5 rounded-full -mr-8 -mt-8`} style={{ backgroundColor: color }}></div>
-    </motion.div>
+    </Motion.div>
 );
 
 const UserDashboardPreview = ({ userId }) => {
@@ -96,7 +96,7 @@ const UserDashboardPreview = ({ userId }) => {
     if (!stats) return <Alert severity="error">Could not load user data</Alert>;
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 space-y-6">
+        <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 space-y-6">
             <Divider sx={{ borderColor: 'rgba(200, 169, 106, 0.1)', my: 4 }} />
             <Typography variant="h6" sx={{ fontWeight: 900, color: '#C8A96A', mb: 3, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 User MLM Perspective
@@ -126,7 +126,7 @@ const UserDashboardPreview = ({ userId }) => {
                     <ModernStatsCard title="Downline R" value={stats.totalRight} color="#C8A96A" icon={Users} />
                 </Grid>
             </Grid>
-        </motion.div>
+        </Motion.div>
     );
 };
 
@@ -194,7 +194,7 @@ const MLMManagement = () => {
                 toast.error("User not found");
                 setSelectedUser(null);
             }
-        } catch (err) {
+        } catch {
             toast.error("Search failed");
         } finally {
             setLoading(false);

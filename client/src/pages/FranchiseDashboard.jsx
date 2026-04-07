@@ -135,7 +135,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                         setDashboardId(response.data._id);
                     }
                 }
-            } catch (error) {
+            } catch {
                 console.log('No existing profile found, will create new one');
             } finally {
                 setLoading(false);
@@ -529,12 +529,6 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         }
     };
 
-    // View member
-    const handleViewMember = (member) => {
-        setSelectedMember(member);
-        setShowViewMemberModal(true);
-    };
-
     // Logout handler
     const handleLogout = () => {
         setShowLogoutConfirm(true);
@@ -606,17 +600,6 @@ const FranchiseDashboard = ({ user, onLogout }) => {
     const packageCardStyles = {
         blue: 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#F5E6C8] shadow-2xl',
         purple: 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#F5E6C8] shadow-2xl'
-    };
-
-    const reportCardStyles = {
-        blue: {
-            border: 'border-l-blue-500',
-            text: 'text-blue-600 hover:text-blue-800'
-        },
-        purple: {
-            border: 'border-l-purple-500',
-            text: 'text-purple-600 hover:text-purple-800'
-        }
     };
 
     const getNavIcon = (label) => {

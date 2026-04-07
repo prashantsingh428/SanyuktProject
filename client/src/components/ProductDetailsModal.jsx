@@ -50,21 +50,6 @@ const ProductDetailsModal = ({
         return Math.round(discount);
     };
 
-    const renderRatingStars = (rating) => {
-        const stars = [];
-        const roundedRating = Math.round(rating * 2) / 2;
-        for (let i = 1; i <= 5; i++) {
-            if (i <= roundedRating) {
-                stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
-            } else if (i - 0.5 === roundedRating) {
-                stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400 opacity-50" />);
-            } else {
-                stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />);
-            }
-        }
-        return stars;
-    };
-
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
             minimumFractionDigits: 2,

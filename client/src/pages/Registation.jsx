@@ -31,7 +31,7 @@ const RegistrationForm = () => {
     const [agreed, setAgreed] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
+    const [profileImage] = useState(null);
 
     const states = Object.keys(addressData).sort();
 
@@ -56,7 +56,7 @@ const RegistrationForm = () => {
                     if (res.data.name) {
                         setFormData(prev => ({ ...prev, sponsorName: res.data.name }));
                     }
-                } catch (err) {
+                } catch {
                     setFormData(prev => ({ ...prev, sponsorName: '' }));
                 }
             } else {

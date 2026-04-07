@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Smartphone, Zap, Search, MapPin, Globe, Shield } from 'lucide-react';
 
 const RechargeSection = ({
@@ -11,7 +11,6 @@ const RechargeSection = ({
     operators,
     openPlanPopup,
     handleRecharge,
-    isLoggedIn,
     plansLoading = false,
     isDetectingOperator = false,
     hasTriedDetection = false
@@ -25,7 +24,7 @@ const RechargeSection = ({
                     
                     {/* LEFT: Premium Informational Content */}
                     <div className="lg:col-span-2 space-y-5 order-2 lg:order-1 text-center lg:text-left">
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0, x: -30 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
@@ -61,12 +60,12 @@ const RechargeSection = ({
                                     </div>
                                 ))}
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     </div>
 
                     {/* RIGHT: Recharge Form */}
                     <div className="lg:col-span-3 order-1 lg:order-2">
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
@@ -211,7 +210,7 @@ const RechargeSection = ({
                                     Recharge Now
                                 </button>
                             </form>
-                        </motion.div>
+                        </Motion.div>
                     </div>
                 </div>
             </div>

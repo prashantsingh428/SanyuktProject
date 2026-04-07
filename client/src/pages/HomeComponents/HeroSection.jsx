@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, userRole, handleNavigation }) => {
@@ -8,7 +8,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
     return (
         <section className="relative h-screen overflow-hidden bg-[#0D0D0D] flex items-start pt-20 md:pt-32">
             <AnimatePresence mode="wait">
-                <motion.div
+                <Motion.div
                     key={currentSlide}
                     initial={{ opacity: 0, scale: 1.1 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -23,33 +23,33 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                     />
                     {/* Gradient Overlay for Text Readability: Darker center for centered text */}
                     <div className="absolute inset-0 bg-black/40 z-10"></div>
-                </motion.div>
+                </Motion.div>
             </AnimatePresence>
 
             {/* Navigation Arrows */}
             <div className="absolute inset-0 z-50 flex items-center justify-between p-4 md:p-8 pointer-events-none">
-                <motion.button
+                <Motion.button
                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(200, 169, 106, 0.4)' }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
                     className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/5 border border-[#C8A96A]/20 flex items-center justify-center text-[#C8A96A] pointer-events-auto backdrop-blur-sm transition-all shadow-2xl"
                 >
                     <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
-                </motion.button>
-                <motion.button
+                </Motion.button>
+                <Motion.button
                     whileHover={{ scale: 1.1, backgroundColor: 'rgba(200, 169, 106, 0.4)' }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
                     className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/5 border border-[#C8A96A]/20 flex items-center justify-center text-[#C8A96A] pointer-events-auto backdrop-blur-sm transition-all shadow-2xl"
                 >
                     <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
-                </motion.button>
+                </Motion.button>
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 relative z-40">
                 <div className="max-w-4xl mx-auto">
                     {/* Content Side - Centered */}
-                    <motion.div
+                    <Motion.div
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.3, duration: 0.8 }}
@@ -66,7 +66,7 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                         </p>
 
                         <div className="flex flex-wrap gap-4 pt-20 pb-32 md:pt-12 md:pb-0 justify-center">
-                            <motion.button
+                            <Motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => {
@@ -85,18 +85,18 @@ const HeroSection = ({ currentSlide, setCurrentSlide, heroSlides, isLoggedIn, us
                                     }
                                 </span>
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </motion.button>
+                            </Motion.button>
 
-                            <motion.button
+                            <Motion.button
                                 whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: '#F5E6C8' }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => handleNavigation('/contact')}
                                 className="px-10 py-4 border border-white/50 text-white font-bold rounded-sm backdrop-blur-sm transition-all duration-300 text-[14px] uppercase tracking-widest hover:text-[#F5E6C8]"
                             >
                                 Contact Us
-                            </motion.button>
+                            </Motion.button>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             </div>
 

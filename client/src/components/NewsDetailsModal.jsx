@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, Tag } from 'lucide-react';
 import { API_URL } from '../api';
 
@@ -48,7 +48,7 @@ const NewsDetailsModal = ({ isOpen, onClose, news }) => {
             {isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 md:p-6 pt-32 md:pt-40">
                     {/* Backdrop */}
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -57,7 +57,7 @@ const NewsDetailsModal = ({ isOpen, onClose, news }) => {
                     />
 
                     {/* Modal Content */}
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, scale: 0.95, y: -20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -20 }}
@@ -168,7 +168,7 @@ const NewsDetailsModal = ({ isOpen, onClose, news }) => {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
         </AnimatePresence>

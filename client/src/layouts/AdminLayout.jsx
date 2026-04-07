@@ -50,7 +50,7 @@ const AdminLayout = () => {
                 return user.name || 'Admin';
             }
             return 'Sanyukt Parivaar';
-        } catch (error) {
+        } catch {
             return 'Sanyukt Parivaar';
         }
     };

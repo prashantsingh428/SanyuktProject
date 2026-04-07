@@ -1,7 +1,6 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
 
-const AboutSection = ({ aboutImage, teamImages }) => {
+const AboutSection = ({ aboutImage }) => {
     return (
         <section className="py-10 md:py-14 bg-[#0D0D0D] relative border-y border-[#C8A96A]/10">
             <div className="container mx-auto px-4">

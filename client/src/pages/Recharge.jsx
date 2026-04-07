@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Smartphone,
     Tv,
@@ -32,7 +32,6 @@ import PaymentMethodModal from "../components/PaymentMethodModal";
 import BrowsePlansModal from "../components/BrowsePlansModal";
 import RazorpayPaymentButton from "../components/RazorpayPaymentButton";
 import {
-    datacardOperators,
     dthOperators,
     mobileOperators,
 } from "../data/operators";
@@ -741,7 +740,7 @@ const Recharge = () => {
             {/* ── SUCCESS ALERT BANNER (Responsive) ── */}
             <AnimatePresence>
                 {showSuccessAlert && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: -100 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -100 }}
@@ -767,7 +766,7 @@ const Recharge = () => {
                                 ✕
                             </button>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
 
@@ -810,7 +809,7 @@ const Recharge = () => {
 
                 {/* 3. DONATION SECTION - Fully Responsive */}
                 <section className='mb-8 relative'>
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -916,7 +915,7 @@ const Recharge = () => {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </section>
 
                 {/* 4. RECHARGE SERVICES SECTION - Fully Responsive */}
@@ -949,7 +948,7 @@ const Recharge = () => {
                         <div className='p-2.5 md:p-5'>
                             <AnimatePresence mode='wait'>
                                 {activeTab === "mobile" && (
-                                    <motion.div 
+                                    <Motion.div 
                                         key='mobile' 
                                         initial={{ opacity: 0 }} 
                                         animate={{ opacity: 1 }} 
@@ -1145,11 +1144,11 @@ const Recharge = () => {
                                                 )}
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 )}
 
                                 {activeTab === "dth" && (
-                                    <motion.div key='dth' initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='max-w-2xl mx-auto'>
+                                    <Motion.div key='dth' initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='max-w-2xl mx-auto'>
                                         <div className='bg-[#1A1A1A] p-6 rounded-none border border-[#C8A96A]/20'>
                                             <h3 className='text-2xl font-serif font-bold text-[#C8A96A] mb-4'>DTH Recharge</h3>
                                             <form onSubmit={(e) => handleRecharge(e, "dth")} className='space-y-4'>
@@ -1202,7 +1201,7 @@ const Recharge = () => {
                                                 </button>
                                             </form>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 )}
                             </AnimatePresence>
                         </div>

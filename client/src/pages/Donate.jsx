@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Heart, Shield, Zap, Users, Receipt, Smartphone,
     ArrowRight, CheckCircle2, Copy, Share2, Info, Clock,
@@ -121,7 +121,7 @@ const Donate = () => {
                         } else {
                             toast.error("Payment verification failed", { id: verifyToast });
                         }
-                    } catch (err) {
+                    } catch {
                         toast.error("Error verifying payment", { id: verifyToast });
                     }
                 },
@@ -141,7 +141,7 @@ const Donate = () => {
 
             const rzp = new window.Razorpay(options);
             rzp.open();
-        } catch (error) {
+        } catch {
             toast.error("Something went wrong", { id: toastId });
             setIsProcessing(false);
         }
@@ -159,7 +159,7 @@ const Donate = () => {
     const SuccessAlert = () => (
         <AnimatePresence>
             {showSuccessAlert && (
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: -80 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -80 }}
@@ -209,14 +209,14 @@ const Donate = () => {
                             style={{ background: 'none', border: 'none', color: 'rgba(200,169,106,0.5)', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '4px' }}
                         >✕</button>
                     </div>
-                </motion.div>
+                </Motion.div>
             )}
         </AnimatePresence>
     );
 
     if (paymentSuccess) {
         return (
-            <motion.div
+            <Motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="min-h-screen bg-gray-50 flex items-center justify-center p-4"
@@ -260,7 +260,7 @@ const Donate = () => {
                         Return Home
                     </button>
                 </div>
-            </motion.div>
+            </Motion.div>
         );
     }
 
@@ -286,7 +286,7 @@ const Donate = () => {
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#F7931E]/5 rounded-full blur-[120px] pointer-events-none"></div>
                     <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#0A7A2F]/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="relative overflow-hidden rounded-[2.5rem] shadow-[0_20px_50px_rgba(10,122,47,0.15)] border border-white/10"
@@ -301,14 +301,14 @@ const Donate = () => {
                             <div className="max-w-5xl mx-auto">
                                 {/* Header Area */}
                                 <div className="text-center mb-12">
-                                    <motion.div
+                                    <Motion.div
                                         initial={{ scale: 0.9 }}
                                         animate={{ scale: 1 }}
                                         className="inline-flex items-center gap-3 py-2 px-6 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8"
                                     >
                                         <Heart className="w-5 h-5 fill-[#F7931E] text-[#F7931E]" />
                                         <span className="text-white font-black text-xs uppercase tracking-[0.3em]">Support Our Mission</span>
-                                    </motion.div>
+                                    </Motion.div>
 
                                     <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight leading-tight">
                                         Empower Change <span className="text-[#F7931E]">- With Your Kindness</span>
@@ -327,7 +327,7 @@ const Donate = () => {
                                         { title: 'Community Led', icon: Users, subtitle: 'Collective Power' },
                                         { title: 'Direct Impact', icon: Zap, subtitle: 'Instant Transfer' }
                                     ].map((feature, i) => (
-                                        <motion.div
+                                        <Motion.div
                                             key={i}
                                             whileHover={{ y: -5 }}
                                             className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-white/10 transition-all duration-300"
@@ -337,7 +337,7 @@ const Donate = () => {
                                             </div>
                                             <h4 className="text-white font-bold text-sm">{feature.title}</h4>
                                             <p className="text-white/40 text-[10px] mt-1 font-bold uppercase tracking-widest leading-none">{feature.subtitle}</p>
-                                        </motion.div>
+                                        </Motion.div>
                                     ))}
                                 </div>
 
@@ -459,7 +459,7 @@ const Donate = () => {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </section>
 
                 {/* 2. SECONDARY TRUST SECTION */}

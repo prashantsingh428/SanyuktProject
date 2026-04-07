@@ -67,7 +67,7 @@ const GrievancePage = () => {
                         department: "Support Team",
                         description: "Your grievance is being processed"
                     });
-                } catch (err) {
+                } catch {
                     setStatusError("❌ Ticket not found");
                 }
             };
@@ -145,7 +145,7 @@ const GrievancePage = () => {
                 message: ''
             });
 
-        } catch (err) {
+        } catch {
             setError("❌ Server error, try again");
         }
     };
@@ -173,7 +173,7 @@ const GrievancePage = () => {
                 description: "Your grievance is being processed"
             });
 
-        } catch (err) {
+        } catch {
             setStatusError("âŒ Ticket not found");
             setStatusResult(null);
         }
@@ -605,4 +605,3 @@ const GrievancePage = () => {
 };
 
 export default GrievancePage;
-

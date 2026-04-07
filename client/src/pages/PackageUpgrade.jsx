@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Package, Shield, Zap, Star, CheckCircle2,
     Wallet, AlertCircle, X, Loader2, CheckCircle, Info
@@ -128,14 +128,14 @@ const FAQItem = ({ question, answer }) => {
             </button>
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div 
+                    <Motion.div 
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                     >
                         <p className="pb-6 sm:pb-8 text-sm sm:text-base text-[#F5E6C8]/60 font-medium leading-relaxed italic">{answer}</p>
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
         </div>
@@ -175,7 +175,7 @@ const ConfirmModal = ({ pkg, walletBalance, onConfirm, onRazorpay, onCancel, loa
 
     return (
         <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/90 backdrop-blur-md px-4 pt-28 overflow-y-auto">
-            <motion.div
+            <Motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 30 }}
@@ -283,7 +283,7 @@ const ConfirmModal = ({ pkg, walletBalance, onConfirm, onRazorpay, onCancel, loa
                         Cancel Selection
                     </button>
                 </div>
-            </motion.div>
+            </Motion.div>
         </div>
     );
 };
@@ -489,7 +489,7 @@ const PackageUpgrade = () => {
                 {/* ── Success Banner ── */}
                 <AnimatePresence>
                     {success && (
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
@@ -507,7 +507,7 @@ const PackageUpgrade = () => {
                                 <X className="w-4 h-4" />
                             </button>
                             <div className="absolute top-0 right-0 h-full w-1 bg-gradient-to-b from-[#C8A96A] to-transparent" />
-                        </motion.div>
+                        </Motion.div>
                     )}
                 </AnimatePresence>
 
@@ -516,7 +516,7 @@ const PackageUpgrade = () => {
                     {/* Background Accents */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#C8A96A]/5 blur-[120px] rounded-full -z-10" />
                     
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="relative z-10"
@@ -530,7 +530,7 @@ const PackageUpgrade = () => {
                         <p className="max-w-xl mx-auto text-[#F5E6C8]/50 font-semibold text-sm sm:text-base leading-relaxed italic">
                             Ascend to a premium tier and manifest the full potential of your high-performance business ecosystem.
                         </p>
-                    </motion.div>
+                    </Motion.div>
                 </div>
 
                 {/* ── Wallet Balance Strip ── */}
@@ -562,7 +562,7 @@ const PackageUpgrade = () => {
                         const Icon = pkg.icon;
 
                         return (
-                            <motion.div
+                            <Motion.div
                                 key={pkg.id}
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -649,7 +649,7 @@ const PackageUpgrade = () => {
                                         </button>
                                     )}
                                 </div>
-                            </motion.div>
+                            </Motion.div>
                         );
                     })}
                 </div>

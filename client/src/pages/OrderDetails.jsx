@@ -11,7 +11,7 @@ import {
     Box, Typography, Button, Paper, Divider, 
     Chip, Snackbar, Alert, CircularProgress 
 } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 
 const OrderDetails = () => {
@@ -279,7 +279,7 @@ const OrderDetails = () => {
 
 
     return (
-        <motion.div 
+        <Motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-6xl mx-auto p-4 md:p-8"
@@ -380,7 +380,7 @@ const OrderDetails = () => {
                                                 
                                                 {/* Animated Progress indicator on the line after active node */}
                                                 {isActive && idx < allPossibleSteps.length - 1 && (
-                                                    <motion.div 
+                                                    <Motion.div 
                                                         className="absolute left-[23.5px] top-12 w-0.5 bg-[#0A7A2F] origin-top z-20"
                                                         initial={{ height: 0 }}
                                                         animate={{ height: ['0%', '100%'] }}
@@ -532,7 +532,7 @@ const OrderDetails = () => {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-        </motion.div>
+        </Motion.div>
     );
 };
 

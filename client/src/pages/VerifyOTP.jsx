@@ -85,7 +85,7 @@ const VerifyOTP = () => {
         setError('');
 
         try {
-            const response = await api.post('/verify-otp', {
+            await api.post('/verify-otp', {
                 email,
                 otp: otpString
             });

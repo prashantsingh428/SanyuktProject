@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, ShoppingCart, Star, ArrowRight } from 'lucide-react';
 import { API_URL } from '../../api';
 
@@ -101,7 +101,7 @@ const ProductsCarousel = ({
                                     key={productId}
                                     className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] snap-center"
                                 >
-                                    <motion.div
+                                    <Motion.div
                                         whileHover={{ y: -6 }}
                                         className="luxury-box overflow-hidden transition-all duration-500 group relative"
                                     >
@@ -112,7 +112,7 @@ const ProductsCarousel = ({
                                         >
 
                                             {imageUrl && !imageErrors[productId] ? (
-                                                <motion.img
+                                                <Motion.img
                                                     whileHover={{ scale: 1.15 }}
                                                     transition={{ duration: 0.8, ease: "easeOut" }}
                                                     src={imageUrl}
@@ -207,7 +207,7 @@ const ProductsCarousel = ({
                                                 </button>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 </div>
                             );
                         })

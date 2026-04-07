@@ -5,7 +5,7 @@ import api, { API_URL } from '../api';
 import { Snackbar, Alert, Fade } from '@mui/material';
 import { addressData } from '../data/addressData';
 import { ChevronDown, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 
 const CheckoutPage = () => {
@@ -399,7 +399,7 @@ const CheckoutPage = () => {
                 {/* Back Button */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-[#C8A96A] hover:text-[#D4AF37] mb-6 transition-colors font-black uppercase tracking-widest text-[10px]"
+                    className="flex items-center gap-2 text-[#C8A96A] hover:text-[#D4AF37] mb-6 transition-colors font-black uppercase tracking-widest text-xs"
                 >
                     <ChevronLeft className="w-5 h-5" />
                     Back to Products
@@ -414,23 +414,23 @@ const CheckoutPage = () => {
                         <div className="flex items-center gap-16 md:gap-24 relative z-10">
                             {/* Step 1 */}
                             <div className="flex flex-col items-center gap-2">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 1 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/40'
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 1 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/60'
                                     }`}>1</div>
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${currentStep >= 1 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/30'}`}>Details</span>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${currentStep >= 1 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/50'}`}>Details</span>
                             </div>
 
                             {/* Step 2 */}
                             <div className="flex flex-col items-center gap-2">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 2 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/40'
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 2 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/60'
                                     }`}>2</div>
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${currentStep >= 2 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/30'}`}>Payment</span>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${currentStep >= 2 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/50'}`}>Payment</span>
                             </div>
 
                             {/* Step 3 */}
                             <div className="flex flex-col items-center gap-2">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 3 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/40'
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 3 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/60'
                                     }`}>3</div>
-                                <span className={`text-[9px] font-black uppercase tracking-widest ${currentStep >= 3 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/30'}`}>Verify</span>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${currentStep >= 3 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/50'}`}>Verify</span>
                             </div>
                         </div>
                     </div>
@@ -448,7 +448,7 @@ const CheckoutPage = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Full Name *
                                     </label>
                                     <input
@@ -456,12 +456,12 @@ const CheckoutPage = () => {
                                         name="fullName"
                                         value={shippingInfo.fullName}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="John Doe"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Email Address *
                                     </label>
                                     <input
@@ -469,12 +469,12 @@ const CheckoutPage = () => {
                                         name="email"
                                         value={shippingInfo.email}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="john@example.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Phone Number *
                                     </label>
                                     <input
@@ -487,12 +487,12 @@ const CheckoutPage = () => {
                                                 setShippingInfo({ ...shippingInfo, phone: val });
                                             }
                                         }}
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20 font-mono"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40 font-mono"
                                         placeholder="0000000000"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Landmark (Optional)
                                     </label>
                                     <input
@@ -500,12 +500,12 @@ const CheckoutPage = () => {
                                         name="landmark"
                                         value={shippingInfo.landmark}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="Nearby landmark"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Address *
                                     </label>
                                     <textarea
@@ -513,12 +513,12 @@ const CheckoutPage = () => {
                                         value={shippingInfo.address}
                                         onChange={handleInputChange}
                                         rows="3"
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="Enter your complete address"
                                     ></textarea>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         City *
                                     </label>
                                     <input
@@ -526,12 +526,12 @@ const CheckoutPage = () => {
                                         name="city"
                                         value={shippingInfo.city}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="City"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         State *
                                     </label>
                                     <div className="relative" ref={stateDropdownRef}>
@@ -539,7 +539,7 @@ const CheckoutPage = () => {
                                             onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
                                             className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 flex items-center justify-between cursor-pointer focus:border-[#C8A96A] transition-all"
                                         >
-                                            <span className={shippingInfo.state ? 'text-[#F5E6C8]' : 'text-[#F5E6C8]/20 text-sm'}>
+                                            <span className={shippingInfo.state ? 'text-[#F5E6C8]' : 'text-[#F5E6C8]/40 text-base'}>
                                                 {shippingInfo.state || 'Select State'}
                                             </span>
                                             <ChevronDown className={`h-4 w-4 text-[#C8A96A] transition-transform ${isStateDropdownOpen ? 'rotate-180' : ''}`} />
@@ -547,7 +547,7 @@ const CheckoutPage = () => {
 
                                         <AnimatePresence>
                                             {isStateDropdownOpen && (
-                                                <motion.div
+                                                <Motion.div
                                                     initial={{ opacity: 0, y: -10 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -10 }}
@@ -555,14 +555,14 @@ const CheckoutPage = () => {
                                                 >
                                                     <div className="p-2 bg-[#0D0D0D] border-b border-[#C8A96A]/10">
                                                         <div className="relative">
-                                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#C8A96A]/40" />
+                                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#C8A96A]/60" />
                                                             <input
                                                                 type="text"
                                                                 placeholder="Search state..."
                                                                 value={stateSearch}
                                                                 onChange={(e) => setStateSearch(e.target.value)}
                                                                 onClick={(e) => e.stopPropagation()}
-                                                                className="w-full pl-9 pr-3 py-2 text-xs bg-[#1A1A1A] border border-[#C8A96A]/10 text-[#F5E6C8] focus:border-[#C8A96A] focus:outline-none"
+                                                                className="w-full pl-9 pr-3 py-2 text-sm bg-[#1A1A1A] border border-[#C8A96A]/10 text-[#F5E6C8] focus:border-[#C8A96A] focus:outline-none"
                                                             />
                                                         </div>
                                                     </div>
@@ -576,24 +576,24 @@ const CheckoutPage = () => {
                                                                         setIsStateDropdownOpen(false);
                                                                         setStateSearch('');
                                                                     }}
-                                                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest cursor-pointer transition-colors hover:bg-[#C8A96A]/10 hover:text-[#C8A96A] ${shippingInfo.state === st ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'text-[#F5E6C8]/40'}`}
+                                                                    className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest cursor-pointer transition-colors hover:bg-[#C8A96A]/10 hover:text-[#C8A96A] ${shippingInfo.state === st ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'text-[#F5E6C8]/60'}`}
                                                                 >
                                                                     {st}
                                                                 </div>
                                                             ))
                                                         ) : (
-                                                            <div className="px-4 py-4 text-[10px] text-[#F5E6C8]/20 text-center italic uppercase tracking-widest">
+                                                            <div className="px-4 py-4 text-xs text-[#F5E6C8]/40 text-center italic uppercase tracking-widest">
                                                                 No states found
                                                             </div>
                                                         )}
                                                     </div>
-                                                </motion.div>
+                                                </Motion.div>
                                             )}
                                         </AnimatePresence>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-[#F5E6C8]/60 uppercase tracking-widest mb-2">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Pincode *
                                     </label>
                                     <input
@@ -606,7 +606,7 @@ const CheckoutPage = () => {
                                                 setShippingInfo({ ...shippingInfo, pincode: val });
                                             }
                                         }}
-                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-sm focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20 font-mono"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40 font-mono"
                                         placeholder="000000"
                                     />
                                 </div>
@@ -633,7 +633,7 @@ const CheckoutPage = () => {
                                         />
                                         <span className="ml-4 flex items-center gap-3">
                                             <IndianRupee className="w-5 h-5 text-[#C8A96A]" />
-                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-[11px]">Cash on Delivery</span>
+                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-xs">Cash on Delivery</span>
                                         </span>
                                     </label>
                                 )}
@@ -650,7 +650,7 @@ const CheckoutPage = () => {
                                         />
                                         <span className="ml-4 flex items-center gap-3">
                                             <div className="w-5 h-5 bg-[#C8A96A] rounded flex items-center justify-center text-[10px] text-[#0D0D0D] font-black">UPI</div>
-                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-[11px]">UPI (GPay/PhonePe/Paytm)</span>
+                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-xs">UPI (GPay/PhonePe/Paytm)</span>
                                         </span>
                                     </label>
                                 )}
@@ -667,7 +667,7 @@ const CheckoutPage = () => {
                                         />
                                         <span className="ml-4 flex items-center gap-3">
                                             <CreditCard className="w-5 h-5 text-[#C8A96A]" />
-                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-[11px]">Debit / Credit Card</span>
+                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-xs">Debit / Credit Card</span>
                                         </span>
                                     </label>
                                 )}
@@ -706,29 +706,29 @@ const CheckoutPage = () => {
                             </div>
 
                             <div className="space-y-3 mb-6">
-                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                    <span className="text-[#F5E6C8]/40">Subtotal</span>
+                                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                                    <span className="text-[#C8A96A]">Subtotal</span>
                                     <span className="text-[#F5E6C8]">₹{formatCurrency(subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                    <span className="text-[#F5E6C8]/40">Shipping</span>
+                                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                                    <span className="text-[#C8A96A]">Shipping</span>
                                     <span className="text-[#F5E6C8]">
                                         {shipping === 0 ? 'Free' : `₹${formatCurrency(shipping)}`}
                                     </span>
                                 </div>
-                                <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                    <span className="text-[#F5E6C8]/40">GST (18%)</span>
+                                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                                    <span className="text-[#C8A96A]">GST (18%)</span>
                                     <span className="text-[#F5E6C8]">₹{formatCurrency(tax)}</span>
                                 </div>
                                 {discount > 0 && (
-                                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-[#C8A96A]">
+                                    <div className="flex justify-between text-sm font-bold uppercase tracking-widest text-[#C8A96A]">
                                         <span>Discount</span>
                                         <span>-₹{formatCurrency(discount)}</span>
                                     </div>
                                 )}
                                 <div className="border-t border-[#C8A96A]/10 pt-4 mt-4">
                                     <div className="flex justify-between items-baseline">
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C8A96A]">Total Amount</span>
+                                        <span className="text-xs font-black uppercase tracking-[0.2em] text-[#C8A96A]">Total Amount</span>
                                         <span className="text-[#C8A96A] text-2xl font-serif font-bold">₹{formatCurrency(total)}</span>
                                     </div>
                                 </div>
@@ -742,7 +742,7 @@ const CheckoutPage = () => {
                                         value={couponCode}
                                         onChange={(e) => setCouponCode(e.target.value)}
                                         placeholder="COUPON CODE"
-                                        className="flex-1 px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-[10px] font-black tracking-widest focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/20"
+                                        className="flex-1 px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-xs font-black tracking-widest focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         disabled={couponApplied}
                                     />
                                     <button
@@ -775,7 +775,7 @@ const CheckoutPage = () => {
 
                             {/* Trust Badges */}
                             <div className="mt-6 pt-6 border-t border-[#C8A96A]/10">
-                                <div className="grid grid-cols-3 gap-2 text-[8px] font-black text-[#C8A96A]/50 uppercase tracking-widest text-center">
+                                <div className="grid grid-cols-3 gap-2 text-[10px] font-black text-[#C8A96A]/70 uppercase tracking-widest text-center">
                                     <div className="flex flex-col items-center gap-1.5">
                                         <Shield className="w-3.5 h-3.5" />
                                         Secure

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube, Twitter, Check } from 'lucide-react';
 
 const ContactFormSection = ({
@@ -52,15 +52,15 @@ const ContactFormSection = ({
                                 sub: 'IST (Indian Standard Time)',
                                 color: 'bg-[#C8A96A]/10 text-[#C8A96A]',
                             },
-                        ].map(({ icon: Icon, title, lines, sub, color }, i) => (
+                        ].map((item, i) => (
                             <div key={i} className="flex items-start gap-4 p-6 bg-[#1A1A1A] rounded-2xl border border-[#C8A96A]/10 hover:border-[#C8A96A]/30 transition-all duration-300">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-                                    <Icon className="w-5 h-5" />
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                                    <item.icon className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <div className="font-bold text-[#F5E6C8] mb-1">{title}</div>
-                                    {lines.map((l, j) => <div key={j} className="text-sm text-[#F5E6C8]/70">{l}</div>)}
-                                    <div className="text-xs text-[#C8A96A]/50 mt-1">{sub}</div>
+                                    <div className="font-bold text-[#F5E6C8] mb-1">{item.title}</div>
+                                    {item.lines.map((line, j) => <div key={j} className="text-sm text-[#F5E6C8]/70">{line}</div>)}
+                                    <div className="text-xs text-[#C8A96A]/50 mt-1">{item.sub}</div>
                                 </div>
                             </div>
                         ))}
@@ -74,16 +74,16 @@ const ContactFormSection = ({
                                     { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/sanyukt_parivaar_rich_life_57?igsh=dDJlMDd0d241amRx' },
                                     { icon: Youtube, label: 'YouTube', href: 'https://www.youtube.com/@Sanyuktparivaarrichlife' },
                                     { icon: Twitter, label: 'X', href: 'https://x.com/sprichlife_57' },
-                                ].map(({ icon: Icon, label, href }) => (
+                                ].map((item) => (
                                     <a
-                                        key={label}
-                                        href={href}
+                                        key={item.label}
+                                        href={item.href}
                                         target="_blank"
                                         rel="noreferrer"
                                         className="w-12 h-12 bg-[#0D0D0D] hover:bg-[#C8A96A] border border-[#C8A96A]/20 rounded-xl flex items-center justify-center text-[#C8A96A] hover:text-[#0D0D0D] transition-all duration-300"
-                                        title={label}
+                                        title={item.label}
                                     >
-                                        <Icon className="w-5 h-5" />
+                                        <item.icon className="w-5 h-5" />
                                     </a>
                                 ))}
                             </div>
@@ -136,7 +136,7 @@ const ContactFormSection = ({
                                     <span>Your message has been sent successfully! We will get back to you soon.</span>
                                 </div>
                             )}
-                            <motion.button
+                            <Motion.button
                                 type="submit"
                                 disabled={contactSubmitting}
                                 whileHover={{ scale: contactSubmitting ? 1 : 1.02 }}
@@ -145,7 +145,7 @@ const ContactFormSection = ({
                             >
                                 <Mail className="w-4 h-4" />
                                 {contactSubmitting ? 'Sending...' : 'Send Message'}
-                            </motion.button>
+                            </Motion.button>
                         </form>
                     </div>
                 </div>
