@@ -604,8 +604,8 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         { name: 'Platinum Package', price: '₹25,000', color: 'blue', features: ['Direct Commission: 15%', 'Level Commission: 10%', 'Product Worth: ₹25,000'] }
     ];
     const packageCardStyles = {
-        blue: 'bg-[#0A7A2F] text-white',
-        purple: 'bg-[#0A7A2F] text-white'
+        blue: 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#F5E6C8] shadow-2xl',
+        purple: 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#F5E6C8] shadow-2xl'
     };
 
     const reportCardStyles = {
@@ -699,7 +699,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         {
             title: 'Joining Report',
             icon: '📋',
-            color: 'blue',
+            color: 'gold',
             description: 'Complete list of all member registrations with details',
             rows: (members.length ? members : recentJoinings).map((member, index) => ({
                 serialNo: index + 1,
@@ -714,7 +714,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         {
             title: 'Income Report',
             icon: '💰',
-            color: 'purple',
+            color: 'gold',
             description: 'Detailed breakdown of all income transactions',
             rows: incomeHistory.map((item, index) => ({
                 serialNo: index + 1,
@@ -728,7 +728,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         {
             title: 'Purchase Report',
             icon: '🛒',
-            color: 'blue',
+            color: 'gold',
             description: 'Product purchase history and inventory',
             rows: products.map((product, index) => ({
                 serialNo: index + 1,
@@ -741,7 +741,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         {
             title: 'Team Business',
             icon: '👥',
-            color: 'purple',
+            color: 'gold',
             description: 'Team performance and business volume analysis',
             rows: (members.length ? members : recentJoinings).map((member, index) => ({
                 serialNo: index + 1,
@@ -755,7 +755,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         {
             title: 'Daily Report',
             icon: '📅',
-            color: 'blue',
+            color: 'gold',
             description: 'Today\'s summary and key metrics',
             rows: [
                 {
@@ -772,7 +772,7 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         {
             title: 'Monthly Report',
             icon: '📊',
-            color: 'purple',
+            color: 'gold',
             description: 'Comprehensive monthly performance overview',
             rows: [
                 {
@@ -795,26 +795,27 @@ const FranchiseDashboard = ({ user, onLogout }) => {
         switch (activeTab) {
             case 'dashboard':
                 return (
-                    <div className="space-y-6">
-                        <div className="bg-green-600 rounded-2xl shadow-lg p-6 text-white">
-                            <h2 className="text-2xl font-bold mb-2">Welcome back, {displayName}! 👋</h2>
-                            <p className="opacity-90">Here's what's happening with your franchise today.</p>
+                    <div className="space-y-8">
+                        <div className="bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D] rounded-none border border-[#C8A96A]/20 shadow-2xl p-8 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-[#C8A96A]/5 rounded-full blur-[100px]"></div>
+                            <h2 className="text-3xl font-serif font-bold mb-2 text-[#C8A96A] uppercase tracking-wider">Welcome back, {displayName}! 👋</h2>
+                            <p className="text-[#F5E6C8]/60 font-black uppercase tracking-[0.2em] text-[10px]">Your Franchise Performance Overview</p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {stats.map((stat, index) => (
                                 (() => {
                                     const StatIcon = getStatIcon(stat.label);
                                     return (
-                                        <div key={index} className={`bg-white rounded-xl shadow-lg p-6 border-l-4 border-${stat.color}-500 hover:shadow-xl transition-shadow`}>
+                                        <div key={index} className="bg-[#1A1A1A] rounded-none shadow-2xl p-6 border border-[#C8A96A]/10 hover:border-[#C8A96A]/40 transition-all group">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <p className="text-gray-500 text-sm">{stat.label}</p>
-                                                    <p className="text-2xl font-bold text-gray-800 mt-2">{stat.value}</p>
-                                                    <p className={`text-xs text-${stat.color}-600 mt-1`}>{stat.change}</p>
+                                                    <p className="text-[#F5E6C8]/40 text-[10px] font-black uppercase tracking-widest mb-2">{stat.label}</p>
+                                                    <p className="text-3xl font-serif font-bold text-[#F5E6C8]">{stat.value}</p>
+                                                    <p className="text-[10px] font-black text-[#C8A96A] mt-2 tracking-widest">{stat.change}</p>
                                                 </div>
-                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50 text-green-700 shadow-sm ring-1 ring-green-100">
-                                                    <StatIcon size={24} strokeWidth={2.2} />
+                                                <div className="flex h-12 w-12 items-center justify-center bg-[#C8A96A]/10 text-[#C8A96A] shadow-inner group-hover:scale-110 transition-transform">
+                                                    <StatIcon size={24} strokeWidth={2.5} />
                                                 </div>
                                             </div>
                                         </div>
@@ -824,39 +825,39 @@ const FranchiseDashboard = ({ user, onLogout }) => {
                         </div>
 
                         <div className="grid grid-cols-1 gap-6">
-                            <div className="bg-white rounded-xl shadow-lg p-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-lg font-semibold text-gray-800">Recent Joinings</h3>
+                            <div className="bg-[#1A1A1A] border border-[#C8A96A]/10 rounded-none shadow-2xl p-8">
+                                <div className="flex justify-between items-center mb-8 pb-4 border-b border-[#C8A96A]/10">
+                                    <h3 className="text-lg font-serif font-bold text-[#C8A96A] uppercase tracking-wider">Recent Joinings</h3>
                                     <button
                                         onClick={() => setActiveTab('members')}
-                                        className="text-sm text-green-600 hover:text-green-800"
+                                        className="text-[10px] font-black text-[#C8A96A] hover:text-[#F5E6C8] uppercase tracking-[0.2em] transition-colors"
                                     >
-                                        View All →
+                                        View All Members →
                                     </button>
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     {recentJoinings.length > 0 ? (
                                         recentJoinings.map((item, i) => (
-                                            <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                                            <div key={i} className="flex items-center justify-between p-4 bg-[#0D0D0D] border border-[#C8A96A]/5 hover:border-[#C8A96A]/30 transition-all">
+                                                <div className="flex items-center space-x-4">
+                                                    <div className="w-12 h-12 bg-[#C8A96A] text-[#0D0D0D] flex items-center justify-center text-lg font-black shadow-lg">
                                                         {item.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-gray-800">{item.name}</p>
-                                                        <p className="text-xs text-gray-500">ID: {item.id} • {item.date}</p>
+                                                        <p className="font-serif font-bold text-[#F5E6C8] text-sm uppercase tracking-tight">{item.name}</p>
+                                                        <p className="text-[10px] font-black text-[#C8A96A]/60 uppercase tracking-widest mt-1">ID: {item.id} • {item.date}</p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-semibold text-gray-800">{item.amount}</p>
-                                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                                    <p className="font-serif font-bold text-[#C8A96A]">{item.amount}</p>
+                                                    <span className="text-[9px] font-black bg-[#C8A96A]/10 text-[#C8A96A] px-3 py-1 uppercase tracking-widest mt-1 inline-block">
                                                         {item.package}
                                                     </span>
                                                 </div>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center py-8 text-gray-500">
+                                        <div className="text-center py-12 text-[#F5E6C8]/20 font-black uppercase tracking-[0.3em] text-[10px]">
                                             No recent joinings found
                                         </div>
                                     )}

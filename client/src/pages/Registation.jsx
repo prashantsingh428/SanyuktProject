@@ -215,7 +215,7 @@ const RegistrationForm = () => {
                                 value={formData.sponsorId}
                                 onChange={handleChange}
                                 placeholder="Enter Sponsor Id"
-                                className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl px-5 py-4 text-sm text-[#F5E6C8] placeholder:text-[#F5E6C8]/20 focus:border-[#C8A96A] outline-none transition-all font-medium"
+                                className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl px-5 py-4 text-sm text-[#F5E6C8] placeholder:text-[#F5E6C8]/20 focus:border-[#C8A96A] focus:ring-1 focus:ring-[#C8A96A]/30 outline-none transition-all font-medium"
                             />
                         </div>
 
@@ -436,10 +436,10 @@ const RegistrationForm = () => {
                             id="agreement"
                             checked={agreed}
                             onChange={(e) => setAgreed(e.target.checked)}
-                            className="mt-0.5 w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
+                            className="mt-0.5 w-5 h-5 rounded border-[#C8A96A]/30 bg-[#0D0D0D] text-[#C8A96A] focus:ring-[#C8A96A]/50 cursor-pointer accent-[#C8A96A]"
                         />
-                        <label htmlFor="agreement" className="text-sm text-gray-600 font-medium cursor-pointer">
-                            I accept the <Link to="/terms" className="text-green-600 hover:text-green-700 font-bold hover:underline">terms and conditions</Link> and <Link to="/privacy" className="text-green-600 hover:text-green-700 font-bold hover:underline">privacy policy</Link>.
+                        <label htmlFor="agreement" className="text-sm text-[#F5E6C8]/60 font-medium cursor-pointer">
+                            I accept the <Link to="/terms" className="text-[#C8A96A] hover:text-[#D4AF37] font-black hover:underline uppercase tracking-tight">terms and conditions</Link> and <Link to="/privacy" className="text-[#C8A96A] hover:text-[#D4AF37] font-black hover:underline uppercase tracking-tight">privacy policy</Link>.
                         </label>
                     </div>
 

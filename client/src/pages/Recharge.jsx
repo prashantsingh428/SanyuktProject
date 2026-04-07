@@ -1098,7 +1098,7 @@ const Recharge = () => {
 
                                         {/* Right Plans Panel */}
                                         <div className='lg:w-96 flex-shrink-0'>
-                                            <div className='bg-[#1A1A1A] rounded-none border border-[#C8A96A]/20 h-[450px] flex flex-col'>
+                                            <div className={`bg-[#1A1A1A] rounded-none border border-[#C8A96A]/20 flex flex-col transition-all duration-500 overflow-hidden ${mobileOperator ? 'h-[450px]' : 'h-[120px]'}`}>
                                                 <div className='p-3 border-b border-[#C8A96A]/10'>
                                                     <h4 className='text-xs font-black text-[#C8A96A] uppercase tracking-wider'>
                                                         {mobileOperator ? `${mobileOperator.toUpperCase()} Plans` : "Select Operator"}

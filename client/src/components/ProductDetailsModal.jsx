@@ -167,18 +167,18 @@ const ProductDetailsModal = ({
                                 )}
                             </Box>
 
-                            <Box sx={{ mt: 1, display: 'flex', gap: { xs: 2, md: 3 }, opacity: 0.5, justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <Box sx={{ mt: 1, display: 'flex', gap: { xs: 2, md: 3 }, justifyContent: 'center', flexWrap: 'wrap' }}>
                                 <Box sx={{ textAlign: 'center' }}>
                                     <ShieldCheck className="w-5 h-5 mx-auto mb-1 text-[#C8A96A]" />
-                                    <Typography variant="caption" sx={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', tracking: '0.1em' }}>Secure</Typography>
+                                    <Typography variant="caption" sx={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', tracking: '0.1em' }}>Secure</Typography>
                                 </Box>
                                 <Box sx={{ textAlign: 'center' }}>
                                     <Truck className="w-5 h-5 mx-auto mb-1 text-[#C8A96A]" />
-                                    <Typography variant="caption" sx={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', tracking: '0.1em' }}>Delivery</Typography>
+                                    <Typography variant="caption" sx={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', tracking: '0.1em' }}>Delivery</Typography>
                                 </Box>
                                 <Box sx={{ textAlign: 'center' }}>
                                     <RotateCcw className="w-5 h-5 mx-auto mb-1 text-[#C8A96A]" />
-                                    <Typography variant="caption" sx={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', tracking: '0.1em' }}>Returns</Typography>
+                                    <Typography variant="caption" sx={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', tracking: '0.1em' }}>Returns</Typography>
                                 </Box>
                             </Box>
                         </Box>
@@ -201,7 +201,7 @@ const ProductDetailsModal = ({
                                         bgcolor: 'rgba(200,169,106,0.05)',
                                         color: '#C8A96A',
                                         fontWeight: 900,
-                                        fontSize: '8px',
+                                        fontSize: '11px',
                                         textTransform: 'uppercase',
                                         letterSpacing: '0.2em',
                                         mb: 1.5,
@@ -211,19 +211,19 @@ const ProductDetailsModal = ({
                                 />
 
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <div className="flex gap-0.5">
+                                    <div className="flex gap-1">
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <Star
                                                 key={star}
-                                                className={`w-2.5 h-2.5 ${star <= Math.round(product.rating || 5)
+                                                className={`w-3 h-3 ${star <= Math.round(product.rating || 5)
                                                     ? "fill-[#C8A96A] text-[#C8A96A]"
                                                     : "text-gray-800"
                                                     }`}
                                             />
                                         ))}
                                     </div>
-                                    <Typography variant="caption" sx={{ color: 'rgba(245,230,200,0.2)', fontWeight: 900, fontSize: '8px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                                        {product.numReviews || 0} AUDITED REVIEWS
+                                    <Typography variant="caption" sx={{ color: 'rgba(245,230,200,0.8)', fontWeight: 950, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                        {product.numReviews || 0} REVIEWS
                                     </Typography>
                                 </Box>
                             </Box>
@@ -234,13 +234,13 @@ const ProductDetailsModal = ({
                                         ₹{formatCurrency(product.price)}
                                     </Typography>
                                     {product.oldPrice && (
-                                        <Typography sx={{ textDecoration: 'line-through', color: 'rgba(245,230,200,0.15)', fontSize: '1rem', fontWeight: 600 }}>
+                                        <Typography sx={{ textDecoration: 'line-through', color: 'rgba(245,230,200,0.6)', fontSize: '1rem', fontWeight: 600 }}>
                                             ₹{formatCurrency(product.oldPrice)}
                                         </Typography>
                                     )}
                                 </Box>
                                 {product.oldPrice && (
-                                    <Typography variant="caption" sx={{ color: '#C8A96A', opacity: 0.4, fontWeight: 900, fontSize: '8px', textTransform: 'uppercase', tracking: '0.1em' }}>
+                                    <Typography variant="caption" sx={{ color: '#C8A96A', opacity: 0.9, fontWeight: 950, fontSize: '11px', textTransform: 'uppercase', tracking: '0.1em' }}>
                                         Benefit: ₹{formatCurrency(product.oldPrice - product.price)} ({calculateDiscount(product.price, product.oldPrice)}% Off)
                                     </Typography>
                                 )}
@@ -254,7 +254,7 @@ const ProductDetailsModal = ({
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: 'rgba(245,230,200,0.7)',
+                                            color: 'rgba(245,230,200,0.9)',
                                             lineHeight: 1.8,
                                             fontSize: '15px',
                                             display: '-webkit-box',
@@ -288,40 +288,40 @@ const ProductDetailsModal = ({
 
                             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5, mb: 4 }}>
                                  <Box sx={{ p: 2, bgcolor: '#0D0D0D', border: '1px solid rgba(200,169,106,0.1)' }}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(245,230,200,0.2)', fontWeight: 900, fontSize: '8px', display: 'block', mb: 0.5, textTransform: 'uppercase', tracking: '0.2em' }}>Audit Volume</Typography>
+                                    <Typography variant="caption" sx={{ color: 'rgba(245,230,200,0.8)', fontWeight: 950, fontSize: '11px', display: 'block', mb: 0.5, textTransform: 'uppercase', tracking: '0.2em' }}>BV Value</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 800, color: '#F5E6C8', display: 'flex', alignItems: 'center', gap: 1, fontSize: '11px' }}>
                                         <Tag className="w-3.5 h-3.5 text-[#C8A96A]/60" /> BV: {product.bv || '0'}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ p: 2, bgcolor: '#0D0D0D', border: '1px solid rgba(200,169,106,0.1)' }}>
-                                    <Typography variant="caption" sx={{ color: 'rgba(245,230,200,0.2)', fontWeight: 900, fontSize: '8px', display: 'block', mb: 0.5, textTransform: 'uppercase', tracking: '0.2em' }}>Status</Typography>
+                                    <Typography variant="caption" sx={{ color: 'rgba(245,230,200,0.8)', fontWeight: 950, fontSize: '11px', display: 'block', mb: 0.5, textTransform: 'uppercase', tracking: '0.2em' }}>Status</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 800, color: product.stock > 0 ? '#C8A96A' : '#f59e0b', display: 'flex', alignItems: 'center', gap: 1, fontSize: '11px', textTransform: 'uppercase' }}>
-                                        <Package className="w-3.5 h-3.5" /> {product.stock > 0 ? 'Liquidity Available' : 'No Vault Supply'}
+                                        <Package className="w-3.5 h-3.5" /> {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                                     </Typography>
                                 </Box>
                             </Box>
 
                             <Box sx={{ mb: 4 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 900, fontSize: '8px', textTransform: 'uppercase', tracking: '0.2em', color: 'rgba(245,230,200,0.2)', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Banknote className="w-3.5 h-3.5 text-[#C8A96A]/40" /> Settlement Rails
+                                <Typography variant="subtitle2" sx={{ fontWeight: 950, fontSize: '11px', textTransform: 'uppercase', tracking: '0.2em', color: 'rgba(245,230,200,0.8)', mb: 1.5, display: 'center', alignItems: 'center', gap: 1 }}>
+                                    <Banknote className="w-3.5 h-3.5 text-[#C8A96A]/40" /> Payment Methods
                                 </Typography>
                                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                     {(product.paymentMethods || ['cod', 'upi', 'card']).includes('cod') && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 0.75, bgcolor: 'rgba(200,169,106,0.05)', border: '1px solid rgba(200,169,106,0.1)' }}>
                                             <Banknote size={12} className="text-[#C8A96A]/60" />
-                                            <Typography variant="caption" sx={{ fontWeight: '900', fontSize: '8px', color: '#C8A96A', textTransform: 'uppercase' }}>COD</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: '950', fontSize: '11px', color: '#C8A96A', textTransform: 'uppercase' }}>COD</Typography>
                                         </Box>
                                     )}
                                     {(product.paymentMethods || ['cod', 'upi', 'card']).includes('upi') && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 0.75, bgcolor: 'rgba(200,169,106,0.05)', border: '1px solid rgba(200,169,106,0.1)' }}>
                                             <QrCode size={12} className="text-[#C8A96A]/60" />
-                                            <Typography variant="caption" sx={{ fontWeight: '900', fontSize: '8px', color: '#C8A96A', textTransform: 'uppercase' }}>UPI</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: '950', fontSize: '11px', color: '#C8A96A', textTransform: 'uppercase' }}>UPI</Typography>
                                         </Box>
                                     )}
                                     {(product.paymentMethods || ['cod', 'upi', 'card']).includes('card') && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 0.75, bgcolor: 'rgba(200,169,106,0.05)', border: '1px solid rgba(200,169,106,0.1)' }}>
                                             <CardIcon size={12} className="text-[#C8A96A]/60" />
-                                            <Typography variant="caption" sx={{ fontWeight: '900', fontSize: '8px', color: '#C8A96A', textTransform: 'uppercase' }}>CARD</Typography>
+                                            <Typography variant="caption" sx={{ fontWeight: '950', fontSize: '11px', color: '#C8A96A', textTransform: 'uppercase' }}>CARD</Typography>
                                         </Box>
                                     )}
                                 </Box>
@@ -347,7 +347,7 @@ const ProductDetailsModal = ({
                                             '&:hover': { borderColor: '#ef4444', bgcolor: 'rgba(255,0,0,0.05)' }
                                         }}
                                     >
-                                        Liquidate
+                                        Remove From Cart
                                     </Button>
                                 ) : (
                                     <Button
@@ -369,7 +369,7 @@ const ProductDetailsModal = ({
                                             '&:hover': { borderColor: '#C8A96A', bgcolor: 'rgba(200,169,106,0.05)' }
                                         }}
                                     >
-                                        Manifest
+                                        Add to Cart
                                     </Button>
                                 )}
                                 <Button
@@ -391,7 +391,7 @@ const ProductDetailsModal = ({
                                         '&:hover': { bgcolor: '#D4AF37' }
                                     }}
                                 >
-                                    Acquire
+                                    Buy Now
                                 </Button>
                             </Box>
                         </Box>

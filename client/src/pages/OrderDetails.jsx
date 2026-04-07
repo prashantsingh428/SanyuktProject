@@ -234,7 +234,7 @@ const OrderDetails = () => {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white rounded-3xl animate-pulse">
                 <CircularProgress sx={{ color: '#0A7A2F' }} size={60} thickness={4} />
-                <p className="mt-4 font-black uppercase tracking-[0.3em] text-slate-300 text-sm">Synchronizing Data</p>
+                <p className="mt-4 font-black uppercase tracking-[0.3em] text-slate-300 text-sm">Loading Data</p>
             </div>
         );
     }
@@ -245,14 +245,14 @@ const OrderDetails = () => {
                 <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <FileText className="text-red-400" size={48} />
                 </div>
-                <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-2">Order Vault Missing</h3>
+                <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-2">Order Not Found</h3>
                 <p className="text-slate-500 mb-8">The requested order coordinates could not be found in our encrypted records.</p>
                 <Button 
                     variant="contained" 
                     onClick={() => navigate('/my-account/orders')}
                     sx={{ bgcolor: '#0A7A2F', px: 4, py: 1.5, borderRadius: '15px', fontWeight: 'bold' }}
                 >
-                    Return to Mission Hub
+                    Back to Orders
                 </Button>
             </div>
         );
@@ -266,7 +266,7 @@ const OrderDetails = () => {
         { status: 'shipped', label: 'Dispatched', description: 'Handed over to carrier network', icon: Boxes },
         { status: 'reached_store', label: 'Reached Store', description: 'Order arrived at local distribution node', icon: MapPin },
         { status: 'out_for_delivery', label: 'Out for Delivery', description: 'Courier is en-route to your location', icon: Truck },
-        { status: 'delivered', label: 'Mission Completed', description: 'Successfully dropped at destination', icon: CheckCircle }
+        { status: 'delivered', label: 'Delivered', description: 'Order successfully delivered', icon: CheckCircle }
     ];
 
     const trackingSteps = order.tracking || [];
@@ -291,7 +291,7 @@ const OrderDetails = () => {
                     className="group flex items-center gap-2 px-5 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95"
                 >
                     <ChevronLeft className="group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-black text-xs uppercase tracking-widest text-slate-600">Back to Hub</span>
+                    <span className="font-black text-xs uppercase tracking-widest text-slate-600">Back</span>
                 </button>
 
                 <div className="flex gap-4">
@@ -324,7 +324,7 @@ const OrderDetails = () => {
                                 <div>
                                     <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase mb-1">Order Details</h1>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Identity:</span>
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Order ID:</span>
                                         <span className="text-xs font-black text-[#0A7A2F] tracking-wider">#{order._id.slice(-8).toUpperCase()}</span>
                                     </div>
                                 </div>
@@ -422,7 +422,7 @@ const OrderDetails = () => {
                 <div className="lg:col-span-5 space-y-6">
                     {/* Item Card */}
                     <div className="bg-slate-50/50 rounded-[2rem] p-6 border border-slate-100 hover:bg-white hover:shadow-xl transition-all duration-500 group">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Manifest Item</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Order Item</span>
                         <div className="flex items-center gap-6">
                             <div className="w-24 h-24 rounded-3xl bg-white shadow-lg overflow-hidden border-4 border-white group-hover:scale-105 transition-transform">
                                 {order.product?.image ? (
@@ -434,7 +434,7 @@ const OrderDetails = () => {
                                 ) : <div className="w-full h-full flex items-center justify-center bg-green-50 text-[#0A7A2F] font-black">SP</div>}
                             </div>
                             <div className="flex-1">
-                                <h2 className="text-xl font-black text-slate-800 tracking-tight leading-tight mb-1">{order.product?.name || 'Mission Supply'}</h2>
+                                <h2 className="text-xl font-black text-slate-800 tracking-tight leading-tight mb-1">{order.product?.name || 'Product'}</h2>
                                 <p className="text-sm font-bold text-slate-500 mb-2">Quantity: {order.quantity || 1}</p>
                                 <div className="text-2xl font-black text-[#0A7A2F] tracking-tighter">
                                     ₹{order.total?.toLocaleString()}
@@ -449,7 +449,7 @@ const OrderDetails = () => {
                             <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
                                 <CreditCard size={18} />
                             </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Financial Spec</h3>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Payment Details</h3>
                         </div>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center text-sm">
@@ -488,7 +488,7 @@ const OrderDetails = () => {
                             <div className="p-2.5 bg-orange-50 text-orange-600 rounded-xl">
                                 <MapPin size={18} />
                             </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Delivery Nodes</h3>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-800">Delivery Address</h3>
                         </div>
                         <div className="space-y-1">
                             <h4 className="font-black text-slate-800 uppercase tracking-tight">{order.shippingInfo?.fullName}</h4>
@@ -497,7 +497,7 @@ const OrderDetails = () => {
                                 {order.shippingInfo?.city}, {order.shippingInfo?.state} - {order.shippingInfo?.pincode}
                             </p>
                             <div className="pt-4 mt-4 border-t border-slate-50">
-                                <p className="text-xs font-bold text-slate-600">Secure Direct Line:</p>
+                                <p className="text-xs font-bold text-slate-600">Contact Number:</p>
                                 <p className="text-sm font-black text-slate-900 tracking-widest">{order.shippingInfo?.phone}</p>
                             </div>
                         </div>

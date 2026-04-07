@@ -156,7 +156,7 @@ const ProductsCarousel = ({
                                         >
                                             <div className="flex items-center gap-1 mb-1">
                                                 {renderStars(rating)}
-                                                <span className="text-[8px] font-bold text-[#F5E6C8]/40 uppercase tracking-widest ml-1">
+                                                <span className="text-[11px] font-black text-[#F5E6C8]/80 uppercase tracking-widest ml-1">
                                                     {reviews}
                                                 </span>
                                             </div>
@@ -165,7 +165,7 @@ const ProductsCarousel = ({
                                                 <h3 className="text-sm font-bold text-[#F5E6C8] truncate group-hover:text-[#C8A96A] group-hover/details:text-[#C8A96A] transition-colors">
                                                     {product.name}
                                                 </h3>
-                                                <span className="w-fit text-[9px] font-bold bg-[#C8A96A]/10 text-[#C8A96A] px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-[#C8A96A]/20">
+                                                <span className="w-fit text-[11px] font-black bg-[#C8A96A]/10 text-[#C8A96A] px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-[#C8A96A]/20">
                                                     {category === "Beauty and cosmetic home based products" ? "Beauty & Cosmetics" : category}
                                                 </span>
                                             </div>
@@ -176,13 +176,13 @@ const ProductsCarousel = ({
                                                         ₹{price}
                                                     </span>
                                                     {oldPrice > price && (
-                                                        <span className="text-[#F5E6C8]/30 text-[10px] line-through font-medium">
+                                                        <span className="text-[#F5E6C8]/60 text-[10px] line-through font-medium">
                                                             MRP ₹{oldPrice}
                                                         </span>
                                                     )}
                                                 </div>
                                                 <div className="flex flex-col items-end">
-                                                    <span className="bg-orange-50 text-[#F7931E] px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-orange-100">
+                                                    <span className="bg-orange-50 text-[#F7931E] px-2 py-0.5 rounded-lg text-[11px] font-black uppercase tracking-widest border border-orange-100">
                                                         BV {bv}
                                                     </span>
                                                 </div>
@@ -193,7 +193,7 @@ const ProductsCarousel = ({
                                                     onClick={() => handleNavigation('/checkout', { state: { product } })}
                                                     className="luxury-button w-full"
                                                 >
-                                                    Instant Buy
+                                                    Buy Now
                                                 </button>
 
                                                 <button

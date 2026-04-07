@@ -286,9 +286,9 @@ const FranchiseLogin = () => {
 
                 {/* Main Grid */}
                 <div className="grid lg:grid-cols-2 gap-8 items-center">
-                    {/* Left Side - Hero Section */}
+                    {/* Left Side - Hero Section (hidden on mobile) */}
                     <motion.div
-                        className="text-center lg:text-left"
+                        className="hidden lg:block text-center lg:text-left"
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}

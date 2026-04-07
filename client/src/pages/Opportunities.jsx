@@ -74,13 +74,14 @@ const OpportunitiesPage = () => {
             </div>
 
             {/* Hero Banner */}
-            <header className="relative h-[120px] bg-cover bg-center border-b border-[#C8A96A]/20"
+            <header className="relative h-[180px] md:h-[220px] bg-cover bg-center border-b border-[#C8A96A]/20"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')" }}>
-                <div className="absolute inset-0 bg-[#0D0D0D]/80"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/80 to-[#0D0D0D]/40"></div>
                 <div className="relative h-full flex flex-col items-center justify-center text-center px-4 z-10">
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#C8A96A] mb-3 animate-slide-up">
+                    <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-serif font-black text-[#C8A96A] mb-4 animate-slide-up uppercase tracking-[0.1em] sm:tracking-[0.2em] md:tracking-[0.3em] lg:tracking-[0.5em] leading-tight">
                         OPPORTUNITIES
                     </h1>
+                    <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#C8A96A] to-transparent"></div>
                 </div>
             </header>
 

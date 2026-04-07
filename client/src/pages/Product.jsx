@@ -224,7 +224,7 @@ const ProductsPage = () => {
                                 <h1 className="text-xl md:text-2xl font-serif font-bold text-[#C8A96A] tracking-tight">
                                     Our Products
                                 </h1>
-                                <p className="text-[9px] md:text-[10px] text-[#F5E6C8]/40 font-black uppercase tracking-[0.25em] mt-0.5">
+                                <p className="text-[9px] md:text-[10px] text-[#F5E6C8]/80 font-black uppercase tracking-[0.25em] mt-0.5">
                                     Trusted Quality • Premium Lifestyle
                                 </p>
                             </div>
@@ -238,9 +238,9 @@ const ProductsPage = () => {
                                     placeholder="Search for items..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-2 bg-[#1A1A1A] border border-[#C8A96A]/20 rounded-none text-xs text-[#F5E6C8] focus:outline-none focus:ring-1 focus:ring-[#C8A96A]/40 focus:border-[#C8A96A] transition-all placeholder:text-gray-600"
+                                    className="w-full pl-9 pr-4 py-2 bg-[#1A1A1A] border border-[#C8A96A]/40 rounded-none text-xs text-[#F5E6C8] focus:outline-none focus:ring-1 focus:ring-[#C8A96A]/60 focus:border-[#C8A96A] transition-all placeholder:text-[#F5E6C8]/60"
                                 />
-                                <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-600 group-focus-within:text-[#C8A96A] transition-colors" />
+                                <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-[#C8A96A]/60 group-focus-within:text-[#C8A96A] transition-colors" />
                             </div>
 
                             {/* Premium Cart Button */}
@@ -269,7 +269,7 @@ const ProductsPage = () => {
                             onClick={() => setSelectedCategory(cat)}
                             className={`px-3 py-1.5 rounded-none text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] transition-all duration-300 border ${selectedCategory === cat
                                 ? "bg-[#C8A96A] text-[#0D0D0D] border-[#C8A96A] shadow-[0_0_10px_rgba(200,169,106,0.2)]"
-                                : "bg-[#1A1A1A] text-[#C8A96A]/40 hover:text-[#C8A96A] hover:bg-[#1A1A1A]/80 border-[#C8A96A]/10 hover:border-[#C8A96A]/30"
+                                : "bg-[#1A1A1A] text-[#F5E6C8]/70 hover:text-[#C8A96A] hover:bg-[#1A1A1A]/80 border-[#C8A96A]/20 hover:border-[#C8A96A]/40"
                                 }`}
                         >
                             {cat}
@@ -350,13 +350,13 @@ const ProductsPage = () => {
                                                         key={star}
                                                         className={`w-2.5 h-2.5 ${star <= Math.round(product.rating || 5)
                                                             ? "fill-[#C8A96A] text-[#C8A96A]"
-                                                            : "text-gray-800"
+                                                            : "text-[#C8A96A]/10"
                                                             }`}
                                                     />
                                                 ))}
                                             </div>
                                             {product.bv && (
-                                                <span className="text-[8px] font-black text-[#C8A96A] uppercase px-1.5 py-0.5 border border-[#C8A96A]/10 bg-[#C8A96A]/5 tracking-widest">
+                                                <span className="text-[8px] font-black text-[#C8A96A] uppercase px-1.5 py-0.5 border border-[#C8A96A]/30 bg-[#C8A96A]/10 tracking-widest">
                                                     BV: {product.bv}
                                                 </span>
                                             )}
@@ -372,7 +372,7 @@ const ProductsPage = () => {
                                             </h3>
                                         </div>
 
-                                        <p className="text-[#F5E6C8]/55 text-[11px] md:text-xs leading-relaxed line-clamp-2 min-h-[2rem] mb-3">
+                                        <p className="text-[#F5E6C8]/85 text-[11px] md:text-xs leading-relaxed line-clamp-2 min-h-[2rem] mb-3">
                                             {product.description || "Premium wellness and lifestyle product from our curated collection."}
                                         </p>
 
@@ -382,7 +382,7 @@ const ProductsPage = () => {
                                                 ₹{formatCurrency(product.price)}
                                             </span>
                                             {product.oldPrice && (
-                                                <span className="text-[11px] text-[#F5E6C8]/25 line-through">
+                                                <span className="text-[11px] text-[#F5E6C8]/60 line-through">
                                                     ₹{formatCurrency(product.oldPrice)}
                                                 </span>
                                             )}

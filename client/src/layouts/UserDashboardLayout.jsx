@@ -23,7 +23,17 @@ const getRankColor = (rank) => {
 
 const UserDashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [userData, setUserData] = useState(null);
+    const [userData] = useState(() => {
+        try {
+            const user = localStorage.getItem('user');
+            return user ? JSON.parse(user) : null;
+        } catch (error) {
+            console.error("Error parsing user data in dashboard layout:", error);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            return null;
+        }
+    });
     const [stats, setStats] = useState(null);
     const [openDropdown, setOpenDropdown] = useState(null);
     const navigate = useNavigate();
@@ -31,32 +41,7 @@ const UserDashboardLayout = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    useEffect(() => {
-        const user = localStorage.getItem('user');
-        if (user) {
-            try {
-                setUserData(JSON.parse(user));
-                fetchStats();
-            } catch (error) {
-                console.error("Error parsing user data in dashboard layout:", error);
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
-                navigate('/login');
-            }
-        } else {
-            navigate('/login');
-        }
-
-        if (isMobile) {
-            setSidebarOpen(false);
-        }
-
-        const handleExternalToggle = () => setSidebarOpen(prev => !prev);
-        window.addEventListener('toggle-dashboard-sidebar', handleExternalToggle);
-        return () => window.removeEventListener('toggle-dashboard-sidebar', handleExternalToggle);
-    }, [isMobile, navigate]);
-
-    const fetchStats = async () => {
+    async function fetchStats() {
         try {
             const response = await api.get('/mlm/get-stats');
             if (response.data) {
@@ -65,7 +50,24 @@ const UserDashboardLayout = () => {
         } catch (error) {
             console.error("Error fetching stats in layout:", error);
         }
-    };
+    }
+
+    useEffect(() => {
+        if (!userData) {
+            navigate('/login');
+            return;
+        }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchStats();
+
+        if (isMobile) {
+            setSidebarOpen(false);
+        }
+
+        const handleExternalToggle = () => setSidebarOpen(prev => !prev);
+        window.addEventListener('toggle-dashboard-sidebar', handleExternalToggle);
+        return () => window.removeEventListener('toggle-dashboard-sidebar', handleExternalToggle);
+    }, [isMobile, navigate, userData]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -295,17 +297,26 @@ const UserDashboardLayout = () => {
                                         <div className="bg-black/40 py-1.5 space-y-0.5 mx-2 rounded-2xl border border-white/5 my-1 shadow-inner">
                                             {item.children.map((child) => {
                                                 const childActive = location.pathname === child.path;
+                                                const isMatchingItem = ['first_silver', 'first_gold', 'first_diamond'].includes(child.id);
+                                                const matchingTone =
+                                                    child.id === 'first_silver' ? 'text-[#D7DCE2]' :
+                                                    child.id === 'first_gold' ? 'text-[#D4AF37]' :
+                                                    child.id === 'first_diamond' ? 'text-[#F4E7C1]' :
+                                                    'text-[#F5E6C8]';
                                                 return (
                                                     <Link
                                                         key={child.id}
                                                         to={child.path}
                                                         onClick={() => isMobile && setSidebarOpen(false)}
-                                                        className={`block pl-12 pr-4 py-2 text-[13px] transition-all rounded-xl mx-2 ${childActive
-                                                            ? 'text-[#C8A96A] font-bold bg-[#C8A96A]/10'
-                                                            : 'text-white/60 hover:text-[#C8A96A] hover:bg-white/5 font-bold'
+                                                        className={`block pl-12 pr-4 py-2.5 text-[18px] transition-all rounded-xl mx-2 font-black tracking-tight ${childActive
+                                                            ? 'text-[#C8A96A] bg-[#C8A96A]/12'
+                                                            : `${isMatchingItem ? `${matchingTone} hover:text-[#F5E6C8] bg-[#C8A96A]/[0.03]` : 'text-[#F5E6C8]'} hover:bg-[#C8A96A]/10`
                                                             }`}
                                                     >
-                                                        {child.name}
+                                                        <span className="inline-flex items-center gap-2">
+                                                            {isMatchingItem && <span className="text-[#C8A96A]">•</span>}
+                                                            {child.name}
+                                                        </span>
                                                     </Link>
                                                 );
                                             })}
@@ -338,12 +349,12 @@ const UserDashboardLayout = () => {
 
             {/* Main Content Area */}
             <main
-                className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-88px)] md:min-h-[calc(100vh-115px)] text-white
+                className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-88px)] md:min-h-[calc(100vh-115px)] text-white overflow-x-hidden
                     ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}
             >
-                <div className="flex-1 px-4 md:px-8 pb-8 pt-0 animate-fadeIn relative">
+                <div className="flex-1 pb-8 pt-0 animate-fadeIn relative">
                     {!sidebarOpen && isMobile && (
-                        <div className="py-5 mb-4 flex items-center space-x-4 text-[#C8A96A] md:hidden">
+                        <div className="py-5 mb-4 px-4 flex items-center space-x-4 text-[#C8A96A] md:hidden">
                             <button
                                 onClick={() => setSidebarOpen(true)}
                                 className="w-14 h-14 flex items-center justify-center bg-[#1A1A1A] shadow-xl shadow-black/40 border border-[#C8A96A]/20 rounded-[2rem] active:scale-95 transition-all text-[#C8A96A]"
@@ -375,6 +386,21 @@ const UserDashboardLayout = () => {
                 
                 /* Selection Color */
                 ::selection { background: rgba(200, 169, 106, 0.28); color: #C8A96A; }
+
+                /* Print cleanup: hide dashboard shell so print pages use full width */
+                @media print {
+                    aside {
+                        display: none !important;
+                    }
+                    main {
+                        margin-left: 0 !important;
+                        min-height: auto !important;
+                        width: 100% !important;
+                    }
+                    body, html {
+                        background: #fff !important;
+                    }
+                }
             `}</style>
         </div>
     );
