@@ -124,8 +124,8 @@ const AboutUsPage = () => {
                     </div>
 
                     {/* Right Image */}
-                    <div className="relative animate-slide-left">
-                        <div className="absolute -inset-4 border border-[#C8A96A]/20 rounded-[2rem] -rotate-2"></div>
+                    <div className="relative min-w-0 animate-slide-left">
+                        <div className="absolute -inset-2 md:-inset-4 border border-[#C8A96A]/20 rounded-[2rem] -rotate-2"></div>
                         <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-black">
                             <img
                                 src={seminarImage}
@@ -300,9 +300,9 @@ const AboutUsPage = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => navigate('/register')}
-                        className="group relative inline-flex items-center justify-center px-12 py-5 font-bold text-[#0D0D0D] transition-all duration-300 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] rounded-full hover:shadow-[0_0_40px_rgba(200,169,106,0.4)]"
+                        className="group relative inline-flex w-full max-w-full items-center justify-center px-6 py-4 md:w-auto md:px-12 md:py-5 font-bold text-[#0D0D0D] transition-all duration-300 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] rounded-full hover:shadow-[0_0_40px_rgba(200,169,106,0.4)]"
                     >
-                        <span className="relative z-10 uppercase tracking-[0.2em] text-sm">Join Sanyukt Parivaar Today</span>
+                        <span className="relative z-10 break-words text-center uppercase tracking-[0.2em] text-xs md:text-sm">Join Sanyukt Parivaar Today</span>
                         <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
                     </Motion.button>
                 </div>
