@@ -188,3 +188,55 @@ exports.getTeamList = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+/**
+ * Get overall system-wide MLM statistics for Admin
+ */
+exports.getSystemMLMStats = async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments({});
+        const activeUsersCount = await User.countDocuments({ activeStatus: true });
+        
+        const pvTotals = await User.aggregate([
+            { $group: { 
+                _id: null, 
+                totalPV: { $sum: { $toDouble: "$pv" } },
+                totalBV: { $sum: { $toDouble: "$bv" } },
+                totalMatchedPV: { $sum: { $toDouble: "$matchedPV" } }
+            }}
+        ]);
+
+        const treeTotals = await BinaryTree.aggregate([
+            { $group: {
+                _id: null,
+                totalLeftPV: { $sum: "$leftPV" },
+                totalRightPV: { $sum: "$rightPV" },
+                totalLeftBV: { $sum: "$leftBV" },
+                totalRightBV: { $sum: "$rightBV" }
+            }}
+        ]);
+
+        const incomeTotals = await IncomeHistory.aggregate([
+            { $group: {
+                _id: "$type",
+                total: { $sum: "$amount" }
+            }}
+        ]);
+
+        const rankDistribution = await User.aggregate([
+            { $group: { _id: "$rank", count: { $sum: 1 } } }
+        ]);
+
+        res.json({
+            totalUsers,
+            activeUsers: activeUsersCount,
+            pvStats: pvTotals[0] || { totalPV: 0, totalBV: 0, totalMatchedPV: 0 },
+            treeStats: treeTotals[0] || { totalLeftPV: 0, totalRightPV: 0, totalLeftBV: 0, totalRightBV: 0 },
+            incomeStats: incomeTotals.reduce((acc, curr) => ({ ...acc, [curr._id]: curr.total }), {}),
+            rankDistribution: rankDistribution.reduce((acc, curr) => ({ ...acc, [curr._id || 'Member']: curr.count }), {})
+        });
+    } catch (error) {
+        console.error("getSystemMLMStats error:", error);
+        res.status(500).json({ message: error.message });
+    }
+};

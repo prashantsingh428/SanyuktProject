@@ -198,34 +198,6 @@ const AdminDashboard = () => {
         ]
     };
 
-    const orderChartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        datasets: [
-            {
-                label: 'Orders',
-                data: orderStats.chartData,
-                borderColor: '#2196F3',
-                backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                fill: true
-            }
-        ]
-    };
-
-    const pieChartData = {
-        labels: ['Active Users', 'Inactive Users', 'Pending'],
-        datasets: [
-            {
-                data: [
-                    userStats.active,
-                    userStats.total - userStats.active,
-                    userStats.newToday
-                ],
-                backgroundColor: ['#4CAF50', '#f44336', '#ff9800'],
-                borderWidth: 0
-            }
-        ]
-    };
-
     // Helper for Activity Icons and Colors
     const getActivityConfig = (type) => {
         switch (type) {
