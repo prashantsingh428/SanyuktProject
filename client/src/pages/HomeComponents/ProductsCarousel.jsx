@@ -5,7 +5,6 @@ import { API_URL } from '../../api';
 
 const ProductsCarousel = ({
     products,
-    loading = false,
     scroll,
     carouselRef,
     calculateDiscount,
@@ -57,49 +56,33 @@ const ProductsCarousel = ({
                     className="flex gap-4 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-hide no-scrollbar"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                    {loading ? (
-                        /* Skeleton Loading State */
-                        [...Array(6)].map((_, i) => (
-                            <div key={i} className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] snap-center">
-                                <div className="luxury-box h-72 animate-pulse flex flex-col">
-                                    <div className="h-32 bg-[#1A1A1A] skeleton-box shimmer border-b border-[#C8A96A]/10"></div>
-                                    <div className="p-3">
-                                        <div className="h-2 w-16 bg-[#1A1A1A] skeleton-box shimmer mb-2"></div>
-                                        <div className="h-4 w-full bg-[#1A1A1A] skeleton-box shimmer mb-3"></div>
-                                        <div className="flex justify-between items-end mt-4">
-                                            <div className="h-6 w-20 bg-[#1A1A1A] skeleton-box shimmer"></div>
-                                            <div className="h-4 w-12 bg-[#1A1A1A] skeleton-box shimmer"></div>
-                                        </div>
-                                        <div className="h-8 w-full bg-[#1A1A1A] skeleton-box shimmer mt-4"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    ) : products && products.length > 0 ? (
-                        products.map((product) => {
-                            const productId = product._id || product.slug || product.name;
-                            const price = product.price || product.dp || 0;
-                            const oldPrice = product.oldPrice || product.mrp || 0;
-                            const bv = product.bv || 0;
-                            const rating = product.rating || 5;
-                            const reviews = product.numReviews || product.reviews || 0;
-                            const category = product.category || "General";
-                            const discount = calculateDiscount(oldPrice, price);
+                    {products.map((product) => {
+                        const price = product.price || product.dp || 0;
+                        const oldPrice = product.oldPrice || product.mrp || 0;
+                        const bv = product.bv || 0;
+                        const rating = product.rating || 5;
+                        const reviews = product.numReviews || product.reviews || 0;
+                        const category = product.category || "General";
+                        const discount = calculateDiscount(oldPrice, price);
 
-                            // Image logic
-                            const getImageUrl = (image) => {
-                                if (!image) return null;
-                                if (image.startsWith('http')) return image;
-                                const path = image.startsWith('/uploads') ? image : `/uploads/${image}`;
-                                return `${API_URL}${path}`;
-                            };
+                        // Image logic
+                        const getImageUrl = (image) => {
+                            if (!image) return null;
+                            if (image.startsWith('http')) return image;
+                            const path = image.startsWith('/uploads') ? image : `/uploads/${image}`;
+                            return `${API_URL}${path}`;
+                        };
 
-                            const imageUrl = getImageUrl(product.image);
+                        const imageUrl = getImageUrl(product.image);
 
-                            return (
-                                <div
-                                    key={productId}
-                                    className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] snap-center"
+                        return (
+                            <div
+                                key={product._id || product.slug}
+                                className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] snap-center"
+                            >
+                                <motion.div
+                                    whileHover={{ y: -6 }}
+                                    className="luxury-box overflow-hidden transition-all duration-500 group relative"
                                 >
                                     <Motion.div
                                         whileHover={{ y: -6 }}
@@ -126,27 +109,28 @@ const ProductsCarousel = ({
                                                 </div>
                                             )}
 
-                                            {/* Top Utility Buttons */}
-                                            <div className="absolute top-3 left-3 flex flex-col items-start gap-2 z-20">
-                                                {parseInt(discount) > 0 && (
-                                                    <span className="w-fit bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow-lg">
-                                                        -{discount}%
-                                                    </span>
-                                                )}
+                                        {imageUrl && !imageErrors[product._id || product.name] ? (
+                                            <motion.img
+                                                whileHover={{ scale: 1.15 }}
+                                                transition={{ duration: 0.8, ease: "easeOut" }}
+                                                src={imageUrl}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover"
+                                                onError={() => handleImageError(product._id || product.name)}
+                                            />
+                                        ) : (
+                                            <div className="text-9xl grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110">
+                                                {product.fallbackIcon || "📦"}
                                             </div>
+                                        )}
 
-                                            {/* Action Float Area */}
-                                            <div className="absolute bottom-3 right-3 z-20 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        addToCart(product);
-                                                    }}
-                                                    className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300"
-                                                >
-                                                    <ShoppingCart className="w-4 h-4" />
-                                                </button>
-                                            </div>
+                                        {/* Top Utility Buttons */}
+                                        <div className="absolute top-3 left-3 flex flex-col items-start gap-2 z-20">
+                                            {parseInt(discount) > 0 && (
+                                                <span className="w-fit bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest shadow-lg">
+                                                    -{discount}%
+                                                </span>
+                                            )}
                                         </div>
 
                                         {/* Product Details */}
@@ -185,7 +169,7 @@ const ProductsCarousel = ({
                                                     <span className="bg-orange-50 text-[#F7931E] px-2 py-0.5 rounded-lg text-[11px] font-black uppercase tracking-widest border border-orange-100">
                                                         BV {bv}
                                                     </span>
-                                                </div>
+                                                )}
                                             </div>
 
                                             <div className="mt-2 flex flex-col gap-1.5">
@@ -217,10 +201,8 @@ const ProductsCarousel = ({
                             <div className="w-16 h-16 rounded-full bg-[#C8A96A]/5 flex items-center justify-center mb-4 border border-[#C8A96A]/10">
                                 <Star className="w-8 h-8 text-[#C8A96A]/20" />
                             </div>
-                            <h3 className="text-[#F5E6C8] font-serif text-lg mb-1 uppercase tracking-widest">No Featured Products</h3>
-                            <p className="text-[#F5E6C8]/40 text-xs font-light max-w-xs">Our latest collection is arriving soon. Check back later for updates.</p>
-                        </div>
-                    )}
+                        );
+                    })}
                 </div>
             </div>
 
