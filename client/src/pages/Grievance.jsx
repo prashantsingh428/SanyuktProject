@@ -4,6 +4,7 @@ import api from "../api"; // path check kar lena
 import { Snackbar, Alert, Fade } from '@mui/material';
 
 import { ChevronRight, Phone, Mail, User, MessageSquare, Send, AlertCircle, CheckCircle, ExternalLink, UserCircle, FileText, X, Ticket } from 'lucide-react';
+import CustomSelect from '../components/CustomSelect';
 
 const GrievancePage = () => {
     const [formData, setFormData] = useState({
@@ -66,7 +67,7 @@ const GrievancePage = () => {
                         department: "Support Team",
                         description: "Your grievance is being processed"
                     });
-                } catch (err) {
+                } catch {
                     setStatusError("❌ Ticket not found");
                 }
             };
@@ -144,7 +145,7 @@ const GrievancePage = () => {
                 message: ''
             });
 
-        } catch (err) {
+        } catch {
             setError("❌ Server error, try again");
         }
     };
@@ -172,7 +173,7 @@ const GrievancePage = () => {
                 description: "Your grievance is being processed"
             });
 
-        } catch (err) {
+        } catch {
             setStatusError("âŒ Ticket not found");
             setStatusResult(null);
         }
@@ -190,21 +191,26 @@ const GrievancePage = () => {
 
     return (
         <div className="bg-[#0D0D0D] font-sans min-h-screen">
-            {/* Hero Banner */}
-            <header className="relative min-h-[180px] md:min-h-[220px] bg-cover bg-center border-b border-[#C8A96A]/20 flex items-center justify-center pt-8 pb-4"
-                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070')" }}>
-                <div className="absolute inset-0 bg-[#0D0D0D]/80 backdrop-blur-sm"></div>
-                <div className="relative flex flex-col items-center justify-center text-center px-4">
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#C8A96A] mb-3 animate-fade-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            {/* 1. PAGE BANNER - Premium Design */}
+            <section className='relative min-h-[160px] md:min-h-[240px] flex items-center justify-center overflow-hidden bg-[#0D0D0D] py-8 md:py-12 border-b border-[#C8A96A]/20'>
+                <div
+                    className='absolute inset-0 bg-cover bg-center opacity-100'
+                    style={{
+                        backgroundImage: "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070')",
+                    }}
+                ></div>
+                <div className='absolute inset-0 bg-[#0D0D0D]/40 bg-gradient-to-r from-[#0D0D0D]/90 via-[#0D0D0D]/60 to-transparent'></div>
+                <div className='relative z-10 text-center px-4 w-full max-w-6xl mx-auto'>
+                    <h1 className='text-3xl md:text-6xl font-serif font-bold mb-2 md:mb-4 tracking-tight drop-shadow-2xl text-[#C8A96A] animate-fade-in'>
                         Grievance
                     </h1>
-                    <div className="flex items-center text-[#F5E6C8]/60 text-xs md:text-sm flex-wrap justify-center font-bold tracking-[0.2em] uppercase">
-                        <Link to="/" className="hover:text-[#C8A96A] transition-colors">Home</Link>
-                        <ChevronRight className="w-4 h-4 mx-2" />
-                        <span className="text-[#C8A96A]">Grievance</span>
+                    <div className='flex items-center justify-center gap-2 text-xs md:text-sm font-medium text-[#F5E6C8]/60 tracking-widest uppercase'>
+                        <Link to="/" className='hover:text-[#C8A96A] cursor-pointer transition-colors'>Home</Link>
+                        <ChevronRight className='w-3 h-3 md:w-4 md:h-4 text-[#C8A96A]' />
+                        <span className='text-[#C8A96A] font-bold'>Grievance</span>
                     </div>
                 </div>
-            </header>
+            </section>
 
             {/* Main Content */}
             <section className="py-12 px-4 max-w-7xl mx-auto">
@@ -369,21 +375,21 @@ const GrievancePage = () => {
                                         <label className="block text-xs font-bold text-[#C8A96A] uppercase tracking-widest">
                                             Category <span className="text-red-400">*</span>
                                         </label>
-                                        <select
+                                        <CustomSelect
                                             name="category"
                                             value={formData.category}
-                                            onChange={handleChange}
+                                            onChange={(val) => handleChange({ target: { name: 'category', value: val } })}
+                                            placeholder="Select Category"
                                             required
-                                            className="w-full px-4 py-2.5 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] focus:outline-none focus:border-[#C8A96A] focus:ring-1 focus:ring-[#C8A96A]/30 transition-all"
-                                        >
-                                            <option value="" className="bg-[#1A1A1A]">Select Category</option>
-                                            <option value="Billing" className="bg-[#1A1A1A]">Billing</option>
-                                            <option value="Product" className="bg-[#1A1A1A]">Product</option>
-                                            <option value="Delivery" className="bg-[#1A1A1A]">Delivery</option>
-                                            <option value="Payment" className="bg-[#1A1A1A]">Payment</option>
-                                            <option value="Technical" className="bg-[#1A1A1A]">Technical</option>
-                                            <option value="Other" className="bg-[#1A1A1A]">Other</option>
-                                        </select>
+                                            options={[
+                                                { value: 'Billing', label: 'Billing' },
+                                                { value: 'Product', label: 'Product' },
+                                                { value: 'Delivery', label: 'Delivery' },
+                                                { value: 'Payment', label: 'Payment' },
+                                                { value: 'Technical', label: 'Technical' },
+                                                { value: 'Other', label: 'Other' }
+                                            ]}
+                                        />
                                     </div>
 
                                     {/* Subject * */}
@@ -573,7 +579,7 @@ const GrievancePage = () => {
                 open={snackbar.open}
                 autoHideDuration={8000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 TransitionComponent={Fade}
             >
                 <Alert
@@ -599,4 +605,3 @@ const GrievancePage = () => {
 };
 
 export default GrievancePage;
-

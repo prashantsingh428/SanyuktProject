@@ -16,8 +16,11 @@ import {
     Menu,
     MenuItem,
     Avatar,
+    Divider,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
+import InfoIcon from '@mui/icons-material/Info';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -31,27 +34,100 @@ import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import HistoryIcon from '@mui/icons-material/History';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import StoreIcon from '@mui/icons-material/Store';
 import InputBase from '@mui/material/InputBase';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import {
+    Phone,
+    Mail,
+    Facebook,
+    Instagram,
+    Youtube,
+    Twitter,
+    ChevronRight,
+    ArrowRight
+} from 'lucide-react';
 
 // Main Header Styling (Sticky, Full width, 80px desktop, 60px mobile)
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-    backgroundColor: '#0D0D0D',
+    backgroundColor: 'rgba(13, 13, 13, 0.95)',
     backdropFilter: 'blur(20px)',
     boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6)',
-    borderBottom: '1px solid rgba(200, 169, 106, 0.4)',
-    minHeight: '72px',
-    height: '72px',
-    justifyContent: 'center',
+    borderBottom: '1px solid rgba(200, 169, 106, 0.3)',
+    minHeight: '88px',
+    height: '88px',
     position: 'fixed',
     top: 0,
     zIndex: 1100,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    transition: 'all 0.3s ease',
     [theme.breakpoints.up('md')]: {
-        minHeight: '80px',
-        height: '80px',
+        minHeight: '115px',
+        height: '115px',
     },
 }));
+
+const TopInfoBar = styled(Box)(({ theme }) => ({
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+        display: 'flex',
+        alignItems: 'center',
+        paddingBottom: '8px',
+        borderBottom: '1px solid rgba(200, 169, 106, 0.1)',
+        marginBottom: '2px',
+        width: '100%',
+        justifyContent: 'flex-end',
+        gap: '15px',
+    },
+}));
+
+const InfoItem = styled(Box)({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    color: '#F5E6C8',
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+    opacity: 0.9,
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+        color: '#C8A96A',
+        opacity: 1,
+    },
+    '& svg': {
+        width: '13px',
+        height: '13px',
+        color: '#C8A96A',
+    },
+});
+
+const SocialIcons = styled(Box)({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '0 10px',
+    borderLeft: '1px solid rgba(200, 169, 106, 0.2)',
+    borderRight: '1px solid rgba(200, 169, 106, 0.2)',
+    '& svg': {
+        width: '13px',
+        height: '13px',
+        color: '#F5E6C8',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+            color: '#C8A96A',
+            transform: 'translateY(-2px)',
+        },
+    },
+});
 
 const LogoContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -59,29 +135,26 @@ const LogoContainer = styled(Box)(({ theme }) => ({
     alignItems: 'center',
     gap: '8px',
     cursor: 'pointer',
-    maxWidth: '220px',
-    flexShrink: 0,
+    maxWidth: '220px', // Reduced from 280px to safely fit and avoid overflow on narrow mobile screens
+    flexShrink: 1, // Allow it to shrink if needed
     [theme.breakpoints.up('md')]: {
         gap: '12px',
-        maxWidth: '350px',
+        maxWidth: '400px',
     },
     [theme.breakpoints.up('lg')]: {
-        maxWidth: '380px',
+        maxWidth: '450px',
     },
     [theme.breakpoints.up('xl')]: {
-        maxWidth: '450px',
+        maxWidth: '500px',
     },
 }));
 
 const LogoImage = styled('img')(({ theme }) => ({
-    height: '36px',
+    height: '84px',
     width: 'auto',
     objectFit: 'contain',
     [theme.breakpoints.up('md')]: {
-        height: '40px',
-    },
-    [theme.breakpoints.up('lg')]: {
-        height: '48px',
+        height: '110px',
     },
 }));
 
@@ -121,14 +194,14 @@ const LogoTagline = styled('span')(({ theme }) => ({
 }));
 
 // NavButton with exact styling
-const NavButton = styled(Button)(({ theme }) => ({
+const NavButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
     color: '#F5E6C8',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
-    padding: '4px 8px',
+    padding: '4px 6px',
     minWidth: 'auto',
     whiteSpace: 'nowrap',
     borderRadius: '2px',
@@ -144,7 +217,7 @@ const NavButton = styled(Button)(({ theme }) => ({
 }));
 
 // Register Button (#C9A84C, White text)
-const RegisterButton = styled(Button)(({ theme }) => ({
+const RegisterButton = styled(Button)(() => ({
     className: 'luxury-button',
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
@@ -163,7 +236,7 @@ const RegisterButton = styled(Button)(({ theme }) => ({
     transition: 'all 0.3s ease',
 }));
 
-const LoginButton = styled(Button)(({ theme }) => ({
+const LoginButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -182,7 +255,7 @@ const LoginButton = styled(Button)(({ theme }) => ({
 }));
 
 // My Account Button (Yellow/Orange theme color)
-const MyAccountButton = styled(Button)(({ theme }) => ({
+const MyAccountButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -203,7 +276,7 @@ const MyAccountButton = styled(Button)(({ theme }) => ({
 }));
 
 // Admin Dashboard Button (Orange/Different color - for admins)
-const AdminDashboardButton = styled(Button)(({ theme }) => ({
+const AdminDashboardButton = styled(Button)(() => ({
     fontFamily: '"Inter", sans-serif',
     fontSize: '11px',
     fontWeight: 700,
@@ -415,11 +488,6 @@ const Header = () => {
     };
 
 
-    const handleAdminDashboardClick = () => {
-        handleUserMenuClose();
-        navigate('/admin/dashboard');
-    };
-
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -490,12 +558,8 @@ const Header = () => {
             <Box sx={{ px: 2, pb: 2, borderBottom: '1px solid rgba(201,168,76,0.3)', mb: 1 }}>
                 <LogoContainer onClick={() => handleNavigation('/')}>
                     {!logoError && (
-                        <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                        <LogoImage src="/logo.png?v=20260403d" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
                     )}
-                    {/* <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2 }}>
-                        <LogoMain>Sanyukt Parivaar <span style={{ fontSize: '0.9rem' }}>&</span> Rich Life</LogoMain>
-                        <LogoTagline>Together We Grow, Together We Prosper</LogoTagline>
-                    </Box> */}
                 </LogoContainer>
             </Box>
 
@@ -508,8 +572,8 @@ const Header = () => {
                             sx={{
                                 '& .MuiTypography-root': {
                                     fontFamily: '"Poppins", "Roboto", sans-serif',
-                                    fontSize: '14px',
-                                    fontWeight: 500,
+                                    fontSize: '18px',
+                                    fontWeight: 600,
                                     color: isActive('/') ? '#C8A96A' : '#C8A96A'
                                 }
                             }}
@@ -517,7 +581,7 @@ const Header = () => {
                     </StyledListItemButton>
                 </ListItem>
 
-                {/* Company Submenu (Mobile Drawer) */}
+                {/* Company Dropdown (Mobile Drawer) */}
                 <ListItem disablePadding sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                     <StyledListItemButton onClick={handleMobileCompanyToggle} sx={{ width: '100%' }}>
                         <ListItemText
@@ -525,8 +589,8 @@ const Header = () => {
                             sx={{
                                 '& .MuiTypography-root': {
                                     fontFamily: '"Poppins", "Roboto", sans-serif',
-                                    fontSize: '14px',
-                                    fontWeight: 500,
+                                    fontSize: '18px',
+                                    fontWeight: 600,
                                     color: isCompanyActive() ? '#C8A96A' : '#C8A96A'
                                 }
                             }}
@@ -546,7 +610,7 @@ const Header = () => {
                                         sx={{
                                             '& .MuiTypography-root': {
                                                 fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                fontSize: '13px',
+                                                fontSize: '16px',
                                                 fontWeight: 500,
                                                 color: isActive(subItem.path) ? '#C8A96A' : '#C8A96A'
                                             }
@@ -567,8 +631,8 @@ const Header = () => {
                                 sx={{
                                     '& .MuiTypography-root': {
                                         fontFamily: '"Poppins", "Roboto", sans-serif',
-                                        fontSize: '14px',
-                                        fontWeight: 500,
+                                        fontSize: '18px',
+                                        fontWeight: 600,
                                         color: isActive(item.path) ? '#C8A96A' : '#C8A96A'
                                     }
                                 }}
@@ -585,8 +649,8 @@ const Header = () => {
                             sx={{
                                 '& .MuiTypography-root': {
                                     fontFamily: '"Poppins", "Roboto", sans-serif',
-                                    fontSize: '14px',
-                                    fontWeight: 500,
+                                    fontSize: '18px',
+                                    fontWeight: 600,
                                     color: isFranchiseActive() ? '#C8A96A' : '#C8A96A'
                                 }
                             }}
@@ -606,7 +670,7 @@ const Header = () => {
                                         sx={{
                                             '& .MuiTypography-root': {
                                                 fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                fontSize: '13px',
+                                                fontSize: '16px',
                                                 fontWeight: 500,
                                                 color: isActive(subItem.path) ? '#C8A96A' : '#C8A96A'
                                             }
@@ -626,8 +690,8 @@ const Header = () => {
                                 sx={{
                                     '& .MuiTypography-root': {
                                         fontFamily: '"Poppins", "Roboto", sans-serif',
-                                        fontSize: '14px',
-                                        fontWeight: 500,
+                                        fontSize: '18px',
+                                        fontWeight: 600,
                                         color: isActive(item.path) ? '#C8A96A' : '#C8A96A'
                                     }
                                 }}
@@ -669,8 +733,8 @@ const Header = () => {
                                                 sx={{
                                                     '& .MuiTypography-root': {
                                                         fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                        fontSize: '14px',
-                                                        fontWeight: 600,
+                                                        fontSize: '18px',
+                                                        fontWeight: 700,
                                                         color: '#C8A96A'
                                                     }
                                                 }}
@@ -692,7 +756,7 @@ const Header = () => {
                                                                 sx={{
                                                                     '& .MuiTypography-root': {
                                                                         fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                                        fontSize: '13px',
+                                                                        fontSize: '16px',
                                                                         fontWeight: 500,
                                                                         color: isActive(subItem.path) ? '#C8A96A' : '#C8A96A'
                                                                     }
@@ -712,7 +776,7 @@ const Header = () => {
                                                             sx={{
                                                                 '& .MuiTypography-root': {
                                                                     fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                                    fontSize: '13px',
+                                                                    fontSize: '16px',
                                                                     fontWeight: 500,
                                                                     color: isActive('/my-account') ? '#C8A96A' : '#C8A96A'
                                                                 }
@@ -735,10 +799,10 @@ const Header = () => {
                         </>
                     ) : (
                         <>
-                            <RegisterButton onClick={() => handleNavigation('/register')} sx={{ ml: 0, width: '100%' }}>
+                            <RegisterButton onClick={() => handleNavigation('/register')} sx={{ ml: 0, width: '100%', fontSize: '14px', py: 1.5 }}>
                                 Register
                             </RegisterButton>
-                            <LoginButton onClick={() => handleNavigation('/login')} sx={{ ml: 0, width: '100%' }}>
+                            <LoginButton onClick={() => handleNavigation('/login')} sx={{ ml: 0, width: '100%', fontSize: '14px', py: 1.5 }}>
                                 Login
                             </LoginButton>
                         </>
@@ -751,315 +815,118 @@ const Header = () => {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <StyledAppBar position="fixed">
-                <Container maxWidth={false} sx={{ px: { xs: 2, lg: 3 } }}>
+                <Container maxWidth={false} sx={{ px: { xs: 2, sm: 2.5, lg: 3 } }}>
                     <Toolbar disableGutters sx={{
                         height: '100%',
                         position: 'relative',
-                        justifyContent: { xs: 'space-between', lg: 'center' },
+                        justifyContent: 'space-between',
                         gap: { lg: 3, xl: 4 }
                     }}>
 
-                        {/* LEFT SPACER (MOBILE/TABLET) */}
-                        <Box
-                            sx={{
-                                display: { xs: 'flex', lg: 'none' },
-                                width: '48px',
-                                flexShrink: 0,
-                            }}
-                        />
 
-                        {/* LEFT - NAVIGATION (DESKTOP) */}
-                        <Box sx={{
-                            display: { xs: 'none', lg: 'flex' },
-                            alignItems: 'center',
-                            gap: { lg: 1, xl: 2 },
-                            flexWrap: 'nowrap',
-                            justifyContent: 'flex-start'
-                        }}>
-
-                            <NavButton
-                                className={isActive('/') ? 'active' : ''}
-                                onClick={() => handleNavigation('/')}
-                            >
-                                Home
-                            </NavButton>
-
-                            {/* Company Dropdown (Desktop) */}
-                            <Box sx={{ position: 'relative' }}>
-                                <NavButton
-                                    className={isCompanyActive() ? 'active' : ''}
-                                    onClick={handleCompanyClick}
-                                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                                >
-                                    Sanyukt Parivaar
-                                    <ExpandMore
-                                        sx={{
-                                            fontSize: '18px',
-                                            transform: openCompanyMenu ? 'rotate(180deg)' : 'rotate(0deg)',
-                                            transition: 'transform 0.2s'
-                                        }}
-                                    />
-                                </NavButton>
-
-                                <Menu
-                                    anchorEl={anchorElCompany}
-                                    open={openCompanyMenu}
-                                    onClose={handleCompanyClose}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'left',
-                                    }}
-                                    MenuListProps={{
-                                        sx: {
-                                            padding: '8px',
-                                        }
-                                    }}
-                                    slotProps={{
-                                        paper: {
-                                            elevation: 0,
-                                            sx: {
-                                                mt: 1.5,
-                                                minWidth: '180px',
-                                                boxShadow: '0px 10px 40px rgba(0,0,0,0.6)',
-                                                border: '1px solid rgba(201,168,76,0.2)',
-                                                borderRadius: '12px',
-                                                overflow: 'visible',
-                                                '&:before': {
-                                                    content: '""',
-                                                    display: 'block',
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 24,
-                                                    width: 10,
-                                                    height: 10,
-                                                    bgcolor: '#1A1A1A',
-                                                    transform: 'translateY(-50%) rotate(45deg)',
-                                                    zIndex: 0,
-                                                    borderTop: '1px solid rgba(201,168,76,0.2)',
-                                                    borderLeft: '1px solid rgba(201,168,76,0.2)',
-                                                },
-                                            }
-                                        }
-                                    }}
-                                    disableScrollLock
-                                >
-                                    {companySubItems.map((item) => (
-                                        <MenuItem
-                                            key={item.name}
-                                            onClick={() => handleCompanyItemClick(item.path)}
-                                            sx={{
-                                                fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                fontSize: '14px',
-                                                fontWeight: 500,
-                                                color: isActive(item.path) ? '#C9A84C' : '#C9A84C',
-                                                borderRadius: '8px',
-                                                py: 1,
-                                                px: 1.5,
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(201,168,76,0.1)',
-                                                    color: '#C9A84C',
-                                                }
-                                            }}
-                                        >
-                                            {item.name}
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
-                            </Box>
-
-                            {menuItems.slice(1, -1).map((item) => (
-                                <NavButton
-                                    key={item.name}
-                                    className={isActive(item.path) ? 'active' : ''}
-                                    onClick={() => handleNavigation(item.path)}
-                                >
-                                    {item.name}
-                                </NavButton>
-                            ))}
-                        </Box>
-
-                        {/* CENTER - LOGO */}
+                        {/* LEFT - LOGO */}
                         <Box sx={{
                             display: 'flex',
-                            justifyContent: 'center',
                             alignItems: 'center',
-                            position: { xs: 'absolute', lg: 'static' },
-                            left: { xs: '50%', lg: 'auto' },
-                            transform: { xs: 'translateX(-50%)', lg: 'none' },
-                            width: { xs: 'calc(100% - 112px)', sm: 'auto' },
-                            maxWidth: { xs: '230px', sm: '260px', lg: 'none' },
+                            flexShrink: 0
                         }}>
                             <LogoContainer onClick={() => handleNavigation('/')}>
                                 {!logoError && (
-                                    <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                                    <LogoImage src="/logo.png?v=20260403d" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
                                 )}
                             </LogoContainer>
                         </Box>
 
-                        {/* RIGHT - NAVIGATION (DESKTOP) */}
+                        {/* SPACER to push navigation to the right */}
+                        <Box sx={{ flexGrow: 1 }} />
+
+                        {/* NAVIGATION GROUP (DESKTOP) - Now 2 Rows */}
                         <Box sx={{
                             display: { xs: 'none', lg: 'flex' },
-                            alignItems: 'center',
-                            gap: { lg: 1, xl: 2 },
-                            flexWrap: 'nowrap',
-                            justifyContent: 'flex-end'
+                            flexDirection: 'column',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center',
+                            height: '100%',
+                            flexGrow: 1
                         }}>
-                            {/* "My Cart" moved to the right side */}
-                            {menuItems.slice(-1).map((item) => (
-                                <NavButton
-                                    key={item.name}
-                                    className={isActive(item.path) ? 'active' : ''}
-                                    onClick={() => handleNavigation(item.path)}
-                                >
-                                    {item.name}
-                                </NavButton>
-                            ))}
-                            {/* Franchise Dropdown (Desktop) */}
-                            <Box sx={{ position: 'relative' }}>
-                                <NavButton
-                                    className={isFranchiseActive() ? 'active' : ''}
-                                    onClick={handleFranchiseClick}
-                                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                                >
-                                    Franchise
-                                    <ExpandMore
-                                        sx={{
-                                            fontSize: '18px',
-                                            transform: openFranchiseMenu ? 'rotate(180deg)' : 'rotate(0deg)',
-                                            transition: 'transform 0.2s'
-                                        }}
+                            {/* TOP ROW: Contact & Socials */}
+                            <TopInfoBar>
+                                <InfoItem onClick={() => window.open('tel:+917880370057', '_self')}>
+                                    <Phone />
+                                    <span>+91 78803 70057</span>
+                                </InfoItem>
+
+                                <SocialIcons>
+                                    <Facebook
+                                        strokeWidth={1.5}
+                                        onClick={(e) => { e.stopPropagation(); window.open('https://www.facebook.com/share/1CLin8tmY3/', '_blank'); }}
                                     />
-                                </NavButton>
+                                    <Instagram
+                                        strokeWidth={1.5}
+                                        onClick={(e) => { e.stopPropagation(); window.open('https://www.instagram.com/sanyukt_parivaar_rich_life_57?igsh=dDJlMDd0d241amRx', '_blank'); }}
+                                    />
+                                    <Youtube
+                                        strokeWidth={1.5}
+                                        onClick={(e) => { e.stopPropagation(); window.open('https://www.youtube.com/@Sanyuktparivaarrichlife', '_blank'); }}
+                                    />
+                                    <Twitter
+                                        strokeWidth={1.5}
+                                        onClick={(e) => { e.stopPropagation(); window.open('https://x.com/sprichlife_57', '_blank'); }}
+                                    />
+                                </SocialIcons>
 
-                                <Menu
-                                    anchorEl={anchorElFranchise}
-                                    open={openFranchiseMenu}
-                                    onClose={handleFranchiseClose}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'left',
-                                    }}
-                                    MenuListProps={{
-                                        sx: {
-                                            padding: '8px',
-                                        }
-                                    }}
-                                    slotProps={{
-                                        paper: {
-                                            elevation: 0,
-                                            sx: {
-                                                mt: 1.5,
-                                                minWidth: '180px',
-                                                boxShadow: '0px 10px 40px rgba(0,0,0,0.6)',
-                                                border: '1px solid rgba(201,168,76,0.2)',
-                                                borderRadius: '12px',
-                                                overflow: 'visible',
-                                                '&:before': {
-                                                    content: '""',
-                                                    display: 'block',
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 24,
-                                                    width: 10,
-                                                    height: 10,
-                                                    bgcolor: '#1A1A1A',
-                                                    transform: 'translateY(-50%) rotate(45deg)',
-                                                    zIndex: 0,
-                                                    borderTop: '1px solid rgba(201,168,76,0.2)',
-                                                    borderLeft: '1px solid rgba(201,168,76,0.2)',
-                                                },
-                                            }
-                                        }
-                                    }}
-                                    disableScrollLock
-                                >
-                                    {franchiseSubItems.map((item) => (
-                                        <MenuItem
-                                            key={item.name}
-                                            onClick={() => handleFranchiseItemClick(item.path)}
-                                            sx={{
-                                                fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                fontSize: '14px',
-                                                fontWeight: 500,
-                                                color: isActive(item.path) ? '#C9A84C' : '#C9A84C',
-                                                borderRadius: '8px',
-                                                py: 1,
-                                                px: 1.5,
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(201,168,76,0.1)',
-                                                    color: '#C9A84C',
-                                                }
-                                            }}
-                                        >
-                                            {item.name}
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
-                            </Box>
+                                <InfoItem onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
+                                    <Mail strokeWidth={1.5} />
+                                    <span>info@sanyuktparivaar.com</span>
+                                </InfoItem>
+                            </TopInfoBar>
 
-                            {trailItems.map((item) => (
+                            {/* BOTTOM ROW: Primary Navigation */}
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: { lg: 2.5, xl: 4 },
+                                flexWrap: 'nowrap'
+                            }}>
                                 <NavButton
-                                    key={item.name}
-                                    className={isActive(item.path) ? 'active' : ''}
-                                    onClick={() => handleNavigation(item.path)}
+                                    className={isActive('/') ? 'active' : ''}
+                                    onClick={() => handleNavigation('/')}
                                 >
-                                    {item.name}
+                                    Home
                                 </NavButton>
-                            ))}
 
-                            {/* Conditional rendering based on login status and role */}
-                            {isLoggedIn ? (
-                                <>
-
-                                    {isAdmin() ? (
-                                        // Admin View
-                                        <AdminDashboardButton
-                                            onClick={handleUserMenuClick}
-                                            startIcon={<AdminPanelSettingsIcon />}
-                                        >
-                                            {getDisplayName()}
-                                        </AdminDashboardButton>
-                                    ) : (
-                                        // Regular User View
-                                        <MyAccountButton
-                                            onClick={handleUserMenuClick}
-                                            startIcon={
-                                                <Avatar
-                                                    src={userData?.profileImage || undefined}
-                                                    sx={{ width: 24, height: 24, bgcolor: 'rgba(201,168,76,0.25)', fontSize: 12, fontWeight: 700 }}
-                                                >
-                                                    {!userData?.profileImage && getUserInitials()}
-                                                </Avatar>
-                                            }
-                                        >
-                                            {getDisplayName()}
-                                        </MyAccountButton>
-                                    )}
+                                {/* Company Dropdown (Desktop) */}
+                                <Box sx={{ position: 'relative' }}>
+                                    <NavButton
+                                        className={isCompanyActive() ? 'active' : ''}
+                                        onClick={handleCompanyClick}
+                                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                                    >
+                                        Sanyukt Parivaar
+                                        <ExpandMore
+                                            sx={{
+                                                fontSize: '18px',
+                                                transform: openCompanyMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.2s'
+                                            }}
+                                        />
+                                    </NavButton>
 
                                     <Menu
-                                        anchorEl={anchorElUser}
-                                        open={openUserMenu}
-                                        onClose={handleUserMenuClose}
+                                        anchorEl={anchorElCompany}
+                                        open={openCompanyMenu}
+                                        onClose={handleCompanyClose}
                                         anchorOrigin={{
                                             vertical: 'bottom',
-                                            horizontal: 'right',
+                                            horizontal: 'left',
                                         }}
                                         transformOrigin={{
                                             vertical: 'top',
-                                            horizontal: 'right',
+                                            horizontal: 'left',
                                         }}
                                         MenuListProps={{
                                             sx: {
-                                                padding: '10px',
-                                                minWidth: '220px',
+                                                padding: '8px',
                                             }
                                         }}
                                         slotProps={{
@@ -1067,7 +934,8 @@ const Header = () => {
                                                 elevation: 0,
                                                 sx: {
                                                     mt: 1.5,
-                                                    boxShadow: '0px 10px 40px rgba(0,0,0,0.7)',
+                                                    minWidth: '180px',
+                                                    boxShadow: '0px 10px 40px rgba(0,0,0,0.6)',
                                                     border: '1px solid rgba(201,168,76,0.2)',
                                                     borderRadius: '12px',
                                                     overflow: 'visible',
@@ -1076,7 +944,7 @@ const Header = () => {
                                                         display: 'block',
                                                         position: 'absolute',
                                                         top: 0,
-                                                        right: 28,
+                                                        left: 24,
                                                         width: 10,
                                                         height: 10,
                                                         bgcolor: '#1A1A1A',
@@ -1088,127 +956,290 @@ const Header = () => {
                                                 }
                                             }
                                         }}
+                                        disableScrollLock
                                     >
-                                        {isAdmin() ? (
-                                            // Admin Menu Items
+                                        {companySubItems.map((item) => (
                                             <MenuItem
-                                                onClick={handleAdminDashboardClick}
+                                                key={item.name}
+                                                onClick={() => handleCompanyItemClick(item.path)}
                                                 sx={{
                                                     fontFamily: '"Poppins", "Roboto", sans-serif',
                                                     fontSize: '14px',
                                                     fontWeight: 500,
-                                                    color: '#C9A84C',
-                                                    borderRadius: '4px',
-                                                    gap: 1.5,
-                                                    py: 1.2,
+                                                    color: isActive(item.path) ? '#C9A84C' : '#C9A84C',
+                                                    borderRadius: '8px',
+                                                    py: 1,
+                                                    px: 1.5,
                                                     '&:hover': {
                                                         backgroundColor: 'rgba(201,168,76,0.1)',
                                                         color: '#C9A84C',
                                                     }
                                                 }}
                                             >
-                                                <DashboardIcon fontSize="small" />
-                                                Admin Dashboard
+                                                {item.name}
                                             </MenuItem>
-                                        ) : (
-                                            // Regular User Menu Items
-                                            [
-                                                { label: 'Dashboard', icon: <DashboardIcon fontSize="small" />, path: '/my-account' },
-                                                { label: 'My Orders', icon: <ReceiptIcon fontSize="small" />, path: '/my-account/orders' },
-                                                { label: 'My Profile', icon: <PersonIcon fontSize="small" />, path: '/my-account/profile' },
-                                                { label: 'Transactions', icon: <HistoryIcon fontSize="small" />, path: '/my-account/transactions' },
-                                                { label: 'KYC Status', icon: <FingerprintIcon fontSize="small" />, path: '/my-account/kyc' },
-                                            ].map((item) => (
-                                                <MenuItem
-                                                    key={item.label}
-                                                    onClick={() => handleNavigation(item.path)}
-                                                    sx={{
-                                                        fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                        fontSize: '14px',
-                                                        fontWeight: 500,
+                                        ))}
+                                    </Menu>
+                                </Box>
+
+                                {menuItems.slice(1, -1).map((item) => (
+                                    <NavButton
+                                        key={item.name}
+                                        className={isActive(item.path) ? 'active' : ''}
+                                        onClick={() => handleNavigation(item.path)}
+                                    >
+                                        {item.name}
+                                    </NavButton>
+                                ))}
+
+                                {/* Secondary Navigation (Cart, Franchise, Contact) */}
+                                {menuItems.slice(-1).map((item) => (
+                                    <NavButton
+                                        key={item.name}
+                                        className={isActive(item.path) ? 'active' : ''}
+                                        onClick={() => handleNavigation(item.path)}
+                                    >
+                                        {item.name}
+                                    </NavButton>
+                                ))}
+
+                                <Box sx={{ position: 'relative' }}>
+                                    <NavButton
+                                        className={isFranchiseActive() ? 'active' : ''}
+                                        onClick={handleFranchiseClick}
+                                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                                    >
+                                        Franchise
+                                        <ExpandMore
+                                            sx={{
+                                                fontSize: '18px',
+                                                transform: openFranchiseMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.2s'
+                                            }}
+                                        />
+                                    </NavButton>
+
+                                    <Menu
+                                        anchorEl={anchorElFranchise}
+                                        open={openFranchiseMenu}
+                                        onClose={handleFranchiseClose}
+                                        anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'left',
+                                        }}
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'left',
+                                        }}
+                                        MenuListProps={{
+                                            sx: {
+                                                padding: '8px',
+                                            }
+                                        }}
+                                        slotProps={{
+                                            paper: {
+                                                elevation: 0,
+                                                sx: {
+                                                    mt: 1.5,
+                                                    minWidth: '180px',
+                                                    boxShadow: '0px 10px 40px rgba(0,0,0,0.6)',
+                                                    border: '1px solid rgba(201,168,76,0.2)',
+                                                    borderRadius: '12px',
+                                                    overflow: 'visible',
+                                                    '&:before': {
+                                                        content: '""',
+                                                        display: 'block',
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 24,
+                                                        width: 10,
+                                                        height: 10,
+                                                        bgcolor: '#1A1A1A',
+                                                        transform: 'translateY(-50%) rotate(45deg)',
+                                                        zIndex: 0,
+                                                        borderTop: '1px solid rgba(201,168,76,0.2)',
+                                                        borderLeft: '1px solid rgba(201,168,76,0.2)',
+                                                    },
+                                                }
+                                            }
+                                        }}
+                                        disableScrollLock
+                                    >
+                                        {franchiseSubItems.map((item) => (
+                                            <MenuItem
+                                                key={item.name}
+                                                onClick={() => handleFranchiseItemClick(item.path)}
+                                                sx={{
+                                                    fontFamily: '"Poppins", "Roboto", sans-serif',
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    color: isActive(item.path) ? '#C9A84C' : '#C9A84C',
+                                                    borderRadius: '8px',
+                                                    py: 1,
+                                                    px: 1.5,
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(201,168,76,0.1)',
                                                         color: '#C9A84C',
-                                                        borderRadius: '8px',
-                                                        gap: 2,
-                                                        py: 1.2,
-                                                        px: 1.5,
-                                                        mb: 0.5,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        '&:hover': {
-                                                            backgroundColor: 'rgba(201,168,76,0.1)',
-                                                            color: '#C9A84C',
-                                                            '& .MuiSvgIcon-root': {
-                                                                color: '#C9A84C',
-                                                            }
-                                                        },
-                                                        '& .MuiSvgIcon-root': {
-                                                            fontSize: '20px',
-                                                            color: '#C9A84C',
-                                                            transition: 'color 0.2s',
-                                                        }
-                                                    }}
-                                                >
-                                                    {item.icon}
-                                                    {item.label}
-                                                </MenuItem>
-                                            ))
+                                                    }
+                                                }}
+                                            >
+                                                {item.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
+                                </Box>
+
+                                {trailItems.map((item) => (
+                                    <NavButton
+                                        key={item.name}
+                                        className={isActive(item.path) ? 'active' : ''}
+                                        onClick={() => handleNavigation(item.path)}
+                                    >
+                                        {item.name}
+                                    </NavButton>
+                                ))}
+
+                                {/* Auth Actions (Login/User Account) */}
+                                {isLoggedIn ? (
+                                    <>
+                                        {isAdmin() ? (
+                                            <AdminDashboardButton
+                                                onClick={handleUserMenuClick}
+                                                startIcon={<AdminPanelSettingsIcon />}
+                                            >
+                                                {getDisplayName()}
+                                            </AdminDashboardButton>
+                                        ) : (
+                                            <MyAccountButton
+                                                onClick={handleUserMenuClick}
+                                                startIcon={
+                                                    <Avatar
+                                                        src={userData?.profileImage || undefined}
+                                                        sx={{ width: 24, height: 24, bgcolor: 'rgba(201,168,76,0.25)', fontSize: 12, fontWeight: 700 }}
+                                                    >
+                                                        {!userData?.profileImage && getUserInitials()}
+                                                    </Avatar>
+                                                }
+                                            >
+                                                {getDisplayName()}
+                                            </MyAccountButton>
                                         )}
 
-                                        <LogoutMenuItem
-                                            onClick={handleLogout}
-                                            sx={{
-                                                fontFamily: '"Poppins", "Roboto", sans-serif',
-                                                fontSize: '14px',
-                                                fontWeight: 600,
-                                                borderRadius: '8px',
-                                                gap: 2,
-                                                py: 1.2,
-                                                px: 1.5,
-                                                mt: 0.5,
-                                                borderTop: '1px solid rgba(201,168,76,0.2)',
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(211, 47, 47, 0.08)',
-                                                },
-                                                '& .MuiSvgIcon-root': {
-                                                    fontSize: '20px',
+                                        <Menu
+                                            anchorEl={anchorElUser}
+                                            open={openUserMenu}
+                                            onClose={handleUserMenuClose}
+                                            anchorOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'right',
+                                            }}
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'right',
+                                            }}
+                                            MenuListProps={{
+                                                sx: {
+                                                    padding: '10px',
+                                                    minWidth: '220px',
+                                                }
+                                            }}
+                                            slotProps={{
+                                                paper: {
+                                                    elevation: 0,
+                                                    sx: {
+                                                        mt: 1.5,
+                                                        boxShadow: '0px 10px 40px rgba(0,0,0,0.7)',
+                                                        border: '1px solid rgba(201,168,76,0.2)',
+                                                        borderRadius: '12px',
+                                                        overflow: 'visible',
+                                                        '&:before': {
+                                                            content: '""',
+                                                            display: 'block',
+                                                            position: 'absolute',
+                                                            top: 0,
+                                                            right: 28,
+                                                            width: 10,
+                                                            height: 10,
+                                                            bgcolor: '#1A1A1A',
+                                                            transform: 'translateY(-50%) rotate(45deg)',
+                                                            zIndex: 0,
+                                                            borderTop: '1px solid rgba(201,168,76,0.2)',
+                                                            borderLeft: '1px solid rgba(201,168,76,0.2)',
+                                                        },
+                                                    }
                                                 }
                                             }}
                                         >
-                                            <LogoutIcon />
-                                            Logout
-                                        </LogoutMenuItem>
-                                    </Menu>
-                                </>
-                            ) : (
-                                <>
-                                    <RegisterButton onClick={() => handleNavigation('/register')} sx={{ ml: 1 }}>
-                                        Register
-                                    </RegisterButton>
-
-                                    <LoginButton onClick={() => handleNavigation('/login')} sx={{ ml: 1 }}>
-                                        Login
-                                    </LoginButton>
-                                </>
-                            )}
+                                            {/* User Menu Items */}
+                                            {isAdmin() ? (
+                                                <MenuItem onClick={() => handleNavigation('/admin/dashboard')}>
+                                                    <DashboardIcon fontSize="small" sx={{ mr: 1.5 }} />
+                                                    Admin Dashboard
+                                                </MenuItem>
+                                            ) : (
+                                                [
+                                                    { label: 'Dashboard', icon: <DashboardIcon fontSize="small" />, path: '/my-account' },
+                                                    { label: 'My Orders', icon: <ReceiptIcon fontSize="small" />, path: '/my-account/orders' },
+                                                    { label: 'My Profile', icon: <PersonIcon fontSize="small" />, path: '/my-account/profile' },
+                                                ].map((item) => (
+                                                    <MenuItem key={item.label} onClick={() => handleNavigation(item.path)}>
+                                                        {item.icon}
+                                                        <Box sx={{ ml: 1.5 }}>{item.label}</Box>
+                                                    </MenuItem>
+                                                ))
+                                            )}
+                                            <Divider />
+                                            <MenuItem onClick={handleLogout} sx={{ color: '#d32f2f' }}>
+                                                <LogoutIcon fontSize="small" sx={{ mr: 1.5 }} />
+                                                Logout
+                                            </MenuItem>
+                                        </Menu>
+                                    </>
+                                ) : (
+                                    <>
+                                        <RegisterButton onClick={() => handleNavigation('/register')} sx={{ ml: 1 }}>
+                                            Register
+                                        </RegisterButton>
+                                        <LoginButton onClick={() => handleNavigation('/login')} sx={{ ml: 1 }}>
+                                            Login
+                                        </LoginButton>
+                                    </>
+                                )}
+                            </Box>
                         </Box>
 
-                        {/* RIGHT - HAMBURGER (MOBILE/TABLET) */}
+                        <Box sx={{ flexGrow: 1, display: { xs: 'flex', lg: 'none' } }} />
+
+
+
+                        {/* RIGHT - MOBILE NAV ICONS & HAMBURGER */}
                         <Box sx={{
                             display: { xs: 'flex', lg: 'none' },
-                            width: '48px',
+                            alignItems: 'center',
                             flexShrink: 0,
                             justifyContent: 'flex-end',
-                            alignItems: 'center',
+                            gap: { xs: 0.5, sm: 1 },
                             zIndex: 10
                         }}>
+                            <IconButton onClick={() => handleNavigation('/')} sx={{ color: '#C9A84C', p: 1 }}>
+                                <HomeIcon sx={{ fontSize: '24px' }} />
+                            </IconButton>
+                            <IconButton onClick={() => handleNavigation('/company/about')} sx={{ color: '#C9A84C', p: 1 }}>
+                                <InfoIcon sx={{ fontSize: '24px' }} />
+                            </IconButton>
+                            <IconButton onClick={() => handleNavigation('/my-account/cart')} sx={{ color: '#C9A84C', p: 1 }}>
+                                <ShoppingCartIcon sx={{ fontSize: '24px' }} />
+                            </IconButton>
+
                             <IconButton
                                 color="inherit"
                                 aria-label="open drawer"
-                                edge="start"
+                                edge="end"
                                 onClick={handleDrawerToggle}
                                 sx={{
                                     color: '#C9A84C',
                                     p: 1,
+                                    ml: 1
                                 }}
                             >
                                 <MenuIcon sx={{ fontSize: { xs: '30px', sm: '32px' } }} />
