@@ -182,23 +182,6 @@ const AdminProducts = () => {
         }
     };
 
-    const renderRatingStars = (rating) => {
-        const stars = [];
-        const roundedRating = Math.round(rating * 2) / 2;
-
-        for (let i = 1; i <= 5; i++) {
-            if (i <= roundedRating) {
-                stars.push(<Star key={i} size={14} className="text-[#C8A96A] fill-[#C8A96A]" />);
-            } else if (i - 0.5 === roundedRating) {
-                // Approximate half star
-                stars.push(<Star key={i} size={14} className="text-[#C8A96A] fill-[#C8A96A]/50" />);
-            } else {
-                stars.push(<Star key={i} size={14} className="text-[#C8A96A]/30" />);
-            }
-        }
-        return stars;
-    };
-
     return (
         <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] selection:bg-[#C8A96A]/30 p-4 md:p-8">
             {/* Header section matches overall Elite Luxury style */}

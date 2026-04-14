@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Transaction = require('../models/Transaction');
+const IncomeHistory = require('../models/IncomeHistory');
 
 // Helper: get start date for range
 const getStartDate = (range) => {
@@ -53,7 +54,7 @@ exports.getProductStats = async (req, res) => {
     try {
         const products = await Product.find();
         const total = products.length;
-        const outOfStock = products.filter(p => p.stock === 0 || p.countInStock === 0).length;
+        const outOfStock = products.filter(p => p.stock === 0).length;
 
         // Top selling from orders
         const topSelling = await Order.aggregate([

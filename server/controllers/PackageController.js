@@ -2,6 +2,18 @@ const User = require("../models/User");
 const IncomeHistory = require("../models/IncomeHistory");
 const BinaryTree = require("../models/BinaryTree");
 const crypto = require("crypto");
+const Razorpay = require("razorpay");
+
+// Initialize Razorpay lazily
+let razorpay;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+    razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET
+    });
+}
+console.log("[DEBUG] RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
+console.log("[DEBUG] RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET ? "Loaded" : "Missing");
 
 // ── Package config ────────────────────────────────────────────────────────────
 const PACKAGES = {
@@ -65,11 +77,24 @@ exports.activatePackage = async (req, res) => {
             const body = razorpay_order_id + "|" + razorpay_payment_id;
             const expectedSignature = crypto
                 .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-                .update(body.toString())
+                .update(body)
                 .digest("hex");
 
             if (expectedSignature !== razorpay_signature) {
                 return res.status(400).json({ success: false, message: "Invalid payment signature verification failed." });
+            }
+            
+            if (razorpay) {
+                try {
+                    const orderDetails = await razorpay.orders.fetch(razorpay_order_id);
+                    const actualPaid = orderDetails.amount / 100;
+                    if (actualPaid !== Number(pkg.price)) {
+                        return res.status(400).json({ success: false, message: "Payment amount mismatch. Fraudulent request detected." });
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch razorpay order in PackageController:", err);
+                    return res.status(500).json({ success: false, message: "Failed to verify transaction amount." });
+                }
             }
         }
         // For "upi" / "cash" - admin will verify separately, but we still activate
