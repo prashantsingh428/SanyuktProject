@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import {
     Wallet, CreditCard, PieChart, ShoppingBag,
     TrendingUp, Users, UserCheck, Activity,
-    Copy, Target, ChevronRight, Share2,
-    CheckCircle2, Clock, Package, Briefcase, Zap,
-    TrendingDown, ArrowUpRight, BarChart3, Gem, Award, Trophy
+    Target, CheckCircle2, Zap,
+    TrendingDown, Gem, Award, Trophy
 } from 'lucide-react';
-import toast from 'react-hot-toast';
 import api from '../api';
 
 import ProfileBanner from '../components/ProfileBanner';
@@ -36,11 +34,11 @@ const SectionHeader = ({ title, subtitle, icon: Icon }) => (
                 </div>
             )}
             <div>
-                <h2 className="text-[14px] font-black text-[#C8A96A] uppercase tracking-[0.15em] leading-none mb-1">
+                <h2 className="text-[16px] font-black text-[#C8A96A] uppercase tracking-[0.2em] leading-none mb-2">
                     {title}
                 </h2>
                 {subtitle && (
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <p className="text-[11px] font-black text-[#F5E6C8]/60 uppercase tracking-[0.2em]">
                         {subtitle}
                     </p>
                 )}
@@ -51,7 +49,7 @@ const SectionHeader = ({ title, subtitle, icon: Icon }) => (
 );
 
 const ModernWalletCard = ({ title, value, color, icon: Icon, progress, showCurrency = true }) => (
-    <motion.div
+    <Motion.div
         variants={cardVariants}
         className="bg-[#1A1A1A] rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-white/5 flex flex-col relative overflow-hidden group hover:shadow-xl hover:shadow-black/40 transition-all duration-300"
     >
@@ -60,87 +58,64 @@ const ModernWalletCard = ({ title, value, color, icon: Icon, progress, showCurre
                 {Icon && <Icon size={20} />}
             </div>
             <div className="flex flex-col items-end">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Status</span>
-                <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8A96A]"></span>
-                    <span className="text-[10px] font-black text-[#C8A96A] uppercase tracking-widest">Active</span>
+                <span className="text-[11px] font-black text-[#F5E6C8]/40 uppercase tracking-widest leading-none mb-2">Status</span>
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#C8A96A]"></span>
+                    <span className="text-[11px] font-black text-[#C8A96A] uppercase tracking-[0.15em]">Active</span>
                 </div>
             </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-            <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{title}</h3>
-            <div className="flex items-baseline gap-1.5">
-                {showCurrency && <span className="text-xl font-black text-slate-500">₹</span>}
-                <span className="text-3xl font-black text-white tracking-tighter">{value !== undefined ? value : "0"}</span>
+        <div className="flex flex-col gap-2">
+            <h3 className="text-[12px] font-black text-[#F5E6C8]/60 uppercase tracking-[0.15em]">{title}</h3>
+            <div className="flex items-baseline gap-2">
+                {showCurrency && <span className="text-2xl font-black text-[#C8A96A]">₹</span>}
+                <span className="text-4xl font-black text-[#F5E6C8] tracking-tighter">{value !== undefined ? value : "0"}</span>
             </div>
         </div>
         {progress !== undefined && (
             <div className="relative h-1 w-full bg-white/5 rounded-none mt-4 overflow-hidden">
-                <motion.div
+                <Motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                     transition={{ duration: 1.5, ease: "easeOut" }}
                     className="absolute top-0 left-0 h-full rounded-none"
                     style={{ backgroundColor: color || '#C8A96A' }}
-                ></motion.div>
+                ></Motion.div>
             </div>
         )}
 
         <div className={`absolute top-0 right-0 w-24 h-24 opacity-5 rounded-full -mr-8 -mt-8`} style={{ backgroundColor: color }}></div>
-    </motion.div>
-);
-
-const PerformanceMetric = ({ title, value, icon: Icon, color, trend }) => (
-    <motion.div
-        variants={cardVariants}
-        className="bg-white rounded-2xl p-5 border border-slate-50 shadow-sm flex items-center gap-4 group hover:border-slate-200 transition-colors"
-    >
-        <div className={`p-3 rounded-xl ${color?.bg} ${color?.text}`}>
-            {Icon && <Icon size={20} />}
-        </div>
-        <div className="flex flex-col flex-1">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{title}</span>
-            <span className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{value}</span>
-        </div>
-        {trend && (
-            <div className="flex flex-col items-end justify-center">
-                <div className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
-                    <ArrowUpRight size={10} strokeWidth={3} />
-                    {trend}
-                </div>
-            </div>
-        )}
-    </motion.div>
+    </Motion.div>
 );
 
 const BusinessMatrixCard = ({ title, lValue, rValue, icon: Icon }) => (
-    <motion.div
+    <Motion.div
         variants={cardVariants}
         className="bg-[#1A1A1A] rounded-2xl p-4 shadow-sm border border-white/5 flex flex-col relative overflow-hidden group h-full"
     >
-        <div className="flex items-center gap-3 mb-4">
-            <div className={`p-2.5 rounded-xl bg-[#C8A96A]/10 text-[#C8A96A] shadow-sm group-hover:scale-105 transition-transform`}>
-                {Icon && <Icon size={16} />}
+        <div className="flex items-center gap-4 mb-5">
+            <div className={`p-3 rounded-xl bg-[#C8A96A]/10 text-[#C8A96A] shadow-lg group-hover:scale-110 transition-transform`}>
+                {Icon && <Icon size={20} />}
             </div>
-            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-snug line-clamp-2 flex-1">
+            <h3 className="text-[11px] font-black text-[#F5E6C8]/60 uppercase tracking-[0.2em] leading-tight line-clamp-2 flex-1">
                 {title}
             </h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mt-auto">
-            <div className="bg-white/5 rounded-xl p-2.5 flex flex-col gap-0.5 group-hover:bg-[#C8A96A]/10 transition-all border border-transparent group-hover:border-[#C8A96A]/20">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Left</span>
-                <span className="text-xl font-black text-white tracking-tight leading-none">{lValue !== undefined ? lValue : 0}</span>
+        <div className="grid grid-cols-2 gap-3 mt-auto">
+            <div className="bg-[#0D0D0D] rounded-xl p-3.5 flex flex-col gap-1 group-hover:bg-[#C8A96A]/10 transition-all border border-[#C8A96A]/5 group-hover:border-[#C8A96A]/20">
+                <span className="text-[10px] font-black text-[#F5E6C8]/40 uppercase tracking-widest">Left</span>
+                <span className="text-2xl font-black text-[#F5E6C8] tracking-tight leading-none">{lValue !== undefined ? lValue : 0}</span>
             </div>
-            <div className="bg-white/5 rounded-xl p-2.5 flex flex-col items-end gap-0.5 group-hover:bg-[#C8A96A]/10 transition-all border border-transparent group-hover:border-[#C8A96A]/20">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">Right</span>
-                <span className="text-xl font-black text-white tracking-tight leading-none">{rValue !== undefined ? rValue : 0}</span>
+            <div className="bg-[#0D0D0D] rounded-xl p-3.5 flex flex-col items-end gap-1 group-hover:bg-[#C8A96A]/10 transition-all border border-[#C8A96A]/5 group-hover:border-[#C8A96A]/20">
+                <span className="text-[10px] font-black text-[#F5E6C8]/40 uppercase tracking-widest text-right">Right</span>
+                <span className="text-2xl font-black text-[#F5E6C8] tracking-tight leading-none">{rValue !== undefined ? rValue : 0}</span>
             </div>
         </div>
 
         <div className={`absolute bottom-0 left-0 h-1 w-full bg-[#C8A96A] opacity-30`}></div>
-    </motion.div>
+    </Motion.div>
 );
 
 const recentActivities = [
@@ -174,7 +149,6 @@ const DashboardOverview = () => {
                 setStats(res.data);
             } catch (err) {
                 console.error("Error fetching MLM stats:", err);
-                // toast.error("Failed to load MLM statistics");
             } finally {
                 setLoading(false);
             }
@@ -191,16 +165,16 @@ const DashboardOverview = () => {
     if (!userData) return null;
 
     return (
-        <div className="max-w-[1600px] mx-auto px-6 pb-12 pt-0 bg-[#0D0D0D] min-h-screen font-['Inter',sans-serif] text-white">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-8 sm:mx-0 pb-12 pt-0 bg-[#0D0D0D] min-h-screen font-['Inter',sans-serif] text-white overflow-hidden sm:overflow-visible">
             <div className="mb-8">
                 <ProfileBanner userData={userData} />
             </div>
 
-            <motion.div
+            <Motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="flex flex-col gap-10"
+                className="flex flex-col gap-10 px-4 sm:px-0"
             >
                 {/* --- SECTION 1: WALLETS & EARNINGS --- */}
                 <div>
@@ -214,14 +188,14 @@ const DashboardOverview = () => {
                         />
                         <ModernWalletCard
                             title="Total PV"
-                            value={Number(stats?.pv || 0).toString()}
+                            value={Number(stats?.pv || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             color="#C8A96A"
                             icon={CreditCard}
                             showCurrency={false}
                         />
                         <ModernWalletCard
                             title="Total BV"
-                            value={Number(stats?.bv || 0).toString()}
+                            value={Number(stats?.bv || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             color="#C8A96A"
                             icon={PieChart}
                             showCurrency={false}
@@ -265,19 +239,19 @@ const DashboardOverview = () => {
                             />
                         </div>
 
-                        <div className="mt-4 p-6 bg-[#1A1A1A] rounded-[2rem] text-white flex items-center justify-between shadow-xl shadow-black/40 border border-[#C8A96A]/20">
-                            <div className="flex items-center gap-4">
+                        <div className="mt-4 p-6 bg-[#1A1A1A] rounded-[2rem] text-white flex flex-col md:flex-row md:items-center md:justify-between gap-5 shadow-xl shadow-black/40 border border-[#C8A96A]/20">
+                            <div className="flex items-center gap-4 min-w-0">
                                 <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
                                     <ShoppingBag size={24} className="text-[#C8A96A]" />
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Total Product Purchases</span>
-                                    <h4 className="text-3xl font-black tracking-tighter">₹ {Number(stats?.productPurchases || 0).toLocaleString()}</h4>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-[12px] font-black text-[#F5E6C8]/40 uppercase tracking-[0.2em] mb-1">Total Product Purchases</span>
+                                    <h4 className="text-3xl md:text-4xl font-black tracking-tighter text-[#F5E6C8] break-all">₹ {Number(stats?.productPurchases || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}</h4>
                                 </div>
                             </div>
                             <button
                                 onClick={() => navigate('/my-account/orders')}
-                                className="px-6 py-3 bg-[#C8A96A] hover:bg-[#D4AF37] text-[#0D0D0D] rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg shadow-[#C8A96A]/20"
+                                className="w-full md:w-auto px-6 py-3 bg-[#C8A96A] hover:bg-[#D4AF37] text-[#0D0D0D] rounded-xl text-sm font-black uppercase tracking-[0.12em] transition-colors shadow-lg shadow-[#C8A96A]/20 shrink-0"
                             >
                                 View Details
                             </button>
@@ -291,7 +265,7 @@ const DashboardOverview = () => {
                         <div className="flex flex-col gap-6 h-full">
                             <ModernWalletCard
                                 title="Today PV Points"
-                                value={`${Number(stats?.dailyPV?.current || 0)} / ${Number(stats?.dailyPV?.target || 320)}`}
+                                value={`${Number(stats?.dailyPV?.current || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })} / ${Number(stats?.dailyPV?.target || 320)}`}
                                 icon={Zap}
                                 color="#C8A96A"
                                 showCurrency={false}
@@ -299,7 +273,7 @@ const DashboardOverview = () => {
                             />
                             <ModernWalletCard
                                 title="Total PV Points"
-                                value={`${Number(stats?.lifetimePV?.current || 0)} / ${Number(stats?.lifetimePV?.target || 10200)}`}
+                                value={`${Number(stats?.lifetimePV?.current || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })} / ${Number(stats?.lifetimePV?.target || 10200)}`}
                                 icon={Trophy}
                                 color="#C8A96A"
                                 showCurrency={false}
@@ -315,14 +289,14 @@ const DashboardOverview = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <BusinessMatrixCard
                             title="PV Left / Right"
-                            lValue={Number(stats?.pvLeft || 0).toString()}
-                            rValue={Number(stats?.pvRight || 0).toString()}
+                            lValue={Number(stats?.pvLeft || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
+                            rValue={Number(stats?.pvRight || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             icon={Target}
                         />
                         <BusinessMatrixCard
                             title="Total PV L / R"
-                            lValue={Number(stats?.totalPvLeft || 0).toString()}
-                            rValue={Number(stats?.totalPvRight || 0).toString()}
+                            lValue={Number(stats?.totalPvLeft || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
+                            rValue={Number(stats?.totalPvRight || 0).toLocaleString('en-IN', { maximumFractionDigits: 3 })}
                             icon={Activity}
                         />
                         <BusinessMatrixCard
@@ -367,7 +341,7 @@ const DashboardOverview = () => {
                 {/* --- SECTION 4: RECENT ACTIVITY --- */}
                 <div>
                     <SectionHeader title="Recent Activity" subtitle="Network Live Updates" icon={Activity} />
-                    <motion.div
+                    <Motion.div
                         variants={cardVariants}
                         className="bg-[#1A1A1A] rounded-[2rem] p-4 shadow-[0_20px_60px_rgb(0,0,0,0.5)] border border-white/5 overflow-hidden relative h-[380px]"
                     >
@@ -375,7 +349,7 @@ const DashboardOverview = () => {
                         <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-b from-[#1A1A1A] to-transparent z-10"></div>
                         <div className="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-[#1A1A1A] to-transparent z-10"></div>
 
-                        <motion.div
+                        <Motion.div
                             animate={{
                                 y: [0, -400], // Adjust based on total height of one set
                             }}
@@ -419,8 +393,8 @@ const DashboardOverview = () => {
                                     </div>
                                 );
                             })}
-                        </motion.div>
-                    </motion.div>
+                        </Motion.div>
+                    </Motion.div>
                 </div>
 
                 {/* --- FOOTER --- */}
@@ -435,7 +409,7 @@ const DashboardOverview = () => {
                         <span className="text-[#C8A96A] bg-[#C8A96A]/5 px-3 py-1.5 rounded-lg border border-[#C8A96A]/10">Sanyukt Executive</span>
                     </div>
                 </div>
-            </motion.div>
+            </Motion.div>
         </div>
     );
 };

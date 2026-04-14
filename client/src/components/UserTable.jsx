@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Search, ChevronLeft, ChevronRight, FileText, Download } from 'lucide-react';
 import api from '../api';
 import toast from 'react-hot-toast';

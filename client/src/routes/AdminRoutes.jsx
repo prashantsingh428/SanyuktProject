@@ -17,7 +17,7 @@ const AdminRoute = ({ children }) => {
 
         return children;
 
-    } catch (error) {
+    } catch {
         localStorage.removeItem("user");
         return <Navigate to="/login" replace />;
     }
