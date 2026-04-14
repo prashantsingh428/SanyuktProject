@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api, { API_URL } from '../../api';
+import { devSharedFetch } from '../../utils/devSharedFetch';
 import NewsDetailsModal from '../../components/NewsDetailsModal';
 import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
 
@@ -15,7 +16,14 @@ const NewsSection = () => {
 
     const fetchNews = async () => {
         try {
-            const { data } = await api.get(`/news?t=${new Date().getTime()}`);
+            const data = await devSharedFetch(
+                'home:news',
+                async () => {
+                    const response = await api.get('/news');
+                    return response.data;
+                },
+                4000
+            );
 
             if (data.success) {
                 setNewsItems(data.data);
@@ -58,7 +66,7 @@ const NewsSection = () => {
 
     if (loading) {
         return (
-            <section className="py-12 bg-[#121212] relative overflow-hidden">
+            <section className="py-6 bg-[#121212] relative overflow-hidden">
                 <div className="container mx-auto px-4 max-w-6xl">
                     {/* Header Skeleton */}
                     <div className="h-6 w-full max-w-lg sm:w-96 skeleton-box shimmer mx-auto mb-2"></div>
@@ -66,8 +74,8 @@ const NewsSection = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {[...Array(3)].map((_, i) => (
-                            <div key={i} className="luxury-box h-[280px] animate-pulse flex flex-col">
-                                <div className="h-32 bg-[#1A1A1A] skeleton-box shimmer border-b border-[#C8A96A]/10"></div>
+                            <div key={i} className="luxury-box h-[380px] md:h-[420px] animate-pulse flex flex-col">
+                                <div className="h-32 md:h-44 bg-[#1A1A1A] skeleton-box shimmer border-b border-[#C8A96A]/10"></div>
                                 <div className="p-4 flex-1">
                                     <div className="h-3 w-24 bg-[#1A1A1A] skeleton-box shimmer mb-3"></div>
                                     <div className="h-5 w-full bg-[#1A1A1A] skeleton-box shimmer mb-2"></div>
@@ -87,7 +95,7 @@ const NewsSection = () => {
 
     if (!loading && newsItems.length === 0) {
         return (
-            <section className="py-12 bg-[#121212] text-center" >
+            <section className="py-6 bg-[#121212] text-center" >
                 <div className="container mx-auto px-4">
                     <h2 className="text-xl md:text-3xl font-serif font-bold text-[#F5E6C8] mb-1 uppercase tracking-widest">
                         Latest News & <span className="text-[#C8A96A]">Updates</span>
@@ -105,25 +113,25 @@ const NewsSection = () => {
         );
     }
     return (
-        <section className="py-10 md:py-16 bg-[#121212] relative overflow-hidden" >
+        <section className="py-3 md:py-6 bg-[#121212] relative overflow-hidden" >
             <div className="container mx-auto px-4 max-w-6xl">
                 <h2 className="text-xl md:text-3xl font-serif font-bold text-center text-[#F5E6C8] mb-1 uppercase tracking-widest">
                     Latest News & <span className="text-[#C8A96A]">Updates</span>
                 </h2>
-                <div className="w-16 h-[1px] bg-[#C8A96A]/40 mx-auto mb-4"></div>
-                <p className="text-center text-[#F5E6C8]/60 mb-5 max-w-2xl mx-auto text-[10px] md:text-xs font-light tracking-tight uppercase">
+                <div className="w-16 h-[1px] bg-[#C8A96A]/40 mx-auto mb-3"></div>
+                <p className="text-center text-[#F5E6C8]/60 mb-4 max-w-2xl mx-auto text-[10px] md:text-xs font-light tracking-tight uppercase">
                     Stay updated with the latest company announcements and success stories.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {newsItems.map((news) => (
                         <div
                             key={news._id}
                             onClick={() => handleNewsClick(news)}
-                            className="luxury-box transition-all duration-500 overflow-hidden cursor-pointer flex flex-col group"
+                            className="luxury-box transition-all duration-500 overflow-hidden cursor-pointer flex flex-col group min-h-[350px] md:min-h-[420px]"
                         >
                             {/* Cover Image */}
-                            <div className="relative h-24 overflow-hidden p-1">
+                            <div className="relative h-32 md:h-44 overflow-hidden p-1">
                                 <img
                                     src={getImageUrl(news.image)}
                                     alt={news.title}
@@ -137,19 +145,19 @@ const NewsSection = () => {
                             </div>
 
                             {/* Card Body */}
-                            <div className="p-2.5 flex flex-col flex-1">
-                                <div className="flex items-center gap-2 mb-1.5 text-[#F5E6C8]/40 text-[9px] font-medium uppercase tracking-tight">
+                            <div className="p-3 md:p-5 flex flex-col flex-1">
+                                <div className="flex items-center gap-2 mb-1 text-[#F5E6C8]/40 text-[9px] font-medium uppercase tracking-tight">
                                     <Calendar className="w-2.5 h-2.5 text-[#C8A96A]" />
                                     <span>{formatDate(news.createdAt)}</span>
                                     <span className="text-[#C8A96A] font-bold mx-1">|</span>
                                     <span>{news.readTime}</span>
                                 </div>
 
-                                <h4 className="font-bold text-[#F5E6C8] text-xs mb-1 leading-snug group-hover:text-[#C8A96A] transition-colors line-clamp-2 uppercase tracking-tight">
+                                <h4 className="font-bold text-[#F5E6C8] text-sm md:text-base mb-1 leading-snug group-hover:text-[#C8A96A] transition-colors line-clamp-2 uppercase tracking-tight">
                                     {news.title}
                                 </h4>
 
-                                <p className="text-[10px] text-gray-500 line-clamp-2 mb-2 flex-1 font-light">
+                                <p className="text-[11px] md:text-xs text-gray-500 line-clamp-3 mb-3 flex-1 font-light">
                                     {news.content}
                                 </p>
 

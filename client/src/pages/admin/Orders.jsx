@@ -10,7 +10,6 @@ import {
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
@@ -23,21 +22,18 @@ const AdminOrders = () => {
     const [newStatus, setNewStatus] = useState('');
     const [statusMessage, setStatusMessage] = useState('');
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
-    const fetchOrders = async () => {
-        setLoading(true);
+    async function fetchOrders() {
         try {
             const res = await api.get('/orders/admin/all');
             setOrders(res.data);
         } catch (error) {
             console.error('Error fetching orders:', error);
-        } finally {
-            setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
 
     const handleUpdateStatus = async () => {
         try {

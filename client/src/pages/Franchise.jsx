@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
-import { motion } from "framer-motion";
+import { motion as Motion } from 'framer-motion';
 import { Building2, MapPin, Phone, User, ChevronRight, Store, Users, Award } from "lucide-react";
 
 const PublicFranchise = () => {
@@ -44,7 +44,7 @@ const PublicFranchise = () => {
             <div className="bg-[#121212] border-b border-[#C8A96A]/30 text-[#C8A96A] py-6 md:py-8 px-4 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full bg-[#C8A96A]/5 pointer-events-none"></div>
 
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="max-w-7xl mx-auto text-center relative z-10"
@@ -53,12 +53,12 @@ const PublicFranchise = () => {
                     <p className="text-[10px] md:text-xs tracking-[0.2em] font-black uppercase text-[#F5E6C8]/60 max-w-3xl mx-auto">
                         Find an Sanyukt Parivaar franchise partner near you
                     </p>
-                </motion.div>
+                </Motion.div>
             </div>
 
             {/* Stats Section */}
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
@@ -93,13 +93,13 @@ const PublicFranchise = () => {
                             <p className="text-[8px] font-black uppercase tracking-widest text-[#F5E6C8]">Support Available</p>
                         </div>
                     </div>
-                </motion.div>
+                </Motion.div>
             </div>
 
             {/* Main Content */}
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-2 relative z-10">
                 {/* Search and Filter */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
@@ -111,7 +111,7 @@ const PublicFranchise = () => {
                         Our Franchise Partners
                         <span className="w-8 h-px bg-[#C8A96A]/50 hidden sm:block"></span>
                     </h2>
-                </motion.div>
+                </Motion.div>
 
                 {/* Loading State */}
                 {loading ? (
@@ -130,7 +130,7 @@ const PublicFranchise = () => {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {franchises.map((franchise, index) => (
-                                    <motion.div
+                                    <Motion.div
                                         key={franchise._id}
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -175,13 +175,13 @@ const PublicFranchise = () => {
                                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" strokeWidth={2} />
                                             </button>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 ))}
                             </div>
                         )}
 
                         {/* Features Section */}
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.6 }}
@@ -219,7 +219,7 @@ const PublicFranchise = () => {
                                     </p>
                                 </div>
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     </>
                 )}
             </div>
@@ -227,7 +227,7 @@ const PublicFranchise = () => {
             {/* Details Modal */}
             {selectedFranchise && (
                 <div className="fixed inset-0 bg-[#0D0D0D]/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="bg-[#121212] border border-[#C8A96A]/30 rounded-none max-w-md w-full p-8 shadow-[0_0_40px_rgba(200,169,106,0.15)] relative"
@@ -287,7 +287,7 @@ const PublicFranchise = () => {
                                 Close
                             </button>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
         </div>

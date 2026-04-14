@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Users, ChevronDown, ChevronRight, Search, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import api from '../api';
 import toast from 'react-hot-toast';
@@ -41,7 +40,7 @@ const TreeNode = ({ node }) => {
                     )}
 
                     <div className="flex justify-center gap-8 w-full">
-                        {node.children.map((child, index) => (
+                        {node.children.map((child) => (
                             <div key={child.id} className="flex flex-col items-center">
                                 {/* Vertical line from bridge to child */}
                                 <div className="h-4 w-px bg-slate-200"></div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
     ArrowLeft, Trophy, Target, TrendingUp, Award, 
     CheckCircle2, Lock, Star, Shield, Zap, Activity, Info 
@@ -25,21 +24,24 @@ const RANKS = [
     { name: "MD", matchPV: 1500000, reward: "₹5 Crore", color: "#EF4444", accent: "red" },
 ];
 
-const StatCard = ({ label, value, icon: Icon, isPoints }) => (
-    <div className="bg-[#1A1A1A] border border-[#C8A96A]/20 rounded-[2rem] p-5 shadow-sm flex flex-col justify-between hover:border-[#C8A96A] hover:bg-[#1A1A1A]/80 transition-all">
-        <div className="flex items-center justify-between mb-4">
-            <div className={`p-2.5 rounded-xl bg-[#C8A96A]/10 text-[#C8A96A] border border-[#C8A96A]/20 shadow-sm`}>
-                <Icon className="w-5 h-5 md:w-6 md:h-6" />
+const StatCard = ({ label, value, icon, isPoints }) => {
+    const IconComponent = icon;
+    return (
+        <div className="bg-[#1A1A1A] border border-[#C8A96A]/20 rounded-[2rem] p-5 shadow-sm flex flex-col justify-between hover:border-[#C8A96A] hover:bg-[#1A1A1A]/80 transition-all">
+            <div className="flex items-center justify-between mb-4">
+                <div className={`p-2.5 rounded-xl bg-[#C8A96A]/10 text-[#C8A96A] border border-[#C8A96A]/20 shadow-sm`}>
+                    {IconComponent && <IconComponent className="w-5 h-5 md:w-6 md:h-6" />}
+                </div>
+            </div>
+            <div>
+                <p className="text-xl md:text-2xl font-black text-[#F5E6C8] tracking-tighter leading-none mb-1 uppercase">
+                    {value}{isPoints && <span className="text-[10px] ml-1 text-[#C8A96A]/60 uppercase">PV</span>}
+                </p>
+                <p className="text-[9px] md:text-[10px] font-bold text-[#C8A96A]/80 uppercase tracking-widest">{label}</p>
             </div>
         </div>
-        <div>
-            <p className="text-xl md:text-2xl font-black text-[#F5E6C8] tracking-tighter leading-none mb-1 uppercase">
-                {value}{isPoints && <span className="text-[10px] ml-1 text-[#C8A96A]/60 uppercase">PV</span>}
-            </p>
-            <p className="text-[9px] md:text-[10px] font-bold text-[#C8A96A]/80 uppercase tracking-widest">{label}</p>
-        </div>
-    </div>
-);
+    );
+};
 
 const MyRank = () => {
     const navigate = useNavigate();
@@ -57,7 +59,6 @@ const MyRank = () => {
     const personalPV = Number(stats?.pv || 0);
     const currentRankName = stats?.rank || 'Member';
     const currentRankIdx = RANKS.findIndex(r => r.name === currentRankName);
-    const currentRank = RANKS[currentRankIdx] || { name: 'Member', color: '#10B981', accent: 'emerald' };
     const nextRank = RANKS[currentRankIdx + 1] || null;
     const progressPct = nextRank ? Math.min((matchedPV / nextRank.matchPV) * 100, 100) : 100;
 
@@ -71,9 +72,9 @@ const MyRank = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#0D0D0D] pb-20 relative overflow-hidden">
+        <div className="min-h-screen bg-[#0D0D0D] pb-20 relative overflow-x-hidden overflow-y-visible">
             {/* ── Background Blobs ── */}
-            <div className="fixed inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#C8A96A]/5 blur-[120px] rounded-full" />
                 <div className="absolute bottom-[10%] left-[-5%] w-[500px] h-[500px] bg-[#C8A96A]/5 blur-[120px] rounded-full" />
             </div>
@@ -197,8 +198,8 @@ const MyRank = () => {
                         </div>
                     </div>
 
-                    <div className="p-4 md:p-8">
-                        <div className="space-y-4">
+                    <div className="p-4 md:p-8 overflow-x-auto">
+                        <div className="space-y-4 min-w-[680px] md:min-w-0">
                             {RANKS.filter(rank => matchedPV < rank.matchPV).map((rank) => {
                                 const isNext = nextRank?.name === rank.name;
 

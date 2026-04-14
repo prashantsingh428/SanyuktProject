@@ -18,7 +18,7 @@ const FranchiseRoute = ({ children }) => {
 
         return children;
 
-    } catch (error) {
+    } catch {
         localStorage.removeItem("franchiseData");
         return <Navigate to="/franchise/login" replace />;
     }

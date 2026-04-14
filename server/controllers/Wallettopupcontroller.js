@@ -10,13 +10,9 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET
     });
-} else {
-    console.warn("[PAYMENT] Razorpay keys are missing in Wallettopupcontroller. Topup functionality will use mock mode.");
 }
-
-const isMocking = () =>
-    !process.env.RAZORPAY_KEY_ID ||
-    process.env.RAZORPAY_KEY_ID === 'rzp_test_your_key_here';
+console.log("[DEBUG] RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
+console.log("[DEBUG] RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET ? "Loaded" : "Missing");
 
 const Withdrawal = require('../models/Withdrawal');
 const Transaction = require('../models/Transaction');
@@ -34,28 +30,18 @@ exports.createTopupOrder = async (req, res) => {
         }
 
         let order;
-        if (isMocking()) {
-            order = {
-                id: `order_mock_${Date.now()}`,
-                amount: amount * 100,
-                currency: 'INR',
-                receipt: `topup_${Date.now()}`,
-                status: 'created',
-            };
-        } else {
-            // Receipt ID max length is 40 chars.
-            order = await razorpay.orders.create({
-                amount: amount * 100,
-                currency: 'INR',
-                receipt: `${req.user._id}_${Date.now()}`,
-                notes: { userId: req.user._id.toString(), purpose: 'wallet_topup' },
-            });
-        }
+        // Receipt ID max length is 40 chars.
+        order = await razorpay.orders.create({
+            amount: amount * 100,
+            currency: 'INR',
+            receipt: `${req.user._id}_${Date.now()}`.substring(0, 40),
+            notes: { userId: req.user._id.toString(), purpose: 'wallet_topup' },
+        });
 
         return res.json({
             success: true,
             order,
-            key: process.env.RAZORPAY_KEY_ID || 'rzp_test_your_key_here',
+            key: process.env.RAZORPAY_KEY_ID,
             user: {
                 name: req.user.userName || 'User',
                 email: req.user.email,
@@ -83,20 +69,30 @@ exports.verifyTopup = async (req, res) => {
         }
 
         // Signature verify
-        let isAuthentic = false;
-        if (isMocking()) {
-            isAuthentic = true;
-        } else {
-            const body = razorpay_order_id + '|' + razorpay_payment_id;
-            const expectedSig = crypto
-                .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-                .update(body)
-                .digest('hex');
-            isAuthentic = expectedSig === razorpay_signature;
-        }
+        const body = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSig = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(body)
+            .digest('hex');
+        
+        const isAuthentic = expectedSig === razorpay_signature;
 
         if (!isAuthentic) {
             return res.status(400).json({ success: false, message: 'Payment verification failed. Fraudulent request.' });
+        }
+
+        let verifiedAmount = amount;
+        try {
+            const orderDetails = await razorpay.orders.fetch(razorpay_order_id);
+            verifiedAmount = orderDetails.amount / 100;
+            
+            // Ensure payment matches what client claimed (optional, but good for UX)
+            if (verifiedAmount !== Number(amount)) {
+                return res.status(400).json({ success: false, message: 'Payment amount mismatch detected. Fraudulent request.' });
+            }
+        } catch (fetchErr) {
+            console.error("Razorpay fetch error:", fetchErr);
+            return res.status(500).json({ success: false, message: 'Failed to verify payment details with Razorpay.' });
         }
 
         // Credit wallet
