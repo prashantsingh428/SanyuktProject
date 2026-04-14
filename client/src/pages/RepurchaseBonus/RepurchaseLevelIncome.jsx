@@ -1,14 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, Users, Layers } from 'lucide-react';
 import api from '../../api';
 
 const RepurchaseLevelIncome = () => {
     const navigate = useNavigate();
-    const cardsRef = useRef([]);
-    const tableRef = useRef(null);
-    const rowsRef = useRef([]);
-
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

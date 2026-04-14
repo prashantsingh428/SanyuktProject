@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Download, CreditCard, User, Shield, Award, CheckCircle } from 'lucide-react';
 
 const IdCard = () => {
-    const [userData, setUserData] = useState(null);
-
-    useEffect(() => {
+    const [userData] = useState(() => {
         try {
             const storedUser = localStorage.getItem('user');
-            setUserData(storedUser ? JSON.parse(storedUser) : null);
+            return storedUser ? JSON.parse(storedUser) : null;
         } catch (error) {
             console.error('Error parsing user data:', error);
-            setUserData(null);
+            return null;
         }
-    }, []);
+    });
 
     const handlePrint = () => window.print();
     const initials = (userData?.userName || 'U').charAt(0).toUpperCase();
 
     return (
-        <div className="mx-auto max-w-5xl bg-gray-50 px-4 py-6 min-h-screen">
+        <div className="mx-auto max-w-5xl bg-gray-50 px-4 py-6 min-h-screen print:bg-white print:max-w-none print:px-0 print:py-0">
             {/* Header */}
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between print:hidden">
                 <div>
@@ -35,8 +33,8 @@ const IdCard = () => {
             </div>
 
             {/* ID Card - Professional Design */}
-            <div className="mx-auto flex max-w-md justify-center">
-                <div className="w-full bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+            <div className="mx-auto flex max-w-md justify-center print:max-w-[420px]">
+                <div className="w-full bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden print:shadow-none print:border-black/30">
                     {/* Card Header - Simple Green Bar */}
                     <div className="bg-green-600 px-5 py-3">
                         <div className="flex items-center justify-between">
@@ -74,10 +72,10 @@ const IdCard = () => {
 
                             {/* Basic Info */}
                             <div className="flex-1 min-w-0">
-                                <h3 className="text-base font-semibold text-gray-800 truncate">
+                                <h3 className="text-lg font-bold text-gray-900 truncate">
                                     {userData?.userName || 'Member Name'}
                                 </h3>
-                                <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                <p className="text-[13px] text-gray-700 mt-0.5 truncate">
                                     {userData?.email || 'email@example.com'}
                                 </p>
                                 <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-100">
@@ -89,20 +87,20 @@ const IdCard = () => {
                         {/* Details Grid */}
                         <div className="mt-4 grid grid-cols-2 gap-3">
                             <div className="border-b border-gray-100 pb-2">
-                                <p className="text-xs text-gray-500">Member ID</p>
-                                <p className="text-sm font-medium text-gray-800 mt-0.5">{userData?.memberId || 'SPRL0000'}</p>
+                                <p className="text-[12px] text-gray-700">Member ID</p>
+                                <p className="text-[15px] font-semibold text-gray-900 mt-0.5">{userData?.memberId || 'SPRL0000'}</p>
                             </div>
                             <div className="border-b border-gray-100 pb-2">
-                                <p className="text-xs text-gray-500">Sponsor ID</p>
-                                <p className="text-sm font-medium text-gray-800 mt-0.5">{userData?.sponsorId || '-'}</p>
+                                <p className="text-[12px] text-gray-700">Sponsor ID</p>
+                                <p className="text-[15px] font-semibold text-gray-900 mt-0.5">{userData?.sponsorId || '-'}</p>
                             </div>
                             <div className="border-b border-gray-100 pb-2">
-                                <p className="text-xs text-gray-500">Mobile</p>
-                                <p className="text-sm font-medium text-gray-800 mt-0.5">{userData?.mobile || '-'}</p>
+                                <p className="text-[12px] text-gray-700">Mobile</p>
+                                <p className="text-[15px] font-semibold text-gray-900 mt-0.5">{userData?.mobile || '-'}</p>
                             </div>
                             <div className="border-b border-gray-100 pb-2">
-                                <p className="text-xs text-gray-500">Joined</p>
-                                <p className="text-sm font-medium text-gray-800 mt-0.5">
+                                <p className="text-[12px] text-gray-700">Joined</p>
+                                <p className="text-[15px] font-semibold text-gray-900 mt-0.5">
                                     {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-GB') : '-'}
                                 </p>
                             </div>
@@ -130,6 +128,10 @@ const IdCard = () => {
                     }
                     .print\\:hidden {
                         display: none;
+                    }
+                    * {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
                 }
             `}</style>
