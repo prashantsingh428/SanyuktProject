@@ -35,14 +35,12 @@ const withdrawalSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-generate referenceNo before save
-withdrawalSchema.pre('save', async function (next) {
+withdrawalSchema.pre('save', async function () {
     if (!this.referenceNo) {
-        const count = await mongoose.model('Withdrawal').countDocuments();
-        const month = new Date().toLocaleString('en', { month: 'short' }).toUpperCase();
-        const year = new Date().getFullYear();
-        this.referenceNo = `WDL/${String(count + 1).padStart(3, '0')}/${year}`;
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        this.referenceNo = `WDL-${timestamp}-${random}`;
     }
-    next();
 });
 
 withdrawalSchema.index({ userId: 1 });

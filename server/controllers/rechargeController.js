@@ -23,11 +23,19 @@ const rechargeDebugLog = (...args) => {
         console.log('[RECHARGE_DEBUG]', ...args);
     }
 };
+
+const maskSecret = (value) => {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    if (raw.length <= 8) return '***';
+    return `${raw.slice(0, 4)}...${raw.slice(-4)}`;
+};
+
 const rechargeCredentialLog = (label, { username, token }) => {
     if (!rechargeCredentialLogEnabled) return;
     console.log(`[RECHARGE_CREDENTIALS] ${label}`, {
         username: String(username || ''),
-        token: String(token || '')
+        token: maskSecret(token)
     });
 };
 
@@ -50,9 +58,9 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET
     });
-} else {
-    console.warn("[PAYMENT] Razorpay keys are missing. Recharge functionality will be disabled.");
 }
+console.log("[DEBUG] RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
+console.log("[DEBUG] RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET ? "Loaded" : "Missing");
 
 // FIXED: Generate proper 10-digit numeric order ID
 const generateOrderId = () => {
@@ -279,6 +287,77 @@ const fetchOperatorCircleFromProvider = async ({ mobile, orderid }) => {
     };
 };
 
+const hasPlansInProviderResponse = (providerResponse = {}) => {
+    const planBuckets = providerResponse?.data;
+    if (!planBuckets || typeof planBuckets !== 'object') return false;
+    return Object.values(planBuckets).some(
+        (plans) => Array.isArray(plans) && plans.length > 0
+    );
+};
+
+const mapProviderCompanyToOperatorId = (providerPayload = {}) => {
+    const normalized = [
+        providerPayload?.company,
+        providerPayload?.operator,
+        providerPayload?.operator_name,
+        providerPayload?.provider,
+        providerPayload?.opcode,
+        providerPayload?.op_code,
+        providerPayload?.opid
+    ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+
+    const tokens = new Set(normalized.split(/\s+/).filter(Boolean));
+
+    if (tokens.has('airtel') || tokens.has('at')) return 'airtel';
+    if (tokens.has('jio') || tokens.has('rj') || tokens.has('jo')) return 'jio';
+    if (tokens.has('vi') || tokens.has('vf') || normalized.includes('voda') || normalized.includes('vodafone') || normalized.includes('idea')) return 'vi';
+    if (tokens.has('bsnl') || tokens.has('bt') || tokens.has('bs')) return 'bsnl';
+    return '';
+};
+
+const normalizeCircleCode = (value) => {
+    if (value === undefined || value === null) return '';
+    const digits = String(value).replace(/\D/g, '');
+    return digits ? digits.padStart(2, '0') : '';
+};
+
+const resolveCircleCodeFromDetection = (payload = {}) => {
+    const directCode = normalizeCircleCode(
+        payload?.circle_code ?? payload?.circleCode ?? payload?.circlecode
+    );
+    if (directCode) return directCode;
+
+    const providerCircle = String(payload?.circle || '').trim().toUpperCase();
+    if (!providerCircle) return '';
+
+    const normalized = providerCircle
+        .replace(/&/g, 'AND')
+        .replace(/[^A-Z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+
+    const aliasMap = {
+        KOLKATA: 'KOLKATTA',
+        ODISHA: 'ORISSA',
+        MIZORAM: 'MIZZORAM',
+        HIMACHAL_PRADESH: 'HP',
+        JAMMU_AND_KASHMIR: 'J_AND_K',
+        JAMMU_KASHMIR: 'J_AND_K',
+        UTTAR_PRADESH_EAST: 'UP_EAST',
+        UTTAR_PRADESH_WEST: 'UP_WEST',
+        NORTH_EAST: 'NESA',
+        NORTH_EASTERN: 'NESA'
+    };
+
+    const mappedKey = CIRCLE_CODES[normalized] ? normalized : aliasMap[normalized];
+    if (!mappedKey || !CIRCLE_CODES[mappedKey]) return '';
+    return String(CIRCLE_CODES[mappedKey]).padStart(2, '0');
+};
+
 // @desc    Fetch operator plans from live provider (ekychub)
 // @route   GET /api/recharge/plans
 exports.getRechargePlans = async (req, res) => {
@@ -299,19 +378,75 @@ exports.getRechargePlans = async (req, res) => {
             });
         }
 
-        const { opcode, generatedOrderId, providerResponse } = await fetchLivePlansFromProvider({
+        let effectiveOperator = String(operator);
+        let effectiveCircle = String(circle);
+        let fallbackApplied = false;
+
+        let { opcode, generatedOrderId, providerResponse } = await fetchLivePlansFromProvider({
             mobile,
-            operator,
-            circle,
+            operator: effectiveOperator,
+            circle: effectiveCircle,
             orderid
         });
 
+        // Fallback: if provider returns empty plan buckets, auto-detect operator/circle and retry once.
+        if (!hasPlansInProviderResponse(providerResponse)) {
+            try {
+                const { providerResponse: detectedData } = await fetchOperatorCircleFromProvider({
+                    mobile: String(mobile),
+                    orderid
+                });
+
+                const detectedOperator = mapProviderCompanyToOperatorId(detectedData);
+                const detectedCircle = resolveCircleCodeFromDetection(detectedData);
+
+                const retryOperator = detectedOperator || effectiveOperator;
+                const retryCircle = detectedCircle || effectiveCircle;
+
+                if (
+                    retryOperator &&
+                    retryCircle &&
+                    (retryOperator !== effectiveOperator || retryCircle !== effectiveCircle)
+                ) {
+                    const retryResult = await fetchLivePlansFromProvider({
+                        mobile,
+                        operator: retryOperator,
+                        circle: retryCircle,
+                        orderid
+                    });
+
+                    if (hasPlansInProviderResponse(retryResult.providerResponse)) {
+                        fallbackApplied = true;
+                        effectiveOperator = retryOperator;
+                        effectiveCircle = retryCircle;
+                        opcode = retryResult.opcode;
+                        generatedOrderId = retryResult.generatedOrderId;
+                        providerResponse = retryResult.providerResponse;
+                    }
+                }
+            } catch (fallbackError) {
+                rechargeDebugLog('plans fallback failed', {
+                    message: fallbackError?.message,
+                    data: fallbackError?.response?.data
+                });
+            }
+        }
+
+        if (providerResponse?.status !== 'Success' && providerResponse?.status !== 'success') {
+            return res.status(400).json({
+                success: false,
+                message: providerResponse?.message || 'Provider failed to fetch plans',
+                ...providerResponse
+            });
+        }
+
         return res.status(200).json({
-            success: providerResponse?.status === 'Success',
+            success: true,
             source: 'live_provider',
-            operator,
+            operator: effectiveOperator,
             opcode,
-            circle,
+            circle: effectiveCircle,
+            fallbackApplied,
             orderid: generatedOrderId,
             ...providerResponse
         });
@@ -363,8 +498,16 @@ exports.getOperatorAndCircle = async (req, res) => {
             orderid
         });
 
+        if (providerResponse?.status !== 'Success' && providerResponse?.status !== 'success') {
+            return res.status(400).json({
+                success: false,
+                message: providerResponse?.message || 'Provider failed to detect operator/circle',
+                ...providerResponse
+            });
+        }
+
         return res.status(200).json({
-            success: providerResponse?.status === 'Success',
+            success: true,
             source: 'live_provider',
             orderid: generatedOrderId,
             ...providerResponse
@@ -378,8 +521,6 @@ exports.getOperatorAndCircle = async (req, res) => {
     }
 };
 
-// Backward compatible alias
-// @route   GET /api/recharge/plans/live
 exports.getLiveRechargePlans = exports.getRechargePlans;
 
 // @desc    Create a new recharge order
@@ -424,7 +565,8 @@ exports.createOrder = async (req, res) => {
         res.status(200).json({
             success: true,
             order,
-            transactionId: transaction._id
+            transactionId: transaction._id,
+            key: process.env.RAZORPAY_KEY_ID
         });
         rechargeDebugLog('createOrder success', {
             transactionId: transaction._id?.toString(),
@@ -461,7 +603,7 @@ exports.verifyPayment = async (req, res) => {
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
             .createHmac("sha256", secret)
-            .update(body.toString())
+            .update(body)
             .digest("hex");
         rechargeDebugLog('verifyPayment signature check', {
             expectedPrefix: expectedSignature.slice(0, 10),
