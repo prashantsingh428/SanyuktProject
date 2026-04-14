@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import api, { API_URL } from '../api';
+import api from '../api';
+import { devSharedFetch } from '../utils/devSharedFetch';
 import { useCart } from '../context/CartContext';
 import {
     ChevronRight, ChevronDown, Check, ArrowRight,
@@ -13,19 +13,18 @@ import {
 
 // Lazy load section components
 const HeroSection = React.lazy(() => import('./HomeComponents/HeroSection'));
-// const RechargeSection = React.lazy(() => import('./HomeComponents/RechargeSection'));
+const RechargeSection = React.lazy(() => import('./HomeComponents/RechargeSection'));
 const AboutSection = React.lazy(() => import('./HomeComponents/AboutSection'));
 const WhyChooseSection = React.lazy(() => import('./HomeComponents/WhyChooseSection'));
 const ProductsCarousel = React.lazy(() => import('./HomeComponents/ProductsCarousel'));
 const BusinessOpportunity = React.lazy(() => import('./HomeComponents/BusinessOpportunity'));
 const TrainingSection = React.lazy(() => import('./HomeComponents/TrainingSection'));
 const NewsSection = React.lazy(() => import('./HomeComponents/NewsSection'));
-// const ContactFormSection = React.lazy(() => import('./HomeComponents/ContactFormSection'));
+const QuickServices = React.lazy(() => import('./HomeComponents/QuickServices'));
 
 import ProductDetailsModal from '../components/ProductDetailsModal';
 import PaymentMethodModal from '../components/PaymentMethodModal';
 import BrowsePlansModal from '../components/BrowsePlansModal';
-import { rechargePlans } from '../data/rechargePlans';
 
 // Simple loading fallback
 const SectionLoader = () => (
@@ -46,7 +45,12 @@ const HomePage = () => {
     const [operator, setOperator] = useState('');
     const [amount, setAmount] = useState('');
     const [showPlansModal, setShowPlansModal] = useState(false);
-    const [planTab, setPlanTab] = useState('All');
+    const [circle, setCircle] = useState('10');
+    const [planCircles, setPlanCircles] = useState([]);
+    const [mobilePlans, setMobilePlans] = useState([]);
+    const [plansLoading, setPlansLoading] = useState(false);
+    const [isDetectingOperator, setIsDetectingOperator] = useState(false);
+    const [hasTriedDetection, setHasTriedDetection] = useState(false);
 
     // Payment Modal State
     const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -54,41 +58,38 @@ const HomePage = () => {
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     // E-commerce state
-    const [viewMode, setViewMode] = useState('grid');
-    const [wishlist, setWishlist] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const { addToCart: contextAddToCart, removeFromCart, isInCart } = useCart();
     const [showCartNotification, setShowCartNotification] = useState(false);
     const [addedToCartProduct, setAddedToCartProduct] = useState('');
-    const [searchAmount, setSearchAmount] = useState('');
 
-    // Contact form state
-    const [contactForm, setContactForm] = useState({
-        firstName: '', lastName: '', email: '', phone: '', enquiryType: 'Product Enquiry', message: ''
-    });
-    const [contactSubmitting, setContactSubmitting] = useState(false);
-    const [contactSuccess, setContactSuccess] = useState(false);
 
     // Hero slides data
     const heroSlides = [
         {
-            image: "/hero4.jpeg",
+            image: "/hero1.png",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Platform",
-            description: "Sanyukt Parivaar & Rich Life Pvt.Ltd. is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
+            subtitle: "Smart Solutions for a Smarter Future",
+            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
         },
         {
-            image: "/hero5.jpeg",
+            image: "/hero2.png",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Platform",
-            description: "Sanyukt Parivaar & Rich Life Pvt.Ltd. is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
+            subtitle: "Smart Solutions for a Smarter Future",
+            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
+        },
+        {
+            image: "/hero3.png",
+            title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
+            subtitle: "Smart Solutions for a Smarter Future",
+            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
         },
         {
             image: "/hero4.jpeg",
             title: "Welcome to Sanyukt Parivaar & Rich Life Pvt.Ltd.",
-            subtitle: "A Trusted & Fast-Growing Multi-Level Marketing Platform",
-            description: "Sanyukt Parivaar & Rich Life Pvt.Ltd. is a people-driven direct selling organization committed to empowering individuals with sustainable income opportunities. Through our transparent MLM business model and high-quality products, we help ordinary people build extraordinary futures."
+            subtitle: "Smart Solutions for a Smarter Future",
+            description: "A people-driven direct selling organization committed to individual growth and financial independence through a high-quality lifestyle and wellness products."
         }
     ];
 
@@ -103,17 +104,6 @@ const HomePage = () => {
         "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=60&h=60&q=80"
     ];
 
-    // Category images
-    const skinCareImage = "https://images.pexels.com/photos/6621360/pexels-photo-6621360.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop";
-    const hairCareImage = "https://images.pexels.com/photos/3993447/pexels-photo-3993447.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop";
-
-    // Product Images from Pexels
-    const productImages = [
-        "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop",
-        "https://images.pexels.com/photos/5946066/pexels-photo-5946066.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop",
-        "https://images.pexels.com/photos/6955177/pexels-photo-6955177.jpeg",
-        "https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-    ];
 
     // Business opportunity image
     const businessImage = "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80";
@@ -121,11 +111,11 @@ const HomePage = () => {
     // Training image
     const trainingImage = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600&q=80";
 
-    // Mobile operators list with inline SVG logos (no external URL needed)
-    const AIRTEL_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><text x='100' y='52' font-family='Arial,sans-serif' font-size='36' font-weight='900' fill='%23ED1C24' text-anchor='middle'>airtel</text></svg>`;
-    const JIO_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><text x='100' y='55' font-family='Arial,sans-serif' font-size='44' font-weight='900' fill='%230066CC' text-anchor='middle'>Jio</text></svg>`;
-    const VI_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><text x='90' y='55' font-family='Arial,sans-serif' font-size='44' font-weight='900' fill='%23E11D48' text-anchor='middle'>Vi</text><text x='148' y='55' font-family='Arial,sans-serif' font-size='20' font-weight='700' fill='%23FBBF24' text-anchor='middle'>!</text></svg>`;
-    const BSNL_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><text x='100' y='52' font-family='Arial,sans-serif' font-size='32' font-weight='900' fill='%23FF6600' text-anchor='middle'>BSNL</text></svg>`;
+    // Mobile operators list with professional icon SVGs
+    const AIRTEL_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23ED1C24'/><text x='50' y='68' font-family='Arial,sans-serif' font-size='65' font-weight='900' fill='white' text-anchor='middle'>a</text></svg>`;
+    const JIO_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%230066CC'/><text x='50' y='62' font-family='Arial,sans-serif' font-size='38' font-weight='900' fill='white' text-anchor='middle'>Jio</text></svg>`;
+    const VI_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23E11D48'/><text x='42' y='65' font-family='Arial,sans-serif' font-size='55' font-weight='900' fill='white' text-anchor='middle'>V</text><text x='72' y='65' font-family='Arial,sans-serif' font-size='35' font-weight='900' fill='%23FBBF24' text-anchor='middle'>!</text></svg>`;
+    const BSNL_LOGO = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23005CAF'/><text x='50' y='62' font-family='Arial,sans-serif' font-size='32' font-weight='900' fill='white' text-anchor='middle'>BSNL</text></svg>`;
 
     const operators = [
         {
@@ -202,7 +192,14 @@ const HomePage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const { data } = await api.get('/products');
+                const data = await devSharedFetch(
+                    'home:products',
+                    async () => {
+                        const response = await api.get('/products');
+                        return response.data;
+                    },
+                    4000
+                );
                 // Only show featured products on the homepage carousel,
                 // fallback to first 8 products if no featured products found
                 const featured = data.filter(p => p.isFeatured);
@@ -226,7 +223,7 @@ const HomePage = () => {
                     const parsedUser = JSON.parse(user);
                     setIsLoggedIn(true);
                     setUserRole(parsedUser.role || 'user');
-                } catch (e) {
+                } catch {
                     setIsLoggedIn(false);
                 }
             } else {
@@ -237,6 +234,190 @@ const HomePage = () => {
         window.addEventListener('storage', checkAuth);
         return () => window.removeEventListener('storage', checkAuth);
     }, [navigate]);
+
+    const normalizePlans = (providerData) => {
+        if (!providerData || typeof providerData !== 'object') return [];
+
+        const normalized = [];
+        Object.entries(providerData).forEach(([bucket, plans]) => {
+            if (!Array.isArray(plans)) return;
+            plans.forEach((plan, index) => {
+                const parsedAmount = Number(plan?.rs);
+                if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) return;
+                normalized.push({
+                    id: `${bucket}-${parsedAmount}-${index}`,
+                    amount: parsedAmount,
+                    validity: plan?.validity || 'NA',
+                    data: 'N/A',
+                    description: plan?.desc || 'Plan details unavailable',
+                    category: plan?.Type || bucket
+                });
+            });
+        });
+
+        return normalized.sort((a, b) => a.amount - b.amount);
+    };
+
+    const mapProviderCompanyToOperatorId = (providerPayload = {}) => {
+        const normalized = [
+            providerPayload?.company,
+            providerPayload?.operator,
+            providerPayload?.operator_name,
+            providerPayload?.provider,
+            providerPayload?.opcode,
+            providerPayload?.op_code,
+            providerPayload?.opid
+        ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+
+        const tokens = new Set(normalized.split(/\s+/).filter(Boolean));
+
+        if (tokens.has('airtel') || tokens.has('at')) return 'airtel';
+        if (tokens.has('jio') || tokens.has('rj') || tokens.has('jo')) return 'jio';
+        if (tokens.has('vi') || tokens.has('vf') || normalized.includes('voda') || normalized.includes('vodafone') || normalized.includes('idea')) return 'vi';
+        if (tokens.has('bsnl') || tokens.has('bt') || tokens.has('bs')) return 'bsnl';
+        return '';
+    };
+
+    const normalizeCircleCode = (value) => {
+        if (value === undefined || value === null) return '';
+        const digits = String(value).replace(/\D/g, '');
+        return digits ? digits.padStart(2, '0') : '';
+    };
+
+    const resolveCircleCodeFromDetection = (payload = {}) => {
+        const directCode = normalizeCircleCode(
+            payload?.circle_code ?? payload?.circleCode ?? payload?.circlecode
+        );
+        if (directCode) return directCode;
+
+        const providerCircle = String(payload?.circle || '').trim().toUpperCase();
+        if (!providerCircle || !Array.isArray(planCircles) || planCircles.length === 0) {
+            return '';
+        }
+
+        const normalizedProvider = providerCircle
+            .replace(/&/g, 'AND')
+            .replace(/[^A-Z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '');
+
+        const aliasMap = {
+            KOLKATA: 'KOLKATTA',
+            ODISHA: 'ORISSA',
+            MIZORAM: 'MIZZORAM',
+            HIMACHAL_PRADESH: 'HP',
+            JAMMU_AND_KASHMIR: 'J_AND_K',
+            JAMMU_KASHMIR: 'J_AND_K',
+            UTTAR_PRADESH_EAST: 'UP_EAST',
+            UTTAR_PRADESH_WEST: 'UP_WEST',
+            NORTH_EAST: 'NESA',
+            NORTH_EASTERN: 'NESA'
+        };
+
+        const lookupName = aliasMap[normalizedProvider] || normalizedProvider;
+        const matched = planCircles.find((c) => String(c.name || '').toUpperCase() === lookupName);
+        return matched?.code || '';
+    };
+
+    useEffect(() => {
+        const fetchPlanCircles = async () => {
+            try {
+                const data = await devSharedFetch(
+                    'home:plan-circles',
+                    async () => {
+                        const response = await api.get('/recharge/plan-circles');
+                        return response.data;
+                    },
+                    4000
+                );
+                if (data?.success && Array.isArray(data.circles)) {
+                    setPlanCircles(data.circles);
+                    const selectedExists = data.circles.some((c) => c.code === circle);
+                    if (!selectedExists && data.circles.length > 0) {
+                        setCircle(data.circles[0].code);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching plan circles:', error);
+            }
+        };
+
+        fetchPlanCircles();
+    }, []);
+
+    useEffect(() => {
+        const shouldFetchPlans = operator && /^\d{10}$/.test(mobileNumber) && circle;
+        if (!shouldFetchPlans) {
+            setMobilePlans([]);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            try {
+                setPlansLoading(true);
+                const { data } = await api.get('/recharge/plans', {
+                    params: {
+                        mobile: mobileNumber,
+                        operator,
+                        circle
+                    }
+                });
+
+                if (data?.success && data?.data) {
+                    setMobilePlans(normalizePlans(data.data));
+                } else {
+                    setMobilePlans([]);
+                }
+            } catch (error) {
+                console.error('Error fetching mobile plans:', error);
+                setMobilePlans([]);
+            } finally {
+                setPlansLoading(false);
+            }
+        }, 450);
+
+        return () => clearTimeout(timeoutId);
+    }, [operator, mobileNumber, circle]);
+
+    useEffect(() => {
+        const sanitizedMobile = String(mobileNumber || '').replace(/\D/g, '').slice(0, 10);
+
+        if (!/^\d{10}$/.test(sanitizedMobile)) {
+            setHasTriedDetection(false);
+            setIsDetectingOperator(false);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            try {
+                setIsDetectingOperator(true);
+                setHasTriedDetection(true);
+                const { data } = await api.get('/recharge/operator-fetch', {
+                    params: { mobile: sanitizedMobile }
+                });
+
+                const detectedOperator = mapProviderCompanyToOperatorId(data);
+                const detectedCircle = resolveCircleCodeFromDetection(data);
+
+                if (detectedOperator) {
+                    setOperator(detectedOperator);
+                }
+                if (detectedCircle) {
+                    setCircle(detectedCircle);
+                }
+            } catch (error) {
+                console.error('Operator detection failed on home recharge:', error);
+            } finally {
+                setIsDetectingOperator(false);
+            }
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [mobileNumber, planCircles]);
 
 
 
@@ -260,13 +441,32 @@ const HomePage = () => {
             navigate('/login');
             return;
         }
+        if (!mobileNumber || !operator || !amount) {
+            toast.error('Please fill all fields');
+            return;
+        }
+        if (!/^\d{10}$/.test(mobileNumber)) {
+            toast.error('Please enter a valid 10-digit mobile number');
+            return;
+        }
+        if (Number(amount) <= 0) {
+            toast.error('Amount must be greater than 0');
+            return;
+        }
+
+        const validPlanAmounts = new Set(
+            mobilePlans.map((plan) => Number(plan.amount)).filter((amt) => amt > 0)
+        );
+
+        // If plans are fetched, we validate. If not, we allow manual entry but show a warning
+        if (mobilePlans.length > 0 && !validPlanAmounts.has(Number(amount))) {
+            toast.error('Please select an amount from the available plans or check if the amount is valid.');
+            return;
+        }
+
         if (mobileNumber && operator && Number(amount) > 0) {
             await fetchWalletBalance();
             setShowPaymentModal(true);
-        } else if (Number(amount) <= 0 && amount !== '') {
-            toast.error('Amount must be greater than 0');
-        } else {
-            toast.error('Please fill all fields');
         }
     };
 
@@ -288,7 +488,6 @@ const HomePage = () => {
                     setMobileNumber('');
                     setOperator('');
                     setAmount('');
-                    setSearchAmount('');
                     setShowPaymentModal(false);
                 } else {
                     toast.error(data.message || "Wallet payment failed", { id: toastId });
@@ -301,16 +500,6 @@ const HomePage = () => {
             }
         } else if (method === 'online') {
             // Razorpay logic
-            const loadScript = (src) => {
-                return new Promise((resolve) => {
-                    const script = document.createElement("script");
-                    script.src = src;
-                    script.onload = () => resolve(true);
-                    script.onerror = () => resolve(false);
-                    document.body.appendChild(script);
-                });
-            };
-
             try {
                 setIsProcessingPayment(true);
                 const toastId = toast.loading("Initiating secure payment...");
@@ -328,18 +517,36 @@ const HomePage = () => {
                     setIsProcessingPayment(false);
                     return;
                 }
+                if (!orderData?.order?.id || !orderData?.order?.amount) {
+                    throw new Error("Invalid payment order response from server");
+                }
+
+                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+                if (!razorpayKeyId) {
+                    console.error("Razorpay key is missing in frontend env");
+                    alert("Payment configuration error. Please contact support.");
+                    setIsProcessingPayment(false);
+                    return;
+                }
 
                 toast.dismiss(toastId);
 
                 // 2. Open Razorpay Checkout Widget
                 const options = {
-                    key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SQbbsEM3Dlfgi2",
+                    key: razorpayKeyId,
                     amount: orderData.order.amount,
                     currency: "INR",
                     name: "Sanyukt Parivaar",
                     description: "Mobile Recharge",
                     order_id: orderData.order.id,
                     handler: async function (response) {
+                        if (!response || !response.razorpay_payment_id) {
+                            console.error("Invalid Razorpay response", response);
+                            alert("Payment failed. Try again.");
+                            setIsProcessingPayment(false);
+                            return;
+                        }
+
                         try {
                             const verifyToast = toast.loading("Verifying payment...");
 
@@ -350,13 +557,15 @@ const HomePage = () => {
                                 razorpay_signature: response.razorpay_signature,
                                 transactionId: orderData.transactionId
                             });
+                            if (!verifyData || typeof verifyData !== "object") {
+                                throw new Error("Invalid verification response from server");
+                            }
 
                             if (verifyData.success) {
                                 toast.success("Recharge successful!", { id: verifyToast });
                                 setMobileNumber('');
                                 setOperator('');
                                 setAmount('');
-                                setSearchAmount('');
                                 setShowPaymentModal(false);
                             } else {
                                 toast.error("Payment verification failed", { id: verifyToast });
@@ -398,11 +607,6 @@ const HomePage = () => {
         }
     };
 
-    const selectPlan = (planAmount) => {
-        setAmount(planAmount);
-        setShowPlansModal(false);
-    };
-
     const openPlanPopup = () => {
         setShowPlansModal(true);
     };
@@ -411,13 +615,6 @@ const HomePage = () => {
         setImageErrors(prev => ({ ...prev, [productName]: true }));
     };
 
-    const toggleWishlist = (productName) => {
-        setWishlist(prev =>
-            prev.includes(productName)
-                ? prev.filter(p => p !== productName)
-                : [...prev, productName]
-        );
-    };
 
     const addToCart = (product) => {
         contextAddToCart(product);
@@ -441,26 +638,6 @@ const HomePage = () => {
         navigate('/checkout', { state: { product } });
     };
 
-    const handleContactSubmit = async (e) => {
-        e.preventDefault();
-        const { firstName, message } = contactForm;
-        if (!firstName.trim() || !message.trim()) {
-            toast.error('Please fill in your name and message.');
-            return;
-        }
-        setContactSubmitting(true);
-        try {
-            const { data } = await api.post('/contact', contactForm);
-            toast.success(data.message || 'Message sent successfully!');
-            setContactSuccess(true);
-            setContactForm({ firstName: '', lastName: '', email: '', phone: '', enquiryType: 'Product Enquiry', message: '' });
-            setTimeout(() => setContactSuccess(false), 3000);
-        } catch (err) {
-            toast.error(err?.response?.data?.message || 'Failed to send message. Please try again.');
-        } finally {
-            setContactSubmitting(false);
-        }
-    };
 
     const calculateDiscount = (mrp, dp) => {
         const mrpValue = typeof mrp === 'string' ? parseInt(mrp.replace('₹', '')) : mrp;
@@ -494,6 +671,9 @@ const HomePage = () => {
         return stars;
     };
 
+
+
+
     const carouselRef = React.useRef(null);
     const scroll = (direction) => {
         const container = carouselRef.current;
@@ -510,7 +690,6 @@ const HomePage = () => {
         }
     };
 
-
     return (
         <div className="min-h-screen bg-[#0D0D0D] font-sans">
             <React.Suspense fallback={<SectionLoader />}>
@@ -523,13 +702,11 @@ const HomePage = () => {
                     handleNavigation={handleNavigation}
                 />
 
-                {/* </RechargeSection> */}
-
-                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-1 mb-1 sm:mt-2 sm:mb-4 px-4 sm:px-5">
+                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-4 mb-4 px-4 sm:px-5">
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
 
                     <span
-                        className="text-center text-xl sm:text-2xl md:text-[38px] italic font-medium text-[#d4a64a] leading-tight"
+                        className="text-center text-xl sm:text-2xl md:text-[32px] italic font-medium text-[#d4a64a] leading-tight"
                         style={{ fontFamily: '"Cormorant Garamond", serif' }}
                     >
                         Create a Life You Love with Your Family!
@@ -537,6 +714,8 @@ const HomePage = () => {
 
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
                 </div>
+
+                <QuickServices />
 
                 <AboutSection
                     aboutImage={aboutImage}
@@ -549,11 +728,30 @@ const HomePage = () => {
                     whyChoosePoints={whyChoosePoints}
                 />
 
-                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 mt-2 mb-2 sm:my-6 px-4 sm:px-5">
+                <RechargeSection
+                    mobileNumber={mobileNumber}
+                    setMobileNumber={setMobileNumber}
+                    operator={operator}
+                    setOperator={setOperator}
+                    circle={circle}
+                    setCircle={setCircle}
+                    circles={planCircles}
+                    amount={amount}
+                    setAmount={setAmount}
+                    operators={operators}
+                    openPlanPopup={openPlanPopup}
+                    handleRecharge={handleRecharge}
+                    isLoggedIn={isLoggedIn}
+                    plansLoading={plansLoading}
+                    isDetectingOperator={isDetectingOperator}
+                    hasTriedDetection={hasTriedDetection}
+                />
+
+                <div className="w-full flex items-center justify-center gap-2 sm:gap-5 my-1 sm:my-2 px-4 sm:px-5">
                     <div className="hidden sm:block flex-1 max-w-[180px] h-px bg-gradient-to-r from-transparent via-[#b88a44] to-transparent" />
 
                     <span
-                        className="text-center text-xl sm:text-2xl md:text-[38px] italic font-medium text-[#d4a64a] leading-tight"
+                        className="text-center text-xl sm:text-2xl md:text-[32px] italic font-medium text-[#d4a64a] leading-tight"
                         style={{ fontFamily: '"Cormorant Garamond", serif' }}
                     >
                         Join Our Community!
@@ -590,7 +788,7 @@ const HomePage = () => {
                 {/* Mid CTA Strip */}
                 <section className="py-4 px-4">
                     <div className="max-w-5xl mx-auto luxury-box p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <h3 className="text-sm md:text-lg font-serif font-bold text-[#F5E6C8] text-center md:text-left uppercase tracking-widest">
+                        <h3 className="text-sm md:text-lg font-serif font-bold text-[#F5E6C8] text-center md:text-left uppercase tracking-widest leading-tight">
                             One of India's Fastest Growing <br /> Direct Selling Companies
                         </h3>
                         <button
@@ -612,24 +810,16 @@ const HomePage = () => {
 
                 <NewsSection />
 
-                {/* <ContactFormSection
-                    contactForm={contactForm}
-                    setContactForm={setContactForm}
-                    handleContactSubmit={handleContactSubmit}
-                    contactSubmitting={contactSubmitting}
-                    contactSuccess={contactSuccess}
-                /> */}
-
                 <div className="luxury-divider"><span>OUR VISION</span></div>
 
                 {/* Final Trust Section */}
-                <section className="py-8 bg-[#0D0D0D] relative overflow-hidden" >
+                <section className="py-4 bg-[#0D0D0D] relative overflow-hidden" >
                     <div className="container mx-auto px-4 text-center relative z-10">
-                        <h2 className="text-xl md:text-3xl font-serif font-bold mb-2 text-[#C8A96A] uppercase tracking-widest">
+                        <h2 className="text-xl md:text-3xl font-serif font-bold mb-1 text-[#C8A96A] uppercase tracking-widest">
                             Together We Grow, <span className="text-[#F5E6C8]">Together We Prosper</span>
                         </h2>
-                        <div className="w-20 h-[1px] bg-[#C8A96A]/40 mx-auto mb-4"></div>
-                        <p className="text-xs md:text-sm font-light mb-6 max-w-2xl mx-auto text-[#F5E6C8]/60 uppercase tracking-tight">
+                        <div className="w-20 h-[1px] bg-[#C8A96A]/40 mx-auto mb-3"></div>
+                        <p className="text-[10px] md:text-xs font-light mb-4 max-w-2xl mx-auto text-[#F5E6C8]/60 uppercase tracking-tight">
                             We don't just build income - we build people, confidence, and a better future.
                         </p>
                         <button
@@ -681,7 +871,7 @@ const HomePage = () => {
                 onClose={() => setShowPlansModal(false)}
                 onSelect={(amount) => setAmount(amount)}
                 operator={operator ? operators.find(op => op.id === operator)?.name : ''}
-                plans={operator ? rechargePlans[operator] : []}
+                plans={mobilePlans}
             />
         </div>
     );

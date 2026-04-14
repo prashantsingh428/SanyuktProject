@@ -1,6 +1,6 @@
 import React from 'react';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { 
     Construction as ConstructionIcon, 
     ArrowLeft, 
@@ -18,7 +18,7 @@ const Construction = ({
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-6 font-['Inter',sans-serif]">
-            <motion.div 
+            <Motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-xl w-full bg-white rounded-[3rem] p-10 md:p-16 shadow-[0_30px_100px_rgba(0,0,0,0.04)] border border-slate-50 text-center relative overflow-hidden"
@@ -28,7 +28,7 @@ const Construction = ({
                 <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-orange-50 rounded-full opacity-50 blur-3xl"></div>
 
                 <div className="relative z-10">
-                    <motion.div 
+                    <Motion.div 
                         animate={{ 
                             rotate: [0, -10, 10, -10, 0],
                         }}
@@ -40,7 +40,7 @@ const Construction = ({
                         className="w-24 h-24 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-sm"
                     >
                         <ConstructionIcon size={48} strokeWidth={1.5} />
-                    </motion.div>
+                    </Motion.div>
 
                     <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight uppercase">
                         {title}
@@ -65,7 +65,7 @@ const Construction = ({
                         </div>
                     </div>
 
-                    <motion.button
+                    <Motion.button
                         whileHover={{ y: -4, scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => navigate(-1)}
@@ -73,7 +73,7 @@ const Construction = ({
                     >
                         <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
                         Go Back
-                    </motion.button>
+                    </Motion.button>
                 </div>
 
                 {/* Corner Icons */}
@@ -83,7 +83,7 @@ const Construction = ({
                 <div className="absolute bottom-10 right-10 text-slate-100 -rotate-12">
                     <HardHat size={40} />
                 </div>
-            </motion.div>
+            </Motion.div>
         </div>
     );
 };
