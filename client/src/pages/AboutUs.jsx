@@ -1,6 +1,6 @@
 import React from 'react';
+import { motion as Motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ChevronRight, CheckCircle, Users, Target, Eye, TrendingUp, Shield, Star, Heart, Award, MapPin, Phone, Mail, Globe, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const AboutUsPage = () => {
@@ -8,17 +8,6 @@ const AboutUsPage = () => {
     // Sample image URLs (replace with actual images)
     const seminarImage = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
     const teamImage = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const trainingImage = "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-
-    // Mission & Vision images
-    const missionImage = "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const visionImage = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-
-    // Why Sanyukt Parivaar images
-    const familyImage = "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const successImage = "https://images.unsplash.com/photo-1552581234-26160f608093?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const trainingImage2 = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80";
-    const growthImage = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2015&q=80";
 
     // Core Values images
     const integrityImage = "https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80";
@@ -62,25 +51,18 @@ const AboutUsPage = () => {
     ];
 
     return (
-        <div className="min-h-screen overflow-x-hidden bg-[#0D0D0D] font-sans text-[#F5E6C8]">
+        <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] overflow-x-hidden">
             {/* Hero Banner Section */}
-            <header className="relative w-full min-h-[180px] md:min-h-[220px] bg-cover bg-center flex items-center justify-center pt-8 pb-4"
+            <header className="relative w-full min-h-[180px] md:min-h-[220px] bg-cover bg-center flex items-center justify-center pb-4"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')" }}>
                 {/* Solid overlay to dim the image, just like Legal Policies page */}
                 <div className="absolute inset-0 bg-black/70"></div>
 
                 {/* Content Container */}
                 <div className="relative flex flex-col items-center justify-center text-center px-4">
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-[#C8A96A] mb-4 drop-shadow-lg animate-fade-in">
+                    <h1 className="text-4xl md:text-6xl font-serif font-bold text-[#C8A96A] drop-shadow-lg animate-fade-in">
                         ABOUT US
                     </h1>
-
-                    {/* Breadcrumbs matching the aesthetic */}
-                    <div className="flex items-center text-[#F5E6C8]/90 text-sm md:text-base font-medium tracking-widest uppercase">
-                        <span onClick={() => navigate('/')} className="cursor-pointer hover:text-[#C8A96A] transition-colors">Vision</span>
-                        <ChevronRight className="w-4 h-4 mx-3 text-[#C8A96A]" />
-                        <span className="text-[#C8A96A]">Our About</span>
-                    </div>
                 </div>
             </header>
 
@@ -109,7 +91,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* ABOUT US - CONTENT + IMAGE */}
-            <section className="py-8 px-4 max-w-7xl mx-auto overflow-hidden">
+            <section className="py-4 px-4 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                     {/* Left Content */}
                     <div className="space-y-4 animate-slide-right">
@@ -166,16 +148,18 @@ const AboutUsPage = () => {
             </section>
 
             {/* MISSION & VISION SECTION */}
-            <section className="py-8 px-4 max-w-7xl mx-auto">
+            <section className="py-4 px-4 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Mission Card */}
                     <article className="group relative">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] opacity-0 group-hover:opacity-20 transition duration-500 blur"></div>
                         <div className="luxury-box p-6 h-full flex flex-col transition-all duration-500">
-                            <div className="w-16 h-16 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center mb-4 shadow-xl shadow-gold-900/20 transform group-hover:rotate-6 transition-transform">
-                                <Target className="w-10 h-10 text-[#0D0D0D]" />
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center shadow-xl shadow-gold-900/20 transform group-hover:rotate-6 transition-transform">
+                                    <Target className="w-6 h-6 text-[#0D0D0D]" />
+                                </div>
+                                <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#C8A96A]">Ambition</h3>
                             </div>
-                            <h3 className="text-3xl font-serif font-bold text-[#C8A96A] mb-3">Ambition</h3>
                             <p className="text-[#F5E6C8]/60 leading-relaxed text-lg font-medium">
                                 Our mission is to architect a reliable platform for financial independence and personal development. We nurture our elite community through sophisticated training and leadership, maintaining absolute integrity in every transaction.
                             </p>
@@ -186,10 +170,12 @@ const AboutUsPage = () => {
                     <article className="group relative">
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] opacity-0 group-hover:opacity-20 transition duration-500 blur"></div>
                         <div className="luxury-box p-6 h-full flex flex-col transition-all duration-500">
-                            <div className="w-16 h-16 bg-[#0D0D0D] border border-[#C8A96A]/30 aspect-square flex items-center justify-center mb-4 shadow-xl transform group-hover:-rotate-6 transition-transform">
-                                <Eye className="w-10 h-10 text-[#C8A96A]" />
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] aspect-square flex items-center justify-center shadow-xl transform group-hover:-rotate-6 transition-transform">
+                                    <Eye className="w-6 h-6 text-[#0D0D0D]" />
+                                </div>
+                                <h3 className="text-2xl md:text-3xl font-serif font-bold text-[#C8A96A]">Future</h3>
                             </div>
-                            <h3 className="text-3xl font-serif font-bold text-[#F5E6C8] mb-3">Future</h3>
                             <p className="text-[#F5E6C8]/60 leading-relaxed text-lg font-medium">
                                 To lead the global direct selling landscape by defining a sustainable lifestyle model. We inspire positive transformation and encourage high-performance entrepreneurship through innovation and responsible legacy-building.
                             </p>
@@ -199,7 +185,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* CORE VALUES SECTION */}
-            <section className="py-8 px-4 max-w-7xl mx-auto relative overflow-hidden">
+            <section className="py-4 px-4 max-w-7xl mx-auto relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#C8A96A]/5 rounded-full blur-[120px] -z-10"></div>
 
                 <h2 className="text-2xl md:text-4xl font-serif font-bold text-center text-[#C8A96A] mb-4 animate-slide-up">
@@ -236,7 +222,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* Why Sanyukt Parivaar Section */}
-            <section className="py-8 px-4">
+            <section className="py-4 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                         {/* Left Content */}
@@ -300,7 +286,7 @@ const AboutUsPage = () => {
             </section>
 
             {/* Final CTA Section */}
-            <section className="py-12 px-4 relative overflow-hidden">
+            <section className="py-6 px-4 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[#C8A96A] opacity-5"></div>
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#C8A96A]/30 to-transparent"></div>
 
@@ -310,7 +296,7 @@ const AboutUsPage = () => {
                         <span className="text-[#C8A96A]">Join a Growing Community That Believes in Shared Success</span>
                     </h2>
 
-                    <motion.button
+                    <Motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => navigate('/register')}
@@ -318,7 +304,7 @@ const AboutUsPage = () => {
                     >
                         <span className="relative z-10 break-words text-center uppercase tracking-[0.2em] text-xs md:text-sm">Join Sanyukt Parivaar Today</span>
                         <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                    </motion.button>
+                    </Motion.button>
                 </div>
             </section>
         </div >

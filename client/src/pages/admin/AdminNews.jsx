@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "../../api";
+import api, { API_URL } from "../../api";
 import { 
     Newspaper, Plus, Trash2, Calendar, User, 
     Tag, Image as ImageIcon, X, Loader2, Search,
@@ -115,7 +115,7 @@ const AdminNews = () => {
         setCategory(news.category);
         setReadTime(news.readTime);
         const cacheBuster = `?t=${new Date().getTime()}`;
-        setPreview(news.image.startsWith('http') ? news.image : `${import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, "") || "http://localhost:5001"}${news.image}${cacheBuster}`);
+        setPreview(news.image.startsWith('http') ? news.image : `${API_URL}${news.image}${cacheBuster}`);
         // Scroll to form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -374,7 +374,7 @@ const AdminNews = () => {
                                 {/* Card Image */}
                                 <div className="relative h-56 overflow-hidden">
                                     <img 
-                                        src={news.image.startsWith('http') ? news.image : `${import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, "") || "http://localhost:5001"}${news.image}?t=${new Date().getTime()}`}
+                                        src={news.image.startsWith('http') ? news.image : `${API_URL}${news.image}?t=${new Date().getTime()}`}
                                         alt={news.title}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
