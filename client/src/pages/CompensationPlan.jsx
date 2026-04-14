@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import {
     ChevronRight, Award, Zap, Star, Shield, Gift,
     TrendingUp, Briefcase, Target, Rocket, CheckCircle2,
@@ -46,7 +46,7 @@ const CompensationPlan = () => {
                 <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[100px] pointer-events-none -mb-40 -ml-40"></div>
                 
                 <Container className="max-w-6xl mx-auto text-center relative z-10">
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
@@ -59,7 +59,7 @@ const CompensationPlan = () => {
                         <p className="text-xl text-[#F5E6C8]/60 max-w-3xl mx-auto font-medium leading-relaxed">
                             A mathematically proven, career-oriented reward system designed for sustainable wealth and financial freedom.
                         </p>
-                    </motion.div>
+                    </Motion.div>
                 </Container>
             </div>
 
@@ -78,7 +78,7 @@ const CompensationPlan = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {packages.map((pkg, i) => (
-                            <motion.div
+                            <Motion.div
                                 key={i}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -103,7 +103,7 @@ const CompensationPlan = () => {
                                         <span className="font-black text-[#C8A96A]">{pkg.capping}</span>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </Motion.div>
                         ))}
                     </div>
                 </section>
@@ -241,7 +241,7 @@ const CompensationPlan = () => {
                 </section>
 
                 {/* Secure Call to Action */}
-                <motion.div 
+                <Motion.div 
                     whileHover={{ scale: 1.01 }}
                     className="max-w-4xl mx-auto rounded-[3rem] p-1 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37]"
                 >
@@ -267,7 +267,7 @@ const CompensationPlan = () => {
                             </Link>
                         </div>
                     </div>
-                </motion.div>
+                </Motion.div>
             </div>
         </div>
     );

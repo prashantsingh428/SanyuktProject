@@ -74,18 +74,14 @@ const OpportunitiesPage = () => {
             </div>
 
             {/* Hero Banner */}
-            <header className="relative h-[120px] bg-cover bg-center border-b border-[#C8A96A]/20"
+            <header className="relative h-[180px] md:h-[220px] bg-cover bg-center border-b border-[#C8A96A]/20"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')" }}>
-                <div className="absolute inset-0 bg-[#0D0D0D]/80"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/80 to-[#0D0D0D]/40"></div>
                 <div className="relative h-full flex flex-col items-center justify-center text-center px-4 z-10">
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#C8A96A] mb-3 animate-slide-up">
+                    <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-serif font-black text-[#C8A96A] mb-4 animate-slide-up uppercase tracking-[0.1em] sm:tracking-[0.2em] md:tracking-[0.3em] lg:tracking-[0.5em] leading-tight">
                         OPPORTUNITIES
                     </h1>
-                    <div className="flex items-center text-[#F5E6C8]/60 text-[10px] uppercase font-black tracking-widest flex-wrap justify-center">
-                        <Link to="/" className="hover:text-[#C8A96A] transition-colors">Home</Link>
-                        <ChevronRight className="w-4 h-4 mx-2 text-[#C8A96A]/40" />
-                        <span className="text-[#C8A96A]">OPPORTUNITIES</span>
-                    </div>
+                    <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#C8A96A] to-transparent"></div>
                 </div>
             </header>
 
@@ -255,8 +251,8 @@ const OpportunitiesPage = () => {
                             Register Now
                         </Link>
                         <Link to="/contact" className="px-4 py-2 font-black text-[9px] tracking-[0.3em] uppercase text-[#F5E6C8] border border-[#F5E6C8]/20 hover:border-[#C8A96A] hover:text-[#C8A96A] transition-all flex items-center justify-center bg-transparent relative overflow-hidden group">
-                           Contact Sales
-                           <div className="absolute inset-0 bg-[#C8A96A]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            Contact Sales
+                            <div className="absolute inset-0 bg-[#C8A96A]/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                         </Link>
                     </div>
                 </div>

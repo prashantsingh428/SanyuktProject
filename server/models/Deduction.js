@@ -32,14 +32,13 @@ const deductionSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-deductionSchema.pre('save', async function (next) {
+// Auto-generate referenceNo before save
+deductionSchema.pre('save', async function () {
     if (!this.referenceNo) {
-        const count = await mongoose.model('Deduction').countDocuments();
-        const month = new Date().toLocaleString('en', { month: 'short' }).toUpperCase();
-        const year = new Date().getFullYear();
-        this.referenceNo = `${this.type.toUpperCase().slice(0, 3)}/${month}/${String(count + 1).padStart(3, '0')}`;
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        this.referenceNo = `${this.type.toUpperCase().slice(0, 3)}-${timestamp}-${random}`;
     }
-    next();
 });
 
 deductionSchema.index({ userId: 1 });

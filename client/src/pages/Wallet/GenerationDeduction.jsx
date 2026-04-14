@@ -1,30 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, AlertCircle } from 'lucide-react';
-import api from '../../api';
+import { ArrowLeft, FileText } from 'lucide-react';
 
 const GenerationDeduction = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [deductions, setDeductions] = useState([]);
-
-    useEffect(() => {
-        const fetchDeductions = async () => {
-            try {
-                const res = await api.get('/wallet/deduction-report');
-                if (res.data.success) {
-                    // Filter or assume deductions handle all wallet types, or specific to gen if needed
-                    setDeductions(res.data.deductions || []);
-                }
-            } catch (err) {
-                console.error("Error fetching deductions:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDeductions();
-    }, []);
-
     return (
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
             <div className="flex items-center gap-4 mb-8">
