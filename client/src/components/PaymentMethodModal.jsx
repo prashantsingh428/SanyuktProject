@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { X, Wallet, CreditCard, ChevronRight, ShieldCheck, ArrowRight } from 'lucide-react';
 
 const PaymentMethodModal = ({ 
@@ -17,7 +17,7 @@ const PaymentMethodModal = ({
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -46,7 +46,7 @@ const PaymentMethodModal = ({
                         </div>
 
                         {/* Wallet Option */}
-                        <motion.button
+                        <Motion.button
                             whileHover={canPayWithWallet && !isProcessing ? { x: 5 } : {}}
                             whileTap={canPayWithWallet && !isProcessing ? { scale: 0.98 } : {}}
                             onClick={() => canPayWithWallet && onSelect('wallet')}
@@ -76,10 +76,10 @@ const PaymentMethodModal = ({
                             {canPayWithWallet && (
                                 <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-[8px] font-bold px-2 py-1 rounded-lg shadow-lg uppercase">Fastest</div>
                             )}
-                        </motion.button>
+                        </Motion.button>
 
                         {/* Razorpay Option */}
-                        <motion.button
+                        <Motion.button
                             whileHover={!isProcessing ? { x: 5 } : {}}
                             whileTap={!isProcessing ? { scale: 0.98 } : {}}
                             onClick={() => onSelect('online')}
@@ -98,7 +98,7 @@ const PaymentMethodModal = ({
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-[#C8A96A]/30 group-hover:text-[#C8A96A] transition-colors" />
-                        </motion.button>
+                        </Motion.button>
                     </div>
 
                     {/* Footer */}
@@ -114,7 +114,7 @@ const PaymentMethodModal = ({
                             </div>
                         )}
                     </div>
-                </motion.div>
+                </Motion.div>
             </div>
         </AnimatePresence>
     );

@@ -5,7 +5,7 @@ import api, { API_URL } from '../api';
 import { Snackbar, Alert, Fade } from '@mui/material';
 import { addressData } from '../data/addressData';
 import { ChevronDown, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 
 const CheckoutPage = () => {
@@ -18,7 +18,7 @@ const CheckoutPage = () => {
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-    
+
     // State for dropdowns
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
     const [stateSearch, setStateSearch] = useState('');
@@ -46,7 +46,9 @@ const CheckoutPage = () => {
     const [couponApplied, setCouponApplied] = useState(false);
     const [discount, setDiscount] = useState(0);
 
-    const availableMethods = product?.paymentMethods || ['cod', 'upi', 'card'];
+    const availableMethods = Array.isArray(product?.paymentMethods) && product.paymentMethods.length > 0
+        ? product.paymentMethods
+        : ['cod', 'upi', 'card'];
 
     // Set initial payment method
     useEffect(() => {
@@ -108,6 +110,10 @@ const CheckoutPage = () => {
         });
     };
 
+    const formatCurrency = (amount) => {
+        return typeof amount === 'number' ? amount.toFixed(2) : '0.00';
+    };
+
     const handleApplyCoupon = () => {
         // Demo coupons
         if (couponCode === 'WELCOME10') {
@@ -125,6 +131,18 @@ const CheckoutPage = () => {
 
     const loadRazorpayScript = () => {
         return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+
+            const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+            if (existingScript) {
+                existingScript.addEventListener('load', () => resolve(true), { once: true });
+                existingScript.addEventListener('error', () => resolve(false), { once: true });
+                return;
+            }
+
             const script = document.createElement('script');
             script.src = 'https://checkout.razorpay.com/v1/checkout.js';
             script.onload = () => resolve(true);
@@ -167,6 +185,10 @@ const CheckoutPage = () => {
             setSnackbar({ open: true, message: 'Pincode must be exactly 6 digits', severity: 'warning' });
             return;
         }
+        if (!paymentMethod) {
+            setSnackbar({ open: true, message: 'Please select a payment method', severity: 'warning' });
+            return;
+        }
 
         if (paymentMethod === 'cod') {
             await createOrder();
@@ -187,22 +209,45 @@ const CheckoutPage = () => {
 
             // 1. Create order on server
             const { data: rpOrder } = await api.post('/orders/razorpay-order', { amount: total });
+            if (!rpOrder || !rpOrder.id || !rpOrder.amount || !rpOrder.currency) {
+                throw new Error('Invalid payment order response from server');
+            }
+            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            if (!razorpayKeyId) {
+                console.error("Razorpay key is missing in frontend env");
+                alert("Payment configuration error. Please contact support.");
+                setLoading(false);
+                return;
+            }
 
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_SROihejcCAh8Vm', // Fallback to provided key if env not set
+                key: razorpayKeyId,
                 amount: rpOrder.amount,
                 currency: rpOrder.currency,
                 name: "Sanyukt Parivaar",
                 description: `Order for ${product.name}`,
-                image: `${API_URL}/logo.png`,
+                image: `${API_URL}/logo.png?v=20260403`,
                 order_id: rpOrder.id,
                 handler: async (response) => {
-                    // 2. Verification and Order Finalization
-                    await createOrder({
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature
-                    });
+                    if (!response || !response.razorpay_payment_id) {
+                        console.error("Invalid Razorpay response", response);
+                        alert("Payment failed. Try again.");
+                        setLoading(false);
+                        return;
+                    }
+
+                    try {
+                        // 2. Verification and Order Finalization
+                        await createOrder({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        });
+                    } catch (err) {
+                        console.error('Order finalization failed:', err);
+                        setSnackbar({ open: true, message: 'Payment captured but order finalization failed. Please contact support.', severity: 'error' });
+                        setLoading(false);
+                    }
                 },
                 prefill: {
                     name: shippingInfo.fullName,
@@ -212,11 +257,21 @@ const CheckoutPage = () => {
                 theme: {
                     color: "#C8A96A",
                 },
+                modal: {
+                    ondismiss: () => {
+                        setLoading(false);
+                    }
+                }
             };
 
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
-                setSnackbar({ open: true, message: 'Payment Failed: ' + response.error.description, severity: 'error' });
+                const reason =
+                    response?.error?.description ||
+                    response?.error?.reason ||
+                    response?.error?.code ||
+                    'Payment failed. Please try again.';
+                setSnackbar({ open: true, message: `Payment Failed: ${reason}`, severity: 'error' });
                 setLoading(false);
             });
             rzp.open();
@@ -230,11 +285,16 @@ const CheckoutPage = () => {
     const createOrder = async (paymentDetails = {}) => {
         setLoading(true);
         try {
+            const productId = product?._id || product?.id;
+            if (!productId) {
+                throw new Error('Product identifier missing');
+            }
+            const normalizedPaymentMethod = paymentMethod || (paymentDetails?.razorpay_payment_id ? 'online' : 'cod');
             const orderData = {
-                product: product._id,
+                product: productId,
                 quantity: 1,
                 shippingInfo,
-                paymentMethod,
+                paymentMethod: normalizedPaymentMethod,
                 subtotal,
                 shipping,
                 tax,
@@ -334,28 +394,45 @@ const CheckoutPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-28 pb-12">
-            <div className="max-w-7xl mx-auto px-4">
+        <div className="min-h-screen bg-[#0D0D0D] text-[#F5E6C8] pb-12">
+            <div className="max-w-7xl mx-auto px-4 pt-6">
                 {/* Back Button */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-[#0A7A2F] mb-6 transition-colors"
+                    className="flex items-center gap-2 text-[#C8A96A] hover:text-[#D4AF37] mb-6 transition-colors font-black uppercase tracking-widest text-xs"
                 >
                     <ChevronLeft className="w-5 h-5" />
                     Back to Products
                 </button>
 
                 {/* Checkout Steps */}
-                <div className="flex items-center justify-center mb-8">
-                    <div className="flex items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${currentStep >= 1 ? 'bg-[#0A7A2F] text-white' : 'bg-gray-200 text-gray-600'
-                            }`}>1</div>
-                        <div className={`w-24 h-1 ${currentStep >= 2 ? 'bg-[#0A7A2F]' : 'bg-gray-200'}`}></div>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${currentStep >= 2 ? 'bg-[#0A7A2F] text-white' : 'bg-gray-200 text-gray-600'
-                            }`}>2</div>
-                        <div className={`w-24 h-1 ${currentStep >= 3 ? 'bg-[#0A7A2F]' : 'bg-gray-200'}`}></div>
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${currentStep >= 3 ? 'bg-[#0A7A2F] text-white' : 'bg-gray-200 text-gray-600'
-                            }`}>3</div>
+                <div className="flex items-center justify-center mb-12">
+                    <div className="flex items-center relative">
+                        {/* Connecting Lines (Background) */}
+                        <div className="absolute top-5 left-0 w-full h-0.5 bg-[#C8A96A]/10 -z-0"></div>
+                        
+                        <div className="flex items-center gap-16 md:gap-24 relative z-10">
+                            {/* Step 1 */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 1 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/60'
+                                    }`}>1</div>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${currentStep >= 1 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/50'}`}>Details</span>
+                            </div>
+
+                            {/* Step 2 */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 2 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/60'
+                                    }`}>2</div>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${currentStep >= 2 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/50'}`}>Payment</span>
+                            </div>
+
+                            {/* Step 3 */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black ${currentStep >= 3 ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A]/60'
+                                    }`}>3</div>
+                                <span className={`text-[11px] font-black uppercase tracking-widest ${currentStep >= 3 ? 'text-[#C8A96A]' : 'text-[#C8A96A]/50'}`}>Verify</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -363,15 +440,15 @@ const CheckoutPage = () => {
                     {/* Left Side - Forms */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Shipping Information */}
-                        <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <Truck className="w-5 h-5 text-[#0A7A2F]" />
+                        <div className="bg-[#1A1A1A] border border-[#C8A96A]/10 rounded-none p-6 md:p-8 shadow-2xl">
+                            <h2 className="text-lg font-serif font-bold text-[#C8A96A] mb-6 flex items-center gap-3 uppercase tracking-wider">
+                                <Truck className="w-5 h-5" />
                                 Shipping Information
                             </h2>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Full Name *
                                     </label>
                                     <input
@@ -379,12 +456,12 @@ const CheckoutPage = () => {
                                         name="fullName"
                                         value={shippingInfo.fullName}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent"
-                                        placeholder="Enter your full name"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
+                                        placeholder="John Doe"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Email Address *
                                     </label>
                                     <input
@@ -392,12 +469,12 @@ const CheckoutPage = () => {
                                         name="email"
                                         value={shippingInfo.email}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent"
-                                        placeholder="Enter your email"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
+                                        placeholder="john@example.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Phone Number *
                                     </label>
                                     <input
@@ -407,15 +484,15 @@ const CheckoutPage = () => {
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '');
                                             if (val.length <= 10) {
-                                                setShippingInfo({...shippingInfo, phone: val});
+                                                setShippingInfo({ ...shippingInfo, phone: val });
                                             }
                                         }}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent font-mono"
-                                        placeholder="Enter 10-digit phone number"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40 font-mono"
+                                        placeholder="0000000000"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Landmark (Optional)
                                     </label>
                                     <input
@@ -423,12 +500,12 @@ const CheckoutPage = () => {
                                         name="landmark"
                                         value={shippingInfo.landmark}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="Nearby landmark"
                                     />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Address *
                                     </label>
                                     <textarea
@@ -436,12 +513,12 @@ const CheckoutPage = () => {
                                         value={shippingInfo.address}
                                         onChange={handleInputChange}
                                         rows="3"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="Enter your complete address"
                                     ></textarea>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         City *
                                     </label>
                                     <input
@@ -449,47 +526,47 @@ const CheckoutPage = () => {
                                         name="city"
                                         value={shippingInfo.city}
                                         onChange={handleInputChange}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         placeholder="City"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         State *
                                     </label>
                                     <div className="relative" ref={stateDropdownRef}>
                                         <div
                                             onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between cursor-pointer focus:ring-2 focus:ring-[#0A7A2F] transition-all bg-white"
+                                            className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 flex items-center justify-between cursor-pointer focus:border-[#C8A96A] transition-all"
                                         >
-                                            <span className={shippingInfo.state ? 'text-gray-800' : 'text-gray-400'}>
+                                            <span className={shippingInfo.state ? 'text-[#F5E6C8]' : 'text-[#F5E6C8]/40 text-base'}>
                                                 {shippingInfo.state || 'Select State'}
                                             </span>
-                                            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isStateDropdownOpen ? 'rotate-180' : ''}`} />
+                                            <ChevronDown className={`h-4 w-4 text-[#C8A96A] transition-transform ${isStateDropdownOpen ? 'rotate-180' : ''}`} />
                                         </div>
 
                                         <AnimatePresence>
                                             {isStateDropdownOpen && (
-                                                <motion.div
+                                                <Motion.div
                                                     initial={{ opacity: 0, y: -10 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -10 }}
-                                                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden"
+                                                    className="absolute z-50 w-full mt-1 bg-[#1A1A1A] border border-[#C8A96A]/20 shadow-2xl overflow-hidden"
                                                 >
-                                                    <div className="p-2 bg-gray-50 border-b border-gray-100">
+                                                    <div className="p-2 bg-[#0D0D0D] border-b border-[#C8A96A]/10">
                                                         <div className="relative">
-                                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#C8A96A]/60" />
                                                             <input
                                                                 type="text"
                                                                 placeholder="Search state..."
                                                                 value={stateSearch}
                                                                 onChange={(e) => setStateSearch(e.target.value)}
                                                                 onClick={(e) => e.stopPropagation()}
-                                                                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:border-[#0A7A2F] focus:outline-none bg-white"
+                                                                className="w-full pl-9 pr-3 py-2 text-sm bg-[#1A1A1A] border border-[#C8A96A]/10 text-[#F5E6C8] focus:border-[#C8A96A] focus:outline-none"
                                                             />
                                                         </div>
                                                     </div>
-                                                    <div className="max-h-60 overflow-y-auto">
+                                                    <div className="max-h-60 overflow-y-auto custom-scrollbar">
                                                         {filteredStates.length > 0 ? (
                                                             filteredStates.map((st) => (
                                                                 <div
@@ -499,24 +576,24 @@ const CheckoutPage = () => {
                                                                         setIsStateDropdownOpen(false);
                                                                         setStateSearch('');
                                                                     }}
-                                                                    className={`px-4 py-2 text-sm cursor-pointer transition-colors hover:bg-green-50 hover:text-[#0A7A2F] ${shippingInfo.state === st ? 'bg-green-50 text-[#0A7A2F] font-bold' : 'text-gray-700'}`}
+                                                                    className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest cursor-pointer transition-colors hover:bg-[#C8A96A]/10 hover:text-[#C8A96A] ${shippingInfo.state === st ? 'bg-[#C8A96A] text-[#0D0D0D]' : 'text-[#F5E6C8]/60'}`}
                                                                 >
                                                                     {st}
                                                                 </div>
                                                             ))
                                                         ) : (
-                                                            <div className="px-4 py-4 text-sm text-gray-500 text-center italic">
+                                                            <div className="px-4 py-4 text-xs text-[#F5E6C8]/40 text-center italic uppercase tracking-widest">
                                                                 No states found
                                                             </div>
                                                         )}
                                                     </div>
-                                                </motion.div>
+                                                </Motion.div>
                                             )}
                                         </AnimatePresence>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-xs font-black text-[#C8A96A] uppercase tracking-widest mb-2">
                                         Pincode *
                                     </label>
                                     <input
@@ -526,71 +603,71 @@ const CheckoutPage = () => {
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '');
                                             if (val.length <= 6) {
-                                                setShippingInfo({...shippingInfo, pincode: val});
+                                                setShippingInfo({ ...shippingInfo, pincode: val });
                                             }
                                         }}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent font-mono"
-                                        placeholder="6-digit Pincode"
+                                        className="w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-base focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40 font-mono"
+                                        placeholder="000000"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Payment Method */}
-                        <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <CreditCard className="w-5 h-5 text-[#0A7A2F]" />
+                        <div className="bg-[#1A1A1A] border border-[#C8A96A]/10 rounded-none p-6 md:p-8 shadow-2xl">
+                            <h2 className="text-lg font-serif font-bold text-[#C8A96A] mb-6 flex items-center gap-3 uppercase tracking-wider">
+                                <CreditCard className="w-5 h-5" />
                                 Payment Method
                             </h2>
 
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {availableMethods.includes('cod') && (
-                                    <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'cod' ? 'border-[#0A7A2F] bg-green-50' : 'border-gray-100'}`}>
+                                    <label className={`flex items-center p-5 border transition-all cursor-pointer ${paymentMethod === 'cod' ? 'border-[#C8A96A] bg-[#C8A96A]/5' : 'border-[#C8A96A]/10 bg-[#0D0D0D]'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
                                             value="cod"
                                             checked={paymentMethod === 'cod'}
                                             onChange={(e) => setPaymentMethod(e.target.value)}
-                                            className="w-4 h-4 text-[#0A7A2F]"
+                                            className="w-4 h-4 accent-[#C8A96A]"
                                         />
-                                        <span className="ml-3 flex items-center gap-2">
-                                            <IndianRupee className="w-5 h-5 text-gray-600" />
-                                            <span className="font-semibold text-gray-800">Cash on Delivery</span>
+                                        <span className="ml-4 flex items-center gap-3">
+                                            <IndianRupee className="w-5 h-5 text-[#C8A96A]" />
+                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-xs">Cash on Delivery</span>
                                         </span>
                                     </label>
                                 )}
 
                                 {availableMethods.includes('upi') && (
-                                    <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'upi' ? 'border-[#0A7A2F] bg-green-50' : 'border-gray-100'}`}>
+                                    <label className={`flex items-center p-5 border transition-all cursor-pointer ${paymentMethod === 'upi' ? 'border-[#C8A96A] bg-[#C8A96A]/5' : 'border-[#C8A96A]/10 bg-[#0D0D0D]'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
                                             value="upi"
                                             checked={paymentMethod === 'upi'}
                                             onChange={(e) => setPaymentMethod(e.target.value)}
-                                            className="w-4 h-4 text-[#0A7A2F]"
+                                            className="w-4 h-4 accent-[#C8A96A]"
                                         />
-                                        <span className="ml-3 flex items-center gap-2">
-                                            <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center text-[10px] text-white font-bold">UPI</div>
-                                            <span className="font-semibold text-gray-800">UPI (GPay/PhonePe/Paytm)</span>
+                                        <span className="ml-4 flex items-center gap-3">
+                                            <div className="w-5 h-5 bg-[#C8A96A] rounded flex items-center justify-center text-[10px] text-[#0D0D0D] font-black">UPI</div>
+                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-xs">UPI (GPay/PhonePe/Paytm)</span>
                                         </span>
                                     </label>
                                 )}
 
                                 {availableMethods.includes('card') && (
-                                    <label className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-[#0A7A2F] bg-green-50' : 'border-gray-100'}`}>
+                                    <label className={`flex items-center p-5 border transition-all cursor-pointer ${paymentMethod === 'card' ? 'border-[#C8A96A] bg-[#C8A96A]/5' : 'border-[#C8A96A]/10 bg-[#0D0D0D]'}`}>
                                         <input
                                             type="radio"
                                             name="payment"
                                             value="card"
                                             checked={paymentMethod === 'card'}
                                             onChange={(e) => setPaymentMethod(e.target.value)}
-                                            className="w-4 h-4 text-[#0A7A2F]"
+                                            className="w-4 h-4 accent-[#C8A96A]"
                                         />
-                                        <span className="ml-3 flex items-center gap-2">
-                                            <CreditCard className="w-5 h-5 text-gray-600" />
-                                            <span className="font-semibold text-gray-800">Debit / Credit Card</span>
+                                        <span className="ml-4 flex items-center gap-3">
+                                            <CreditCard className="w-5 h-5 text-[#C8A96A]" />
+                                            <span className="font-bold text-[#F5E6C8] uppercase tracking-widest text-xs">Debit / Credit Card</span>
                                         </span>
                                     </label>
                                 )}
@@ -600,17 +677,17 @@ const CheckoutPage = () => {
 
                     {/* Right Side - Order Summary */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h2>
+                        <div className="bg-[#1A1A1A] border border-[#C8A96A]/10 rounded-none p-6 sticky top-24 shadow-2xl">
+                            <h2 className="text-lg font-serif font-bold text-[#C8A96A] mb-6 uppercase tracking-wider">Order Summary</h2>
 
                             {/* Product Details */}
-                            <div className="flex gap-3 mb-4 pb-4 border-b">
-                                <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                            <div className="flex gap-3 mb-6 pb-6 border-b border-[#C8A96A]/10">
+                                <div className="w-16 h-16 bg-[#0D0D0D] border border-[#C8A96A]/20 overflow-hidden">
                                     {product.image ? (
                                         <img
                                             src={product.image.startsWith('http') ? product.image : `${API_URL}${product.image.startsWith('/uploads') ? product.image : '/uploads/' + product.image}`}
                                             alt={product.name}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover opacity-80"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-2xl">
@@ -619,60 +696,59 @@ const CheckoutPage = () => {
                                     )}
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="font-medium text-gray-800 text-sm line-clamp-2">
+                                    <h3 className="font-serif font-bold text-[#F5E6C8] text-xs line-clamp-2 leading-tight uppercase tracking-tight">
                                         {product.name}
                                     </h3>
-                                    <p className="text-[#0A7A2F] font-bold mt-1">
-                                        ₹{product.price?.toFixed(2)}
+                                    <p className="text-[#C8A96A] font-black mt-1 text-sm">
+                                        ₹{formatCurrency(product.price)}
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Price Breakdown */}
-                            <div className="space-y-2 mb-4">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Subtotal</span>
-                                    <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+                            <div className="space-y-3 mb-6">
+                                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                                    <span className="text-[#C8A96A]">Subtotal</span>
+                                    <span className="text-[#F5E6C8]">₹{formatCurrency(subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Shipping</span>
-                                    <span className="font-medium">
-                                        {shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}
+                                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                                    <span className="text-[#C8A96A]">Shipping</span>
+                                    <span className="text-[#F5E6C8]">
+                                        {shipping === 0 ? 'Free' : `₹${formatCurrency(shipping)}`}
                                     </span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">GST (18%)</span>
-                                    <span className="font-medium">₹{tax.toFixed(2)}</span>
+                                <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+                                    <span className="text-[#C8A96A]">GST (18%)</span>
+                                    <span className="text-[#F5E6C8]">₹{formatCurrency(tax)}</span>
                                 </div>
                                 {discount > 0 && (
-                                    <div className="flex justify-between text-sm text-green-600">
+                                    <div className="flex justify-between text-sm font-bold uppercase tracking-widest text-[#C8A96A]">
                                         <span>Discount</span>
-                                        <span>-₹{discount.toFixed(2)}</span>
+                                        <span>-₹{formatCurrency(discount)}</span>
                                     </div>
                                 )}
-                                <div className="border-t pt-2 mt-2">
-                                    <div className="flex justify-between font-bold">
-                                        <span>Total</span>
-                                        <span className="text-[#0A7A2F] text-xl">₹{total.toFixed(2)}</span>
+                                <div className="border-t border-[#C8A96A]/10 pt-4 mt-4">
+                                    <div className="flex justify-between items-baseline">
+                                        <span className="text-xs font-black uppercase tracking-[0.2em] text-[#C8A96A]">Total Amount</span>
+                                        <span className="text-[#C8A96A] text-2xl font-serif font-bold">₹{formatCurrency(total)}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Coupon Code */}
-                            <div className="mb-4">
+                            <div className="mb-6">
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
                                         value={couponCode}
                                         onChange={(e) => setCouponCode(e.target.value)}
-                                        placeholder="Enter coupon code"
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0A7A2F] focus:border-transparent"
+                                        placeholder="COUPON CODE"
+                                        className="flex-1 px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 text-[#F5E6C8] text-xs font-black tracking-widest focus:border-[#C8A96A] focus:outline-none transition-all placeholder:text-[#F5E6C8]/40"
                                         disabled={couponApplied}
                                     />
                                     <button
                                         onClick={handleApplyCoupon}
                                         disabled={couponApplied}
-                                        className={`px-4 py-2 bg-[#0A7A2F] text-white rounded-lg text-sm font-medium hover:bg-[#2F7A32] transition-all ${couponApplied ? 'opacity-50 cursor-not-allowed' : ''
+                                        className={`px-4 py-2 bg-[#C8A96A] text-[#0D0D0D] text-[10px] font-black uppercase tracking-widest hover:bg-[#D4AF37] transition-all ${couponApplied ? 'opacity-50 cursor-not-allowed' : ''
                                             }`}
                                     >
                                         Apply
@@ -684,12 +760,12 @@ const CheckoutPage = () => {
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={loading}
-                                className={`w-full py-3 bg-gradient-to-r from-[#0A7A2F] to-[#2F7A32] text-white rounded-xl font-bold hover:shadow-lg transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''
+                                className={`w-full py-4 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-xs font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''
                                     }`}
                             >
                                 {loading ? (
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="flex items-center justify-center gap-3">
+                                        <div className="w-4 h-4 border-2 border-[#0D0D0D] border-t-transparent rounded-full animate-spin"></div>
                                         Processing...
                                     </div>
                                 ) : (
@@ -698,19 +774,19 @@ const CheckoutPage = () => {
                             </button>
 
                             {/* Trust Badges */}
-                            <div className="mt-4 pt-4 border-t">
-                                <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-                                    <div className="flex items-center gap-1">
-                                        <Shield className="w-4 h-4" />
-                                        Secure Payment
+                            <div className="mt-6 pt-6 border-t border-[#C8A96A]/10">
+                                <div className="grid grid-cols-3 gap-2 text-[10px] font-black text-[#C8A96A]/70 uppercase tracking-widest text-center">
+                                    <div className="flex flex-col items-center gap-1.5">
+                                        <Shield className="w-3.5 h-3.5" />
+                                        Secure
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Truck className="w-4 h-4" />
-                                        Free Shipping
+                                    <div className="flex flex-col items-center gap-1.5 border-x border-[#C8A96A]/10">
+                                        <Truck className="w-3.5 h-3.5" />
+                                        Fast
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Package className="w-4 h-4" />
-                                        7 Days Return
+                                    <div className="flex flex-col items-center gap-1.5">
+                                        <Package className="w-3.5 h-3.5" />
+                                        Genuine
                                     </div>
                                 </div>
                             </div>
@@ -718,6 +794,7 @@ const CheckoutPage = () => {
                     </div>
                 </div>
             </div>
+            
             {/* Global Notifications Snackbar */}
             <Snackbar
                 open={snackbar.open}
@@ -732,12 +809,16 @@ const CheckoutPage = () => {
                     variant="filled"
                     sx={{
                         width: '100%',
-                        borderRadius: '16px',
-                        fontWeight: 800,
-                        boxShadow: '0 8px 30px rgba(247,147,30,0.25)',
-                        bgcolor: '#f7931e',
-                        color: 'white',
-                        '& .MuiAlert-icon': { color: 'white' }
+                        borderRadius: '0',
+                        fontWeight: 900,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        fontSize: '10px',
+                        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                        bgcolor: '#1A1A1A',
+                        color: '#C8A96A',
+                        border: '1px solid rgba(200,169,106,0.2)',
+                        '& .MuiAlert-icon': { color: '#C8A96A' }
                     }}
                 >
                     {snackbar.message}

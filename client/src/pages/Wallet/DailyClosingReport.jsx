@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, TrendingUp, TrendingDown, Wallet, RefreshCw } from 'lucide-react';
 import api from '../../api';
@@ -21,7 +21,7 @@ const DailyClosingReport = () => {
                 params: { date: selectedDate }
             });
             if (res.data.success) setData(res.data);
-        } catch (err) {
+        } catch {
             setError('System synchronization failed.');
         } finally {
             setLoading(false);

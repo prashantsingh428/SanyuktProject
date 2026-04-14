@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../api";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { 
     ShieldAlert, Search, RefreshCw, CheckCircle, Clock, 
     Activity, LayoutList, Fingerprint, Phone, Mail, 
@@ -122,7 +122,7 @@ const AdminGrievance = () => {
             
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-10 relative z-10">
                 {/* Header Section */}
-                <motion.div 
+                <Motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
@@ -148,10 +148,10 @@ const AdminGrievance = () => {
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
                     </button>
-                </motion.div>
+                </Motion.div>
 
                 {/* Stats Cards */}
-                <motion.div 
+                <Motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.1 }}
@@ -173,10 +173,10 @@ const AdminGrievance = () => {
                             </div>
                         </div>
                     ))}
-                </motion.div>
+                </Motion.div>
 
                 {/* Search and Filters */}
-                <motion.div 
+                <Motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
@@ -210,11 +210,11 @@ const AdminGrievance = () => {
                     <div className="w-full md:w-4/12 text-left md:text-right text-sm text-[#F5E6C8]/40 font-black uppercase tracking-widest">
                         Showing {filteredData.length} of {data.length} grievances
                     </div>
-                </motion.div>
+                </Motion.div>
 
                 {/* Debug Info */}
                 {data.length === 0 && !loading && (
-                    <motion.div 
+                    <Motion.div 
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="p-6 mb-8 border border-red-500/30 bg-red-900/10 rounded-2xl shadow-xl"
                     >
@@ -231,23 +231,23 @@ const AdminGrievance = () => {
                         <button onClick={fetchData} className="px-6 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-100 rounded-lg text-sm font-bold border border-red-500/30 transition-colors">
                             Retry Fetch
                         </button>
-                    </motion.div>
+                    </Motion.div>
                 )}
 
                 {/* Grievance List */}
                 {filteredData.length === 0 && data.length > 0 ? (
-                    <motion.div 
+                    <Motion.div 
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="luxury-box p-16 text-center shadow-2xl"
                     >
                         <ShieldAlert className="w-16 h-16 text-[#C8A96A]/20 mx-auto mb-4" />
                         <h3 className="text-xl font-serif font-bold text-[#F5E6C8] mb-2">No grievances found</h3>
                         <p className="text-[#F5E6C8]/40 text-sm">{searchTerm || statusFilter !== 'All' ? 'Try adjusting your filters' : 'New grievances will appear here'}</p>
-                    </motion.div>
+                    </Motion.div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredData.map((item, index) => (
-                            <motion.div
+                            <Motion.div
                                 key={item._id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -340,7 +340,7 @@ const AdminGrievance = () => {
                                         </div>
                                     )}
                                 </div>
-                            </motion.div>
+                            </Motion.div>
                         ))}
                     </div>
                 )}
@@ -349,7 +349,7 @@ const AdminGrievance = () => {
             {/* Custom Snackbar Notification */}
             <AnimatePresence>
                 {snackbar.open && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 50, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
@@ -359,7 +359,7 @@ const AdminGrievance = () => {
                     >
                         {snackbar.severity === 'error' ? <AlertTriangle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5 text-[#C8A96A]" />}
                         <span className="font-medium text-sm">{snackbar.message}</span>
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
         </div>
