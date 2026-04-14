@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
-import { motion } from "framer-motion";
+import { motion as Motion } from 'framer-motion';
 import { Building2, Plus, Eye, EyeOff, Copy, CheckCircle } from "lucide-react";
 
 const AdminFranchise = () => {
@@ -105,7 +105,7 @@ const AdminFranchise = () => {
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
@@ -117,10 +117,10 @@ const AdminFranchise = () => {
                         <span className="text-[#F5E6C8]">Admin Franchise Panel</span>
                     </h1>
                     <p className="text-[#F5E6C8]/40 mt-2 text-sm font-medium">Manage your franchise partners</p>
-                </motion.div>
+                </Motion.div>
 
                 {/* Add Franchise Form */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
@@ -230,10 +230,10 @@ const AdminFranchise = () => {
                             </button>
                         </div>
                     </form>
-                </motion.div>
+                </Motion.div>
 
                 {/* Franchise List */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -263,7 +263,7 @@ const AdminFranchise = () => {
                                     </tr>
                                 ) : (
                                     list.map((item, index) => (
-                                        <motion.tr
+                                        <Motion.tr
                                             key={item._id}
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
@@ -299,7 +299,7 @@ const AdminFranchise = () => {
                                                     </button>
                                                 </div>
                                             </td>
-                                        </motion.tr>
+                                        </Motion.tr>
                                     ))
                                 )}
                             </tbody>
@@ -312,7 +312,7 @@ const AdminFranchise = () => {
                             Total Franchises: <span className="font-bold text-[#C8A96A]">{list.length}</span>
                         </p>
                     </div>
-                </motion.div>
+                </Motion.div>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Zap, Clock, Database, ChevronRight } from 'lucide-react';
 
 const BrowsePlansModal = ({
@@ -26,7 +26,7 @@ const BrowsePlansModal = ({
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -83,7 +83,7 @@ const BrowsePlansModal = ({
                     <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                         {filteredPlans.length > 0 ? (
                             filteredPlans.map((plan) => (
-                                <motion.button
+                                <Motion.button
                                     key={plan.id}
                                     whileHover={{ x: 5 }}
                                     onClick={() => {
@@ -114,7 +114,7 @@ const BrowsePlansModal = ({
                                     </div>
 
                                     <ChevronRight className="w-5 h-5 text-[#C8A96A]/30 group-hover:text-[#C8A96A] transition-colors" />
-                                </motion.button>
+                                </Motion.button>
                             ))
                         ) : (
                             <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -123,7 +123,7 @@ const BrowsePlansModal = ({
                             </div>
                         )}
                     </div>
-                </motion.div>
+                </Motion.div>
             </div>
         </AnimatePresence>
     );
