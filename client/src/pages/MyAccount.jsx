@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import api from "../api";
+import api, { API_URL } from "../api";
 import CartPage from './Cart';
 
 // Material-UI imports
@@ -183,6 +183,10 @@ const MyAccount = ({ defaultTab }) => {
     const [walletTxError, setWalletTxError] = useState(null);
     const [walletTxSearch, setWalletTxSearch] = useState('');
     const [walletTxFilter, setWalletTxFilter] = useState('All');
+    const [walletTxPage, setWalletTxPage] = useState(1);
+    const [orderHistPage, setOrderHistPage] = useState(1);
+    const [rechargeHistPage, setRechargeHistPage] = useState(1);
+    const WALLET_TX_PER_PAGE = 10;
 
     // ── KYC State ──
     const [kycData, setKycData] = useState({
@@ -198,6 +202,7 @@ const MyAccount = ({ defaultTab }) => {
     // ── Orders UI ──
     const [orderSearchQuery, setOrderSearchQuery] = useState('');
     const [orderTab, setOrderTab] = useState('All Orders');
+    const [showAllOrders, setShowAllOrders] = useState(false);
 
     // ─── Handlers ──────────────────────────────────────────────────────────────
 
@@ -842,14 +847,14 @@ const MyAccount = ({ defaultTab }) => {
 
                             {/* ── Orders ── */}
                             {tabValue === 2 && (
-                                <Box sx={{ bgcolor: '#1A1A1A', borderRadius: { xs: '10px', sm: '12px' }, p: { xs: 1.5, sm: 3 }, boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)' }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 3, flexWrap: 'wrap', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
-                                        <Typography variant="h4" sx={{ fontWeight: 800, color: '#F5E6C8', fontSize: { xs: '2rem', sm: '2.125rem' } }}>Orders</Typography>
-                                        <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'stretch', flexDirection: { xs: 'column', sm: 'row' }, width: { xs: '100%', sm: 'auto' } }}>
+                                <Box sx={{ bgcolor: '#1A1A1A', borderRadius: { xs: '0', sm: '12px' }, p: { xs: 2, sm: 3 }, boxShadow: '0 2px 12px rgba(0, 0, 0, 0.4)', overflow: 'hidden', width: '100%' }}>
+                                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 3, gap: 2 }}>
+                                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#F5E6C8', fontSize: { xs: '22px', sm: '28px' } }}>Orders</Typography>
+                                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, alignItems: 'stretch', width: { xs: '100%', sm: 'auto' } }}>
                                             <TextField size="small" placeholder="Search order, invoice, email" value={orderSearchQuery} onChange={(e) => setOrderSearchQuery(e.target.value)}
-                                                sx={{ width: { xs: '100%', sm: '320px' }, '& .MuiOutlinedInput-root': { borderRadius: '6px' } }}
+                                                sx={{ width: '100%', '& .MuiOutlinedInput-root': { borderRadius: '6px' } }}
                                                 InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: 'rgba(200, 169, 106, 0.4)', fontSize: 20 }} /></InputAdornment> }} />
-                                            <Button variant="contained" onClick={() => navigate('/products')} sx={{ bgcolor: '#C8A96A', '&:hover': { bgcolor: '#C8A96A' }, borderRadius: '6px', textTransform: 'none', px: 2.5, py: 1, whiteSpace: 'nowrap', fontWeight: 600, boxShadow: 'none', width: { xs: '100%', sm: 'auto' } }}>New sales order</Button>
+                                            <Button variant="contained" onClick={() => navigate('/products')} sx={{ bgcolor: '#C8A96A', '&:hover': { bgcolor: '#C8A96A' }, borderRadius: '6px', textTransform: 'none', px: 2.5, py: 1, whiteSpace: 'nowrap', fontWeight: 600, boxShadow: 'none', width: { xs: '100%', sm: 'auto' } }}>New Order</Button>
                                         </Box>
                                     </Box>
 
@@ -902,6 +907,10 @@ const MyAccount = ({ defaultTab }) => {
                                                     return { color: '#fff3e0', text: '#e65100', label: 'Pending' };
                                                 };
 
+                                                const ORDER_LIMIT = 10;
+                                                const visibleOrders = showAllOrders ? filteredOrders : filteredOrders.slice(0, ORDER_LIMIT);
+                                                const hasMore = filteredOrders.length > ORDER_LIMIT;
+
                                                 return (
                                                     <>
                                                         {/* Desktop Table */}
@@ -917,7 +926,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                         </TableRow>
                                                                     </TableHead>
                                                                     <TableBody>
-                                                                        {filteredOrders.map((order, index) => {
+                                                                        {visibleOrders.map((order, index) => {
                                                                             const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
                                                                             const s = getOrderStyle(order.status);
                                                                             const total = order.totalAmount || order.total || '0';
@@ -935,7 +944,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                                         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                                                                                             <Button size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: '6px', borderColor: '#C8A96A', color: '#C8A96A', fontWeight: 600 }} onClick={() => navigate(`/order-details/${order._id}`)}>Details</Button>
                                                                                             {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
-                                                                                                <Button size="small" variant="contained" sx={{ textTransform: 'none', borderRadius: '6px', bgcolor: '#C8A96A', fontWeight: 600, boxShadow: 'none' }} onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
+                                                                                                <Button size="small" variant="contained" sx={{ textTransform: 'none', borderRadius: '6px', bgcolor: '#C8A96A', fontWeight: 600, boxShadow: 'none' }} onClick={() => window.open(`${API_URL}/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
                                                                                             )}
                                                                                         </Box>
                                                                                     </TableCell>
@@ -946,9 +955,44 @@ const MyAccount = ({ defaultTab }) => {
                                                                 </Table>
                                                             </TableContainer>
                                                         </Box>
+
+                                                        {/* Read More - Desktop */}
+                                                        {hasMore && !showAllOrders && (
+                                                            <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center', mt: 3 }}>
+                                                                <Button
+                                                                    onClick={() => setShowAllOrders(true)}
+                                                                    variant="outlined"
+                                                                    sx={{
+                                                                        borderColor: '#C8A96A',
+                                                                        color: '#C8A96A',
+                                                                        fontWeight: 700,
+                                                                        borderRadius: '12px',
+                                                                        px: 5,
+                                                                        py: 1.2,
+                                                                        textTransform: 'none',
+                                                                        fontSize: '14px',
+                                                                        '&:hover': { bgcolor: 'rgba(200, 169, 106, 0.1)', borderColor: '#C8A96A' },
+                                                                    }}
+                                                                >
+                                                                    Read More ({filteredOrders.length - ORDER_LIMIT} more orders)
+                                                                </Button>
+                                                            </Box>
+                                                        )}
+                                                        {showAllOrders && hasMore && (
+                                                            <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center', mt: 3 }}>
+                                                                <Button
+                                                                    onClick={() => setShowAllOrders(false)}
+                                                                    variant="text"
+                                                                    sx={{ color: 'rgba(200, 169, 106, 0.6)', fontWeight: 600, textTransform: 'none', fontSize: '13px' }}
+                                                                >
+                                                                    Show Less
+                                                                </Button>
+                                                            </Box>
+                                                        )}
+
                                                         {/* Mobile Cards */}
-                                                        <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 1.5 }}>
-                                                            {filteredOrders.map((order, index) => {
+                                                        <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2 }}>
+                                                            {visibleOrders.map((order, index) => {
                                                                 const s = getOrderStyle(order.status);
                                                                 const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
                                                                 const total = order.totalAmount || order.total || '0';
@@ -968,7 +1012,7 @@ const MyAccount = ({ defaultTab }) => {
                                                                             <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
                                                                                 <Button size="small" variant="outlined" sx={{ color: '#C8A96A', borderColor: 'rgba(200, 169, 106, 0.3)', fontWeight: 700, flex: 1, py: 0.75, minWidth: 0 }} onClick={() => navigate(`/order-details/${order._id}`)}>Details</Button>
                                                                                 {(statusMatch === 'shipped' || statusMatch === 'delivered') && (
-                                                                                    <Button size="small" variant="contained" sx={{ bgcolor: '#C8A96A', '&:hover': { bgcolor: '#C8A96A' }, color: '#0D0D0D', fontWeight: 700, boxShadow: 'none', flex: 1, py: 0.75, minWidth: 0 }} onClick={() => window.open(`/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
+                                                                                    <Button size="small" variant="text" sx={{ color: '#C8A96A', fontWeight: 700, minWidth: 'auto', p: 0.5 }} onClick={() => window.open(`${API_URL}/api/orders/${order._id}/invoice`, '_blank')}>Invoice</Button>
                                                                                 )}
                                                                             </Box>
                                                                         </Box>
@@ -984,6 +1028,40 @@ const MyAccount = ({ defaultTab }) => {
                                                                 </Paper>
                                                             )}
                                                         </Box>
+
+                                                        {/* Read More - Mobile */}
+                                                        {hasMore && !showAllOrders && (
+                                                            <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mt: 2 }}>
+                                                                <Button
+                                                                    onClick={() => setShowAllOrders(true)}
+                                                                    variant="outlined"
+                                                                    fullWidth
+                                                                    sx={{
+                                                                        borderColor: '#C8A96A',
+                                                                        color: '#C8A96A',
+                                                                        fontWeight: 700,
+                                                                        borderRadius: '12px',
+                                                                        py: 1.5,
+                                                                        textTransform: 'none',
+                                                                        fontSize: '14px',
+                                                                        '&:hover': { bgcolor: 'rgba(200, 169, 106, 0.1)', borderColor: '#C8A96A' },
+                                                                    }}
+                                                                >
+                                                                    Read More ({filteredOrders.length - ORDER_LIMIT} more)
+                                                                </Button>
+                                                            </Box>
+                                                        )}
+                                                        {showAllOrders && hasMore && (
+                                                            <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mt: 2 }}>
+                                                                <Button
+                                                                    onClick={() => setShowAllOrders(false)}
+                                                                    variant="text"
+                                                                    sx={{ color: 'rgba(200, 169, 106, 0.6)', fontWeight: 600, textTransform: 'none', fontSize: '13px' }}
+                                                                >
+                                                                    Show Less
+                                                                </Button>
+                                                            </Box>
+                                                        )}
                                                     </>
                                                 );
                                             })()}
@@ -995,47 +1073,59 @@ const MyAccount = ({ defaultTab }) => {
                             {/* ══════════════════════════════════════════════ */}
                             {/* ── Transactions Tab ──                         */}
                             {/* ══════════════════════════════════════════════ */}
-                            {tabValue === 3 && (
+                            {tabValue === 3 && (() => {
+                                const walletTxTotalPages = Math.ceil(filteredWalletTx.length / WALLET_TX_PER_PAGE);
+                                const walletTxStartIdx = (walletTxPage - 1) * WALLET_TX_PER_PAGE;
+                                const paginatedWalletTx = filteredWalletTx.slice(walletTxStartIdx, walletTxStartIdx + WALLET_TX_PER_PAGE);
+                                const getWalletPages = () => {
+                                    const pages = [];
+                                    const max = 5;
+                                    let start = Math.max(1, walletTxPage - Math.floor(max / 2));
+                                    let end = Math.min(walletTxTotalPages, start + max - 1);
+                                    if (end - start < max - 1) start = Math.max(1, end - max + 1);
+                                    for (let i = start; i <= end; i++) pages.push(i);
+                                    return pages;
+                                };
+                                return (
                                 <Box>
-                                    <Typography variant="h6" sx={{ color: '#C8A96A', mb: 3, fontWeight: 700, borderBottom: '3px solid #C8A96A', pb: 1, display: 'inline-block' }}>
+                                    <Typography variant="h5" sx={{ color: '#F5E6C8', mb: 3, fontWeight: 800, borderBottom: '3px solid #C8A96A', pb: 1, display: 'inline-block', fontSize: { xs: '20px', sm: '24px' } }}>
                                         Transaction History
                                     </Typography>
 
                                     {/* Stats Cards */}
                                     <Grid container spacing={2} sx={{ mb: 4 }}>
                                         <Grid item xs={6} sm={3}>
-                                            <Paper sx={{ p: 2, borderRadius: '12px', borderLeft: '4px solid #C8A96A', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(200, 169, 106, 0.8)', fontWeight: 600, textTransform: 'uppercase', fontSize: '10px' }}>Total Orders</Typography>
-                                                <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5, color: '#F5E6C8' }}>{userOrders.length}</Typography>
+                                            <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #C8A96A', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
+                                                <Typography sx={{ color: '#C8A96A', fontWeight: 700, textTransform: 'uppercase', fontSize: '13px', letterSpacing: '0.05em' }}>Total Orders</Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, color: '#F5E6C8' }}>{userOrders.length}</Typography>
                                             </Paper>
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
-                                            <Paper sx={{ p: 2, borderRadius: '12px', borderLeft: '4px solid #F7931E', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(200, 169, 106, 0.8)', fontWeight: 600, textTransform: 'uppercase', fontSize: '10px' }}>Recharges</Typography>
-                                                <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5, color: '#F5E6C8' }}>{userTransactions.filter(t => t.type !== 'donation').length}</Typography>
+                                            <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #F7931E', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
+                                                <Typography sx={{ color: '#C8A96A', fontWeight: 700, textTransform: 'uppercase', fontSize: '13px', letterSpacing: '0.05em' }}>Recharges</Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, color: '#F5E6C8' }}>{userTransactions.filter(t => t.type !== 'donation').length}</Typography>
                                             </Paper>
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
-                                            <Paper sx={{ p: 2, borderRadius: '12px', borderLeft: '4px solid #e91e63', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(200, 169, 106, 0.8)', fontWeight: 600, textTransform: 'uppercase', fontSize: '10px' }}>Donations</Typography>
-                                                <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5, color: '#F5E6C8' }}>{userTransactions.filter(t => t.type === 'donation').length}</Typography>
+                                            <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #e91e63', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
+                                                <Typography sx={{ color: '#C8A96A', fontWeight: 700, textTransform: 'uppercase', fontSize: '13px', letterSpacing: '0.05em' }}>Donations</Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, color: '#F5E6C8' }}>{userTransactions.filter(t => t.type === 'donation').length}</Typography>
                                             </Paper>
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
-                                            <Paper sx={{ p: 2, borderRadius: '12px', borderLeft: '4px solid #2196f3', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(200, 169, 106, 0.8)', fontWeight: 600, textTransform: 'uppercase', fontSize: '10px' }}>Tickets</Typography>
-                                                <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5, color: '#F5E6C8' }}>{userGrievances.length}</Typography>
+                                            <Paper sx={{ p: 2.5, borderRadius: '12px', borderLeft: '4px solid #2196f3', bgcolor: '#1A1A1A', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)' }}>
+                                                <Typography sx={{ color: '#C8A96A', fontWeight: 700, textTransform: 'uppercase', fontSize: '13px', letterSpacing: '0.05em' }}>Tickets</Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, mt: 0.5, color: '#F5E6C8' }}>{userGrievances.length}</Typography>
                                             </Paper>
                                         </Grid>
                                     </Grid>
 
                                     {/* ══ WALLET TRANSACTION REPORT ══ */}
-                                    <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-                                        <Typography variant="h6" sx={{ color: '#C8A96A', fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <AccountBalanceWalletIcon sx={{ fontSize: 20 }} /> Wallet Transaction Report
+                                    <Box sx={{ mb: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
+                                        <Typography variant="h6" sx={{ color: '#C8A96A', fontWeight: 800, fontSize: '18px', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <AccountBalanceWalletIcon sx={{ fontSize: 22 }} /> Wallet Transactions
                                         </Typography>
                                         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
-                                            {/* Filter Buttons */}
                                             {[
                                                 { key: 'All', label: 'All' },
                                                 { key: 'credit', label: '↑ Credits' },
@@ -1043,9 +1133,9 @@ const MyAccount = ({ defaultTab }) => {
                                             ].map(f => (
                                                 <Button key={f.key} size="small"
                                                     variant={walletTxFilter === f.key ? 'contained' : 'outlined'}
-                                                    onClick={() => setWalletTxFilter(f.key)}
+                                                    onClick={() => { setWalletTxFilter(f.key); setWalletTxPage(1); }}
                                                     sx={{
-                                                        textTransform: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px',
+                                                        textTransform: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '13px', px: 2.5, py: 0.8,
                                                         ...(walletTxFilter === f.key
                                                             ? { bgcolor: f.key === 'debit' ? '#d32f2f' : '#C8A96A', '&:hover': { bgcolor: f.key === 'debit' ? '#b71c1c' : 'rgba(200,169,106,0.8)' } }
                                                             : { borderColor: f.key === 'debit' ? '#d32f2f' : '#C8A96A', color: f.key === 'debit' ? '#d32f2f' : '#C8A96A' })
@@ -1053,10 +1143,9 @@ const MyAccount = ({ defaultTab }) => {
                                                     {f.label}
                                                 </Button>
                                             ))}
-                                            {/* Search */}
-                                            <TextField size="small" placeholder="Search..." value={walletTxSearch} onChange={(e) => setWalletTxSearch(e.target.value)}
-                                                sx={{ width: 160, '& .MuiOutlinedInput-root': { borderRadius: '8px', fontSize: '13px' } }}
-                                                InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 16, color: 'rgba(200, 169, 106, 0.4)' }} /></InputAdornment> }} />
+                                            <TextField size="small" placeholder="Search..." value={walletTxSearch} onChange={(e) => { setWalletTxSearch(e.target.value); setWalletTxPage(1); }}
+                                                sx={{ width: { xs: '100%', sm: 180 }, '& .MuiOutlinedInput-root': { borderRadius: '10px', fontSize: '14px' } }}
+                                                InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: 'rgba(200, 169, 106, 0.4)' }} /></InputAdornment> }} />
                                         </Box>
                                     </Box>
 
@@ -1067,109 +1156,145 @@ const MyAccount = ({ defaultTab }) => {
                                         </Box>
                                     ) : walletTxError ? (
                                         <Box sx={{ textAlign: 'center', py: 5, bgcolor: '#1A1A1A', borderRadius: '12px', border: '1px solid #ffcdd2', mb: 4 }}>
-                                            <Typography sx={{ color: '#d32f2f', fontWeight: 600, mb: 1 }}>{walletTxError}</Typography>
-                                            <Button variant="outlined" size="small" onClick={fetchAllWalletTransactions} sx={{ borderColor: '#C8A96A', color: '#C8A96A', borderRadius: '8px', textTransform: 'none' }}>Try Again</Button>
+                                            <Typography sx={{ color: '#d32f2f', fontWeight: 600, fontSize: '15px', mb: 1 }}>{walletTxError}</Typography>
+                                            <Button variant="outlined" size="small" onClick={fetchAllWalletTransactions} sx={{ borderColor: '#C8A96A', color: '#C8A96A', borderRadius: '10px', textTransform: 'none', fontSize: '14px' }}>Try Again</Button>
                                         </Box>
                                     ) : filteredWalletTx.length === 0 ? (
-                                        <Box sx={{ textAlign: 'center', py: 5, bgcolor: '#1A1A1A', borderRadius: '12px', border: '1px solid ' + 'rgba(200, 169, 106, 0.15)' + '', mb: 4 }}>
-                                            <AccountBalanceWalletIcon sx={{ fontSize: 60, color: '#eee', mb: 1 }} />
-                                            <Typography sx={{ color: 'rgba(200, 169, 106, 0.8)', fontWeight: 600 }}>
+                                        <Box sx={{ textAlign: 'center', py: 5, bgcolor: '#1A1A1A', borderRadius: '12px', border: '1px solid rgba(200, 169, 106, 0.15)', mb: 4 }}>
+                                            <AccountBalanceWalletIcon sx={{ fontSize: 60, color: 'rgba(200, 169, 106, 0.3)', mb: 1 }} />
+                                            <Typography sx={{ color: '#F5E6C8', fontWeight: 600, fontSize: '16px' }}>
                                                 {allWalletTransactions.length === 0 ? 'No Wallet Transactions Yet' : 'No transactions match your filter'}
                                             </Typography>
-                                            <Typography variant="body2" sx={{ color: 'rgba(200, 169, 106, 0.4)', mt: 0.5 }}>Income aur withdrawal transactions yahan dikhenge.</Typography>
+                                            <Typography sx={{ color: 'rgba(200, 169, 106, 0.5)', mt: 0.5, fontSize: '14px' }}>Income and withdrawal transactions will appear here.</Typography>
                                         </Box>
                                     ) : (
                                         <Box sx={{ mb: 4 }}>
                                             {/* Desktop Table */}
                                             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                                                <TableContainer sx={{ border: '1px solid ' + 'rgba(200, 169, 106, 0.15)' + '', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)', mb: 1 }}>
+                                                <TableContainer sx={{ border: '1px solid rgba(200, 169, 106, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)', mb: 1 }}>
                                                     <Table>
                                                         <TableHead sx={{ bgcolor: '#0D0D0D' }}>
                                                             <TableRow>
                                                                 {['#', 'Date', 'Type', 'Amount', 'Source / Description', 'Reference'].map(h => (
-                                                                    <TableCell key={h} sx={{ color: '#F5E6C8', fontWeight: 700, fontSize: '13px', borderBottom: '1px solid ' + 'rgba(200, 169, 106, 0.15)' + '', py: 2 }}>{h}</TableCell>
+                                                                    <TableCell key={h} sx={{ color: '#C8A96A', fontWeight: 800, fontSize: '14px', borderBottom: '1px solid rgba(200, 169, 106, 0.15)', py: 2.5, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{h}</TableCell>
                                                                 ))}
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
-                                                            {filteredWalletTx.map((txn, index) => (
+                                                            {paginatedWalletTx.map((txn, index) => (
                                                                 <TableRow key={txn._id || index} hover sx={{ bgcolor: index % 2 === 0 ? '#1A1A1A' : '#0D0D0D', '&:hover': { bgcolor: 'rgba(200, 169, 106, 0.05)' } }}>
-                                                                    <TableCell sx={{ borderBottom: 'none', color: 'rgba(200, 169, 106, 0.6)', fontSize: '12px' }}>{index + 1}</TableCell>
-                                                                    <TableCell sx={{ borderBottom: 'none', color: 'rgba(200, 169, 106, 0.8)', fontSize: '13px', whiteSpace: 'nowrap' }}>
+                                                                    <TableCell sx={{ borderBottom: 'none', color: '#C8A96A', fontSize: '14px', fontWeight: 600 }}>{walletTxStartIdx + index + 1}</TableCell>
+                                                                    <TableCell sx={{ borderBottom: 'none', color: '#F5E6C8', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>
                                                                         {new Date(txn.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                                     </TableCell>
                                                                     <TableCell sx={{ borderBottom: 'none' }}>
-                                                                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1.5, py: 0.4, borderRadius: '6px', bgcolor: txn.txType === 'credit' ? '#e8f5e9' : '#fff3e0', color: txn.txType === 'credit' ? '#2e7d32' : '#e65100', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase' }}>
-                                                                            {txn.txType === 'credit' ? <TrendingUpIcon sx={{ fontSize: 14 }} /> : <TrendingDownIcon sx={{ fontSize: 14 }} />}
+                                                                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 2, py: 0.5, borderRadius: '8px', bgcolor: txn.txType === 'credit' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(230, 81, 0, 0.1)', color: txn.txType === 'credit' ? '#4caf50' : '#ff9800', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase' }}>
+                                                                            {txn.txType === 'credit' ? <TrendingUpIcon sx={{ fontSize: 16 }} /> : <TrendingDownIcon sx={{ fontSize: 16 }} />}
                                                                             {txn.type}
                                                                         </Box>
                                                                     </TableCell>
                                                                     <TableCell sx={{ borderBottom: 'none' }}>
-                                                                        <Typography sx={{ fontWeight: 800, fontSize: '15px', color: txn.txType === 'credit' ? '#C8A96A' : '#d32f2f' }}>
+                                                                        <Typography sx={{ fontWeight: 900, fontSize: '16px', color: txn.txType === 'credit' ? '#4caf50' : '#ef5350' }}>
                                                                             {txn.txType === 'credit' ? '+' : '-'}₹{txn.amount?.toLocaleString()}
                                                                         </Typography>
                                                                     </TableCell>
-                                                                    <TableCell sx={{ borderBottom: 'none', maxWidth: 200 }}>
-                                                                        <Typography noWrap sx={{ fontSize: '13px', color: '#C8A96A' }}>{txn.source}</Typography>
+                                                                    <TableCell sx={{ borderBottom: 'none', maxWidth: 220 }}>
+                                                                        <Typography noWrap sx={{ fontSize: '14px', color: '#F5E6C8', fontWeight: 500 }}>{txn.source}</Typography>
                                                                     </TableCell>
-                                                                    <TableCell sx={{ borderBottom: 'none', color: 'rgba(200, 169, 106, 0.6)', fontSize: '12px', fontFamily: 'monospace' }}>{txn.details || '—'}</TableCell>
+                                                                    <TableCell sx={{ borderBottom: 'none', color: 'rgba(200, 169, 106, 0.7)', fontSize: '13px', fontWeight: 500 }}>{txn.details || '—'}</TableCell>
                                                                 </TableRow>
                                                             ))}
                                                         </TableBody>
                                                     </Table>
                                                 </TableContainer>
-                                                <Typography variant="caption" sx={{ color: 'rgba(200, 169, 106, 0.6)', pl: 1 }}>
-                                                    Showing {filteredWalletTx.length} of {allWalletTransactions.length} transactions
-                                                </Typography>
                                             </Box>
 
                                             {/* Mobile Cards */}
                                             <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 1.5 }}>
-                                                {filteredWalletTx.map((txn, index) => (
-                                                    <Paper key={txn._id || index} variant="outlined" sx={{ p: 2, borderRadius: '12px', bgcolor: '#1A1A1A', borderLeft: `4px solid ${txn.txType === 'credit' ? '#C8A96A' : '#d32f2f'}` }}>
+                                                {paginatedWalletTx.map((txn, index) => (
+                                                    <Paper key={txn._id || index} variant="outlined" sx={{ p: 2.5, borderRadius: '14px', bgcolor: '#1A1A1A', borderLeft: `4px solid ${txn.txType === 'credit' ? '#4caf50' : '#ef5350'}` }}>
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                             <Box sx={{ flex: 1 }}>
-                                                                <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4, px: 1.2, py: 0.3, borderRadius: '5px', bgcolor: txn.txType === 'credit' ? '#e8f5e9' : '#fff3e0', color: txn.txType === 'credit' ? '#2e7d32' : '#e65100', fontWeight: 800, fontSize: '10px', textTransform: 'uppercase', mb: 0.5 }}>
-                                                                    {txn.txType === 'credit' ? <TrendingUpIcon sx={{ fontSize: 12 }} /> : <TrendingDownIcon sx={{ fontSize: 12 }} />}
+                                                                <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1.5, py: 0.5, borderRadius: '6px', bgcolor: txn.txType === 'credit' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(230, 81, 0, 0.1)', color: txn.txType === 'credit' ? '#4caf50' : '#ff9800', fontWeight: 800, fontSize: '12px', textTransform: 'uppercase', mb: 1 }}>
+                                                                    {txn.txType === 'credit' ? <TrendingUpIcon sx={{ fontSize: 14 }} /> : <TrendingDownIcon sx={{ fontSize: 14 }} />}
                                                                     {txn.type}
                                                                 </Box>
-                                                                <Typography sx={{ fontSize: '13px', color: '#C8A96A', fontWeight: 500 }}>{txn.source}</Typography>
-                                                                <Typography sx={{ fontSize: '11px', color: 'rgba(200, 169, 106, 0.6)', mt: 0.25 }}>
+                                                                <Typography sx={{ fontSize: '15px', color: '#F5E6C8', fontWeight: 600 }}>{txn.source}</Typography>
+                                                                <Typography sx={{ fontSize: '13px', color: 'rgba(200, 169, 106, 0.6)', mt: 0.5 }}>
                                                                     {new Date(txn.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                                 </Typography>
                                                             </Box>
-                                                            <Typography sx={{ fontWeight: 800, fontSize: '17px', color: txn.txType === 'credit' ? '#C8A96A' : '#d32f2f', flexShrink: 0 }}>
+                                                            <Typography sx={{ fontWeight: 900, fontSize: '18px', color: txn.txType === 'credit' ? '#4caf50' : '#ef5350', flexShrink: 0 }}>
                                                                 {txn.txType === 'credit' ? '+' : '-'}₹{txn.amount?.toLocaleString()}
                                                             </Typography>
                                                         </Box>
                                                     </Paper>
                                                 ))}
                                             </Box>
+
+                                            {/* Pagination */}
+                                            {walletTxTotalPages > 1 && (
+                                                <Box sx={{ mt: 3, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                                                    <Typography sx={{ color: 'rgba(200, 169, 106, 0.6)', fontSize: '14px', fontWeight: 500 }}>
+                                                        Showing {walletTxStartIdx + 1} – {Math.min(walletTxStartIdx + WALLET_TX_PER_PAGE, filteredWalletTx.length)} of {filteredWalletTx.length}
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center' }}>
+                                                        <Button size="small" disabled={walletTxPage === 1} onClick={() => setWalletTxPage(p => p - 1)}
+                                                            sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.15)', color: '#C8A96A', '&.Mui-disabled': { color: 'rgba(200, 169, 106, 0.15)', borderColor: 'rgba(200, 169, 106, 0.05)' } }}>‹</Button>
+                                                        {getWalletPages()[0] > 1 && (
+                                                            <>
+                                                                <Button size="small" onClick={() => setWalletTxPage(1)} sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.1)', color: '#C8A96A', fontSize: '14px', fontWeight: 700 }}>1</Button>
+                                                                {getWalletPages()[0] > 2 && <Typography sx={{ color: 'rgba(200, 169, 106, 0.3)', px: 0.5 }}>…</Typography>}
+                                                            </>
+                                                        )}
+                                                        {getWalletPages().map(pg => (
+                                                            <Button key={pg} size="small" onClick={() => setWalletTxPage(pg)}
+                                                                sx={{ minWidth: 36, height: 36, borderRadius: '10px', fontSize: '14px', fontWeight: 700,
+                                                                    ...(pg === walletTxPage
+                                                                        ? { bgcolor: '#C8A96A', color: '#0D0D0D', '&:hover': { bgcolor: '#C8A96A' } }
+                                                                        : { border: '1px solid rgba(200, 169, 106, 0.1)', color: '#C8A96A' })
+                                                                }}>{pg}</Button>
+                                                        ))}
+                                                        {getWalletPages()[getWalletPages().length - 1] < walletTxTotalPages && (
+                                                            <>
+                                                                {getWalletPages()[getWalletPages().length - 1] < walletTxTotalPages - 1 && <Typography sx={{ color: 'rgba(200, 169, 106, 0.3)', px: 0.5 }}>…</Typography>}
+                                                                <Button size="small" onClick={() => setWalletTxPage(walletTxTotalPages)} sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.1)', color: '#C8A96A', fontSize: '14px', fontWeight: 700 }}>{walletTxTotalPages}</Button>
+                                                            </>
+                                                        )}
+                                                        <Button size="small" disabled={walletTxPage === walletTxTotalPages} onClick={() => setWalletTxPage(p => p + 1)}
+                                                            sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.15)', color: '#C8A96A', '&.Mui-disabled': { color: 'rgba(200, 169, 106, 0.15)', borderColor: 'rgba(200, 169, 106, 0.05)' } }}>›</Button>
+                                                    </Box>
+                                                </Box>
+                                            )}
                                         </Box>
                                     )}
 
                                     <Divider sx={{ my: 3 }} />
 
                                     {/* ══ ORDER HISTORY ══ */}
-                                    <Typography variant="h6" sx={{ color: '#C8A96A', mb: 2, fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography variant="h6" sx={{ color: '#C8A96A', mb: 2, fontWeight: 800, fontSize: '18px', display: 'flex', alignItems: 'center', gap: 1 }}>
                                         🛒 Order History
                                     </Typography>
                                     {ordersLoading ? (
                                         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={36} sx={{ color: '#C8A96A' }} /></Box>
                                     ) : userOrders.length === 0 ? (
-                                        <Box sx={{ textAlign: 'center', py: 4, bgcolor: '#1A1A1A', borderRadius: '12px', border: '1px solid ' + 'rgba(200, 169, 106, 0.15)' + '', mb: 4 }}>
-                                            <ShoppingBagIcon sx={{ fontSize: 60, color: '#eee', mb: 1 }} />
-                                            <Typography sx={{ color: 'rgba(200, 169, 106, 0.8)', fontWeight: 600 }}>No Orders Yet</Typography>
+                                        <Box sx={{ textAlign: 'center', py: 4, bgcolor: '#1A1A1A', borderRadius: '12px', border: '1px solid rgba(200, 169, 106, 0.15)', mb: 4 }}>
+                                            <ShoppingBagIcon sx={{ fontSize: 60, color: 'rgba(200, 169, 106, 0.3)', mb: 1 }} />
+                                            <Typography sx={{ color: '#F5E6C8', fontWeight: 600, fontSize: '16px' }}>No Orders Yet</Typography>
                                         </Box>
-                                    ) : (
+                                    ) : (() => {
+                                        const orderHistTotalPages = Math.ceil(userOrders.length / WALLET_TX_PER_PAGE);
+                                        const orderHistStartIdx = (orderHistPage - 1) * WALLET_TX_PER_PAGE;
+                                        const paginatedOrders = userOrders.slice(orderHistStartIdx, orderHistStartIdx + WALLET_TX_PER_PAGE);
+                                        return (
                                         <Box sx={{ mb: 4 }}>
-                                            {userOrders.map((order, index) => {
+                                            {paginatedOrders.map((order, index) => {
                                                 const productName = order.product?.name || order.items?.[0]?.name || order.items?.[0]?.productId?.name || 'Item';
                                                 const total = order.totalAmount || order.total || '0';
                                                 return (
                                                     <Paper key={order._id || index} variant="outlined" sx={{ p: 0, borderRadius: '14px', mb: 2, overflow: 'hidden', cursor: 'pointer', '&:hover': { boxShadow: '0 6px 18px rgba(200, 169, 106, 0.08)', borderColor: '#C8A96A' }, transition: 'all 0.3s ease' }} onClick={() => setTabValue(2)}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                            <Box sx={{ p: 2, bgcolor: 'rgba(200, 169, 106, 0.05)', borderRight: '1px solid ' + 'rgba(200, 169, 106, 0.15)' + '', display: 'flex', alignItems: 'center' }}>
+                                                            <Box sx={{ p: 2, bgcolor: 'rgba(200, 169, 106, 0.05)', borderRight: '1px solid rgba(200, 169, 106, 0.15)', display: 'flex', alignItems: 'center' }}>
                                                                 <Box sx={{ width: 44, height: 44, borderRadius: '10px', bgcolor: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                                     <ShoppingBagIcon sx={{ color: '#C8A96A', fontSize: 24 }} />
                                                                 </Box>
@@ -1177,28 +1302,55 @@ const MyAccount = ({ defaultTab }) => {
                                                             <Box sx={{ p: 2, flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                                 <Box>
                                                                     <Typography sx={{ fontWeight: 700, fontSize: '15px', color: '#F5E6C8' }}>Order #{order._id?.slice(-8).toUpperCase() || index + 1}</Typography>
-                                                                    <Typography sx={{ fontSize: '12px', color: 'rgba(200, 169, 106, 0.6)' }}>{productName} • {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</Typography>
+                                                                    <Typography sx={{ fontSize: '13px', color: 'rgba(200, 169, 106, 0.6)' }}>{productName} • {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</Typography>
                                                                 </Box>
                                                                 <Box sx={{ textAlign: 'right' }}>
                                                                     <Typography sx={{ fontWeight: 800, color: '#C8A96A', fontSize: '16px' }}>₹{total}</Typography>
-                                                                    <Chip label={(order.status || 'Placed').toUpperCase()} size="small" sx={{ height: 20, fontSize: '10px', fontWeight: 800, mt: 0.5, bgcolor: order.status === 'delivered' ? '#C8A96A' : '#F7931E', color: 'white', borderRadius: '4px' }} />
+                                                                    <Chip label={(order.status || 'Placed').toUpperCase()} size="small" sx={{ height: 22, fontSize: '11px', fontWeight: 800, mt: 0.5, bgcolor: order.status === 'delivered' ? '#4caf50' : order.status === 'pending' ? '#ff9800' : '#C8A96A', color: 'white', borderRadius: '6px' }} />
                                                                 </Box>
                                                             </Box>
                                                         </Box>
                                                     </Paper>
                                                 );
                                             })}
+                                            {orderHistTotalPages > 1 && (
+                                                <Box sx={{ mt: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                                                    <Typography sx={{ color: 'rgba(200, 169, 106, 0.6)', fontSize: '14px', fontWeight: 500 }}>
+                                                        Showing {orderHistStartIdx + 1} – {Math.min(orderHistStartIdx + WALLET_TX_PER_PAGE, userOrders.length)} of {userOrders.length}
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center' }}>
+                                                        <Button size="small" disabled={orderHistPage === 1} onClick={() => setOrderHistPage(p => p - 1)}
+                                                            sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.15)', color: '#C8A96A', '&.Mui-disabled': { color: 'rgba(200, 169, 106, 0.15)', borderColor: 'rgba(200, 169, 106, 0.05)' } }}>‹</Button>
+                                                        {Array.from({ length: orderHistTotalPages }, (_, i) => i + 1).map(pg => (
+                                                            <Button key={pg} size="small" onClick={() => setOrderHistPage(pg)}
+                                                                sx={{ minWidth: 36, height: 36, borderRadius: '10px', fontSize: '14px', fontWeight: 700,
+                                                                    ...(pg === orderHistPage
+                                                                        ? { bgcolor: '#C8A96A', color: '#0D0D0D', '&:hover': { bgcolor: '#C8A96A' } }
+                                                                        : { border: '1px solid rgba(200, 169, 106, 0.1)', color: '#C8A96A' })
+                                                                }}>{pg}</Button>
+                                                        ))}
+                                                        <Button size="small" disabled={orderHistPage === orderHistTotalPages} onClick={() => setOrderHistPage(p => p + 1)}
+                                                            sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.15)', color: '#C8A96A', '&.Mui-disabled': { color: 'rgba(200, 169, 106, 0.15)', borderColor: 'rgba(200, 169, 106, 0.05)' } }}>›</Button>
+                                                    </Box>
+                                                </Box>
+                                            )}
                                         </Box>
-                                    )}
+                                        );
+                                    })()}
 
                                     {/* ── RECHARGE HISTORY SECTION ── */}
-                                    {userTransactions.some(t => t.type !== 'donation') && (
+                                    {userTransactions.some(t => t.type !== 'donation') && (() => {
+                                        const rechargeData = userTransactions.filter(txn => txn.type !== 'donation');
+                                        const rechargeTotalPages = Math.ceil(rechargeData.length / WALLET_TX_PER_PAGE);
+                                        const rechargeStartIdx = (rechargeHistPage - 1) * WALLET_TX_PER_PAGE;
+                                        const paginatedRecharges = rechargeData.slice(rechargeStartIdx, rechargeStartIdx + WALLET_TX_PER_PAGE);
+                                        return (
                                         <>
-                                            <Typography variant="h6" sx={{ color: '#C8A96A', mb: 2, fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="h6" sx={{ color: '#C8A96A', mb: 2, fontWeight: 800, fontSize: '18px', display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 ⚡ Recharge History
                                             </Typography>
                                             <Box sx={{ mb: 4 }}>
-                                                {userTransactions.filter(txn => txn.type !== 'donation').map((txn, index) => (
+                                                {paginatedRecharges.map((txn, index) => (
                                                     <Paper
                                                         key={txn._id || index}
                                                         variant="outlined"
@@ -1216,9 +1368,9 @@ const MyAccount = ({ defaultTab }) => {
                                                                 p: 2,
                                                                 display: 'flex',
                                                                 alignItems: 'center',
-                                                                bgcolor: txn.status === 'success' ? '#f4faf5' : txn.status === 'failed' ? '#fff9f9' : '#fffdf4',
-                                                                borderRight: { xs: 'none', sm: '1px solid #f0f0f0' },
-                                                                borderBottom: { xs: '1px solid #f0f0f0', sm: 'none' },
+                                                                bgcolor: txn.status === 'success' ? 'rgba(76, 175, 80, 0.05)' : txn.status === 'failed' ? 'rgba(211, 47, 47, 0.05)' : 'rgba(251, 192, 45, 0.05)',
+                                                                borderRight: { xs: 'none', sm: '1px solid rgba(200, 169, 106, 0.1)' },
+                                                                borderBottom: { xs: '1px solid rgba(200, 169, 106, 0.1)', sm: 'none' },
                                                                 justifyContent: { xs: 'center', sm: 'flex-start' }
                                                             }}>
                                                                 <Box sx={{
@@ -1238,11 +1390,11 @@ const MyAccount = ({ defaultTab }) => {
                                                                         {txn.operator} {txn.type?.toUpperCase()}
                                                                     </Typography>
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                        <Typography sx={{ fontSize: '12px', color: 'rgba(200, 169, 106, 0.6)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                            <PhoneIcon sx={{ fontSize: 12 }} /> {txn.rechargeNumber}
+                                                                        <Typography sx={{ fontSize: '13px', color: 'rgba(200, 169, 106, 0.6)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                            <PhoneIcon sx={{ fontSize: 13 }} /> {txn.rechargeNumber}
                                                                         </Typography>
-                                                                        <Typography sx={{ fontSize: '12px', color: 'rgba(200, 169, 106, 0.6)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                            <EventIcon sx={{ fontSize: 12 }} /> {new Date(txn.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                                        <Typography sx={{ fontSize: '13px', color: 'rgba(200, 169, 106, 0.6)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                            <EventIcon sx={{ fontSize: 13 }} /> {new Date(txn.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                                         </Typography>
                                                                     </Box>
                                                                 </Box>
@@ -1252,10 +1404,10 @@ const MyAccount = ({ defaultTab }) => {
                                                                         label={txn.status?.toUpperCase()}
                                                                         size="small"
                                                                         sx={{
-                                                                            height: 20, fontSize: '10px', fontWeight: 800, mt: 0.75, px: 0.5,
-                                                                            bgcolor: txn.status === 'success' ? '#C8A96A' : txn.status === 'failed' ? '#d32f2f' : '#fbc02d',
+                                                                            height: 22, fontSize: '11px', fontWeight: 800, mt: 0.75, px: 0.5,
+                                                                            bgcolor: txn.status === 'success' ? '#4caf50' : txn.status === 'failed' ? '#d32f2f' : '#ff9800',
                                                                             color: 'white',
-                                                                            borderRadius: '4px'
+                                                                            borderRadius: '6px'
                                                                         }}
                                                                     />
                                                                 </Box>
@@ -1263,9 +1415,31 @@ const MyAccount = ({ defaultTab }) => {
                                                         </Box>
                                                     </Paper>
                                                 ))}
+                                                {rechargeTotalPages > 1 && (
+                                                    <Box sx={{ mt: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                                                        <Typography sx={{ color: 'rgba(200, 169, 106, 0.6)', fontSize: '14px', fontWeight: 500 }}>
+                                                            Showing {rechargeStartIdx + 1} – {Math.min(rechargeStartIdx + WALLET_TX_PER_PAGE, rechargeData.length)} of {rechargeData.length}
+                                                        </Typography>
+                                                        <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center' }}>
+                                                            <Button size="small" disabled={rechargeHistPage === 1} onClick={() => setRechargeHistPage(p => p - 1)}
+                                                                sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.15)', color: '#C8A96A', '&.Mui-disabled': { color: 'rgba(200, 169, 106, 0.15)', borderColor: 'rgba(200, 169, 106, 0.05)' } }}>‹</Button>
+                                                            {Array.from({ length: rechargeTotalPages }, (_, i) => i + 1).map(pg => (
+                                                                <Button key={pg} size="small" onClick={() => setRechargeHistPage(pg)}
+                                                                    sx={{ minWidth: 36, height: 36, borderRadius: '10px', fontSize: '14px', fontWeight: 700,
+                                                                        ...(pg === rechargeHistPage
+                                                                            ? { bgcolor: '#C8A96A', color: '#0D0D0D', '&:hover': { bgcolor: '#C8A96A' } }
+                                                                            : { border: '1px solid rgba(200, 169, 106, 0.1)', color: '#C8A96A' })
+                                                                    }}>{pg}</Button>
+                                                            ))}
+                                                            <Button size="small" disabled={rechargeHistPage === rechargeTotalPages} onClick={() => setRechargeHistPage(p => p + 1)}
+                                                                sx={{ minWidth: 36, height: 36, borderRadius: '10px', border: '1px solid rgba(200, 169, 106, 0.15)', color: '#C8A96A', '&.Mui-disabled': { color: 'rgba(200, 169, 106, 0.15)', borderColor: 'rgba(200, 169, 106, 0.05)' } }}>›</Button>
+                                                        </Box>
+                                                    </Box>
+                                                )}
                                             </Box>
                                         </>
-                                    )}
+                                        );
+                                    })()}
 
                                     {/* ── DONATION HISTORY SECTION ── */}
                                     {userTransactions.some(t => t.type === 'donation') && (
@@ -1352,7 +1526,8 @@ const MyAccount = ({ defaultTab }) => {
                                         </Box>
                                     )}
                                 </Box>
-                            )}
+                                );
+                            })()}
 
                             {/* ── Grievances ── */}
                             {tabValue === 4 && (

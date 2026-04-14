@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import {
     Users, Calendar, Star, Activity,
     Copy, Mail, Map, Award, User,
@@ -14,7 +14,7 @@ const ProfileBanner = ({ userData }) => {
         if (!text) return;
         try {
             await navigator.clipboard.writeText(text);
-        } catch (err) {
+        } catch {
             const textArea = document.createElement("textarea");
             textArea.value = text;
             document.body.appendChild(textArea);
@@ -41,10 +41,10 @@ const ProfileBanner = ({ userData }) => {
     ];
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full bg-[#1A1A1A] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden relative"
+            className="w-full bg-[#1A1A1A] rounded-none sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-y border-x-0 sm:border-x border-white/10 overflow-hidden relative"
         >
             {/* Minimalist Top Accent */}
             <div className="h-1 w-full bg-white/10"></div>
@@ -107,18 +107,18 @@ const ProfileBanner = ({ userData }) => {
                 </div>
 
                 {/* Tier 3: Logistic Details (Clean Grid) */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 pt-8 border-t border-white/10">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 pt-8 border-t border-white/10">
                     {details.slice(0, 4).map((item, idx) => ( // Using slice(0,4) to match the original 4 items
-                        <div key={idx} className="flex flex-col gap-2 group cursor-default">
+                        <div key={idx} className="flex flex-col gap-1 sm:gap-2 group cursor-default">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-500 group-hover:bg-[#C8A96A]/10 group-hover:text-[#C8A96A] transition-all">
+                                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-500 group-hover:bg-[#C8A96A]/10 group-hover:text-[#C8A96A] transition-all shrink-0">
                                     <item.icon size={16} />
                                 </div>
-                                <span className="text-[12px] font-black text-gray-500 uppercase tracking-widest group-hover:text-gray-300 transition-colors">
+                                <span className="text-[10px] sm:text-[12px] font-black text-gray-500 uppercase tracking-widest group-hover:text-gray-300 transition-colors leading-tight">
                                     {item.label}
                                 </span>
                             </div>
-                            <span className="text-[18px] lg:text-[20px] font-black text-white tracking-tight group-hover:text-[#C8A96A] transition-colors truncate pl-10">
+                            <span className="text-[15px] sm:text-[18px] lg:text-[20px] font-black text-white tracking-tight group-hover:text-[#C8A96A] transition-colors pl-0 sm:pl-10 break-words">
                                 {item.value}
                             </span>
                         </div>
@@ -126,7 +126,7 @@ const ProfileBanner = ({ userData }) => {
                 </div>
             </div>
             <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5"></div>
-        </motion.div>
+        </Motion.div>
     );
 };
 
