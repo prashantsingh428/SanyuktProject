@@ -43,7 +43,7 @@ const LogoContainer = styled(Box)({
 });
 
 const LogoImage = styled('img')({
-    height: '45px',
+    height: '80px',
     width: 'auto',
     objectFit: 'contain',
 });
@@ -56,7 +56,7 @@ const LogoTextContainer = styled(Box)({
 const LogoMain = styled('span')({
     fontFamily: '"Playfair Display", serif',
     fontWeight: 800,
-    fontSize: '1.6rem',
+    fontSize: '2.0rem',
     color: '#C8A96A',
     letterSpacing: '0.02em',
 });
@@ -116,7 +116,7 @@ const ContactLine = styled(Box)({
     gap: '8px',
     marginBottom: '10px',
     fontSize: '14px',
-    color: '#0A0A0A',
+    color: '#F5E6C8', // Changed from #0A0A0A for better visibility
     opacity: 0.9,
     fontFamily: '"Poppins", "Roboto", sans-serif',
     transition: 'color 0.2s ease-in-out',
@@ -214,15 +214,10 @@ const Footer = () => {
 
                     {/* COLUMN 1 - COMPANY INFO */}
                     <Grid item xs={12} md={4}>
-                        <LogoContainer onClick={() => handleNavigation('/')}>
-                            {!logoError ? (
-                                <LogoImage src="/logo.png" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
-                            ) : null}
-                            <LogoTextContainer>
-                                <LogoMain>Sanyukt Parivaar</LogoMain>
-                                <Typography sx={{ fontSize: '0.95rem', fontWeight: 800, color: '#C8A96A', mb: 0.5, letterSpacing: '0.01em' }}>& Rich Life Pvt.Ltd.</Typography>
-                                <Typography sx={{ fontSize: '0.8rem', fontWeight: 900, color: '#C8A96A', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Together We Grow, Together We Prosper</Typography>
-                            </LogoTextContainer>
+                        <LogoContainer onClick={() => handleNavigation('/')} sx={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px' }}>
+                            {!logoError && (
+                                <LogoImage src="/logo.png?v=20260403d" alt="Sanyukt Parivaar Logo" onError={handleLogoError} />
+                            )}
                         </LogoContainer>
 
                         <CompanyDescription>
@@ -246,7 +241,7 @@ const Footer = () => {
                     </Grid>
 
                     {/* COLUMN 2 - QUICK LINKS */}
-                    <Grid item xs={6} sm={6} md={3}>
+                    <Grid item xs={12} sm={6} md={2}>
                         <SectionTitle>Quick Links</SectionTitle>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             {quickLinks.map((link, index) => (
@@ -257,68 +252,43 @@ const Footer = () => {
                         </Box>
                     </Grid>
 
-                    {/* COLUMN 3 - POLICIES & CONTACT US (Split internally) */}
-                    <Grid item xs={6} sm={6} md={5}>
-                        <Grid container spacing={2}>
-                            {/* Policies - full width on mobile inside this half-col, side-by-side on sm+ */}
-                            <Grid item xs={12} sm={6}>
-                                <SectionTitle>Our Policies</SectionTitle>
-                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                    {policyLinks.map((link, index) => (
-                                        <FooterLink key={index} onClick={() => handleNavigation(link.path)}>
-                                            {link.name}
-                                        </FooterLink>
-                                    ))}
-                                </Box>
-                            </Grid>
-
-                            {/* Contact Us - hidden on xs, shown from sm+ */}
-                            <Grid item xs={12} sm={6} sx={{ display: { xs: 'none', sm: 'block' } }}>
-                                <SectionTitle>Contact Us</SectionTitle>
-                                <Box sx={{ mb: 2 }}>
-                                    <ContactText sx={{ fontWeight: 700, mb: 1.5, color: '#C8A96A', fontSize: '15px' }}>
-                                        Sanyukt Parivaar & Rich Life Pvt.Ltd.
-                                    </ContactText>
-                                    <ContactText sx={{ fontWeight: 500, fontSize: '13px', borderLeft: '2px solid #C8A96A', pl: 1.5, mb: 2 }}>
-                                        Bhatiniya, Gopinathpur, Harraiya,<br />
-                                        Basti - 272130, Uttar Pradesh
-                                    </ContactText>
-                                </Box>
-                                <Box>
-                                    <ContactLine onClick={() => window.open('tel:+917880370057', '_self')}>
-                                        <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Phone:</Typography>
-                                        +91 78803 70057
-                                    </ContactLine>
-                                    <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
-                                        <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Email:</Typography>
-                                        info@sanyuktparivaar.com
-                                    </ContactLine>
-                                </Box>
-                            </Grid>
-                        </Grid>
+                    {/* COLUMN 3 - POLICIES */}
+                    <Grid item xs={12} sm={6} md={3}>
+                        <SectionTitle>Our Policies</SectionTitle>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            {policyLinks.map((link, index) => (
+                                <FooterLink key={index} onClick={() => handleNavigation(link.path)}>
+                                    {link.name}
+                                </FooterLink>
+                            ))}
+                        </Box>
                     </Grid>
 
-                    {/* CONTACT - full width row on xs only */}
-                    <Grid item xs={12} sx={{ display: { xs: 'block', sm: 'none' }, pt: '0 !important' }}>
+                    {/* COLUMN 4 - CONTACT US */}
+                    <Grid item xs={12} sm={6} md={3}>
                         <SectionTitle>Contact Us</SectionTitle>
                         <Box sx={{ mb: 2 }}>
-                            <ContactText sx={{ fontWeight: 700, mb: 1, color: '#C8A96A', fontSize: '14px' }}>
+                            <ContactText sx={{ fontWeight: 700, mb: 1.5, color: '#C8A96A', fontSize: '15px' }}>
                                 Sanyukt Parivaar & Rich Life Pvt.Ltd.
                             </ContactText>
-                            <ContactText sx={{ fontSize: '13px', fontWeight: 500, opacity: 1, borderLeft: '2px solid #C8A96A', pl: 1.5 }}>
+                            <ContactText sx={{ fontWeight: 500, fontSize: '13px', borderLeft: '2px solid #C8A96A', pl: 1.5, mb: 2 }}>
                                 Bhatiniya, Gopinathpur, Harraiya,<br />
                                 Basti - 272130, Uttar Pradesh
                             </ContactText>
                         </Box>
-                        <ContactLine onClick={() => window.open('tel:+917880370057', '_self')}>
-                            <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Phone:</Typography>
-                            +91 78803 70057
-                        </ContactLine>
-                        <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
-                            <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Email:</Typography>
-                            info@sanyuktparivaar.com
-                        </ContactLine>
+                        <Box>
+                            <ContactLine onClick={() => window.open('tel:+917880370057', '_self')}>
+                                <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Phone:</Typography>
+                                <Typography sx={{ color: '#F5E6C8', fontSize: '13px' }}>+91 78803 70057</Typography>
+                            </ContactLine>
+                            <ContactLine onClick={() => window.open('mailto:info@sanyuktparivaar.com', '_self')}>
+                                <Typography sx={{ fontWeight: 600, mr: 1, color: '#C8A96A', fontSize: '13px' }}>Email:</Typography>
+                                <Typography sx={{ color: '#F5E6C8', fontSize: '13px' }}>info@sanyuktparivaar.com</Typography>
+                            </ContactLine>
+                        </Box>
                     </Grid>
+
+
 
                 </Grid>
             </FooterContent>
@@ -335,10 +305,10 @@ const Footer = () => {
                     alignItems: 'center',
                     gap: { xs: 1.5, md: 0 }
                 }}>
-                    <CopyrightText>
+                    <CopyrightText component="div">
                         © 2026 Sanyukt Parivaar & Rich Life Pvt.Ltd.. All Rights Reserved.
                     </CopyrightText>
-                    <CopyrightText sx={{ fontSize: '12px', display: 'flex', alignItems: 'center', opacity: 1, letterSpacing: '0.5px' }}>
+                    <CopyrightText component="div" sx={{ fontSize: '12px', display: 'flex', alignItems: 'center', opacity: 1, letterSpacing: '0.5px' }}>
                         POWERED BY
                         <Link
                             href="https://aigrowthexa.com"
@@ -390,4 +360,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

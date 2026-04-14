@@ -1,47 +1,34 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const sendEmail = async (to, subject, text) => {
-    try {
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587, // Switch to 587 (STARTTLS) - more compatible with cloud providers
-            secure: false, // Must be false for 587
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            connectionTimeout: 15000, // Increase timeout slightly
-            tls: {
-                rejectUnauthorized: false // Helps avoid certificate issues on some nodes
-            }
-        });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-        console.log(`[EMAIL] START: Attempting to send to ${to} with subject: ${subject}`);
+const sendEmail = async (to, subject, text, html) => {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is missing");
+  }
 
-        const mailOptions = {
-            from: `"Sanyukt Parivaar and Rich Life" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
-            text
-        };
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[EMAIL] SUCCESS: Sent to ${to}. ID: ${info.messageId}`);
-        return info;
-    } catch (error) {
-        console.error(`[EMAIL] FAILURE: Could not send to ${to}.`);
-        console.error(`[EMAIL] ERROR: ${error.message}`);
-        console.error(`[EMAIL] STACK: ${error.stack}`);
-        
-        // Detailed check for common errors
-        if (error.message.includes('EAUTH')) {
-            console.error("[EMAIL] Potential Issue: Invalid EMAIL_USER or EMAIL_PASS (App Password).");
-        } else if (error.message.includes('ETIMEDOUT')) {
-            console.error("[EMAIL] Potential Issue: Connection timeout. Check if port 465 is blocked.");
-        }
-        
-        throw error;
+  try {
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to,
+      subject,
+      text,
+      html,
+    });
+
+    if (error) {
+      throw new Error(error.message || "Resend returned an error");
     }
+
+    console.log("Email sent:", data);
+    return data;
+
+  } catch (error) {
+    console.error("Email error:", error?.message || error);
+    throw error;
+  }
 };
 
 module.exports = sendEmail;

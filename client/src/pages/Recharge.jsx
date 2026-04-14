@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Smartphone,
     Tv,
@@ -24,6 +24,7 @@ import {
     Lock,
     IndianRupee,
     MapPin,
+    RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api";
@@ -31,7 +32,6 @@ import PaymentMethodModal from "../components/PaymentMethodModal";
 import BrowsePlansModal from "../components/BrowsePlansModal";
 import RazorpayPaymentButton from "../components/RazorpayPaymentButton";
 import {
-    datacardOperators,
     dthOperators,
     mobileOperators,
 } from "../data/operators";
@@ -71,11 +71,16 @@ const Recharge = () => {
     const [selectedCircle, setSelectedCircle] = useState("10");
     const [mobilePlans, setMobilePlans] = useState([]);
     const [plansLoading, setPlansLoading] = useState(false);
+    const [hasFetchedPlans, setHasFetchedPlans] = useState(false);
     const [mobilePlansPage, setMobilePlansPage] = useState(1);
     const MOBILE_PLANS_PER_PAGE = 8;
     const [isDetectingOperator, setIsDetectingOperator] = useState(false);
     const [detectedOperatorInfo, setDetectedOperatorInfo] = useState(null);
     const [hasTriedDetection, setHasTriedDetection] = useState(false);
+
+    // Refs to track detection lifecycle
+    const detectionInProgress = useRef(false);
+    const lastDetectedMobileRef = useRef("");
 
     // Payment Modal States
     const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -106,6 +111,12 @@ const Recharge = () => {
     // Fetch User Stats (Balance) and Profile
     useEffect(() => {
         const fetchAllData = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                rechargeDebugLog("No token found, skipping authenticated data fetch");
+                return;
+            }
+
             try {
                 const [statsRes, userRes] = await Promise.all([
                     api.get("mlm/get-stats"),
@@ -164,39 +175,259 @@ const Recharge = () => {
         fetchPlanCircles();
     }, []);
 
-    useEffect(() => {
-        const shouldFetch =
-            mobileOperator && /^\d{10}$/.test(mobileNumber) && selectedCircle;
-        if (!shouldFetch) {
-            setMobilePlans([]);
+    const mapProviderCompanyToOperatorId = (providerPayload) => {
+        const normalized = [
+            providerPayload?.company,
+            providerPayload?.operator,
+            providerPayload?.operator_name,
+            providerPayload?.provider,
+            providerPayload?.opcode,
+            providerPayload?.op_code,
+            providerPayload?.opid,
+        ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+        const tokens = new Set(normalized.split(/\s+/).filter(Boolean));
+
+        if (tokens.has("airtel") || tokens.has("at")) return "airtel";
+        if (tokens.has("jio") || tokens.has("rj") || tokens.has("jo")) return "jio";
+        if (
+            tokens.has("vi") ||
+            tokens.has("vf") ||
+            normalized.includes("vodafone") ||
+            normalized.includes("idea")
+        ) {
+            return "vi";
+        }
+        if (tokens.has("bsnl") || tokens.has("bt") || tokens.has("bs")) return "bsnl";
+        return "";
+    };
+
+    const normalizeCircleCode = (value) => {
+        if (value === undefined || value === null) return "";
+        const digits = String(value).replace(/\D/g, "");
+        return digits ? digits.padStart(2, "0") : "";
+    };
+
+    const resolveCircleCodeFromDetection = (payload) => {
+        const directCode = normalizeCircleCode(
+            payload?.circle_code ?? payload?.circleCode ?? payload?.circlecode
+        );
+        if (directCode) return directCode;
+
+        const providerCircle = String(payload?.circle || "").trim().toUpperCase();
+        if (!providerCircle || !Array.isArray(planCircles) || planCircles.length === 0) {
+            return "";
+        }
+
+        const normalizedProvider = providerCircle
+            .replace(/&/g, "AND")
+            .replace(/[^A-Z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "");
+
+        const aliasMap = {
+            KOLKATA: "KOLKATTA",
+            ODISHA: "ORISSA",
+            MIZORAM: "MIZZORAM",
+            HIMACHAL_PRADESH: "HP",
+            JAMMU_AND_KASHMIR: "J_AND_K",
+            JAMMU_KASHMIR: "J_AND_K",
+            UTTAR_PRADESH_EAST: "UP_EAST",
+            UTTAR_PRADESH_WEST: "UP_WEST",
+            NORTH_EAST: "NESA",
+            NORTH_EASTERN: "NESA",
+        };
+        const lookupName = aliasMap[normalizedProvider] || normalizedProvider;
+
+        const matched = planCircles.find((c) => String(c.name || "").toUpperCase() === lookupName);
+
+        return matched?.code || "";
+    };
+
+    // Improved detectOperatorAndCircle function
+    const detectOperatorAndCircle = async (rawMobile, { showErrorToast = false, forceRedetect = false } = {}) => {
+        const sanitizedMobile = String(rawMobile || "").replace(/\D/g, "").slice(0, 10);
+        if (!/^\d{10}$/.test(sanitizedMobile)) {
+            return { detected: false, operatorId: "", circleCode: "" };
+        }
+
+        // Prevent multiple simultaneous detections
+        if (detectionInProgress.current && !forceRedetect) {
+            rechargeDebugLog("Detection already in progress, skipping...");
+            return { detected: false, operatorId: mobileOperator, circleCode: selectedCircle };
+        }
+
+        try {
+            detectionInProgress.current = true;
+            setIsDetectingOperator(true);
+            setHasTriedDetection(true);
+
+            const { data } = await api.get("/recharge/operator-fetch", {
+                params: { mobile: sanitizedMobile },
+            });
+
+            const detectedOperatorId = mapProviderCompanyToOperatorId(data);
+            const resolvedCircleCode = resolveCircleCodeFromDetection(data);
+            const hasUsableDetectionData = Boolean(
+                data?.success || detectedOperatorId || resolvedCircleCode || data?.company || data?.circle
+            );
+
+            if (hasUsableDetectionData) {
+                const updates = {};
+                if (detectedOperatorId) updates.operator = detectedOperatorId;
+                if (resolvedCircleCode) updates.circle = resolvedCircleCode;
+
+                // Only update if we have valid values
+                if (detectedOperatorId) {
+                    setMobileOperator(detectedOperatorId);
+                }
+                if (resolvedCircleCode) {
+                    setSelectedCircle(resolvedCircleCode);
+                }
+
+                setDetectedOperatorInfo({
+                    company: data.company,
+                    circle: data.circle,
+                    circleCode: resolvedCircleCode || data?.circle_code || "N/A",
+                });
+
+                return {
+                    detected: true,
+                    operatorId: detectedOperatorId || mobileOperator,
+                    circleCode: resolvedCircleCode || selectedCircle,
+                    updates
+                };
+            }
+
+            setDetectedOperatorInfo(null);
+            if (showErrorToast) {
+                toast.error("Unable to auto-detect operator. Please select network manually.");
+            }
+            return { detected: false, operatorId: "", circleCode: "" };
+        } catch (error) {
+            console.error("Operator detect failed:", error);
+            setDetectedOperatorInfo(null);
+            if (showErrorToast) {
+                toast.error("Operator detection failed. Please select network manually.");
+            }
+            return { detected: false, operatorId: "", circleCode: "" };
+        } finally {
+            setIsDetectingOperator(false);
+            detectionInProgress.current = false;
+        }
+    };
+
+    // Improved fetchPlansForCurrentSelection
+    const fetchPlansForCurrentSelection = async ({ showToastOnEmpty = true, forceRedetect = false } = {}) => {
+        const sanitizedMobile = String(mobileNumber || "").replace(/\D/g, "").slice(0, 10);
+        if (!/^\d{10}$/.test(sanitizedMobile)) {
+            toast.error("Enter valid 10-digit mobile number first.");
             return;
         }
 
-        const timeoutId = setTimeout(async () => {
-            try {
-                setPlansLoading(true);
-                const { data } = await api.get("/recharge/plans", {
-                    params: {
-                        mobile: mobileNumber,
-                        operator: mobileOperator,
-                        circle: selectedCircle,
-                    },
-                });
+        // Wait for any ongoing detection to complete
+        if (detectionInProgress.current) {
+            toast.loading("Detecting operator...", { duration: 2000 });
+            await new Promise(resolve => {
+                const checkInterval = setInterval(() => {
+                    if (!detectionInProgress.current) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
 
-                if (data?.success && data?.data) {
-                    setMobilePlans(normalizePlans(data.data));
-                } else {
-                    setMobilePlans([]);
-                }
-            } catch (error) {
-                console.error("Live plan fetch failed:", error);
-                setMobilePlans([]);
-            } finally {
-                setPlansLoading(false);
+        let operatorForPlans = mobileOperator;
+        let circleForPlans = selectedCircle;
+
+        // Try to detect if operator is empty OR if forceRedetect is true
+        if (forceRedetect || !operatorForPlans) {
+            const detectionResult = await detectOperatorAndCircle(sanitizedMobile, {
+                showErrorToast: !operatorForPlans,
+                forceRedetect
+            });
+
+            // Use detection results if available
+            if (detectionResult.operatorId) {
+                operatorForPlans = detectionResult.operatorId;
             }
-        }, 450);
+            if (detectionResult.circleCode) {
+                circleForPlans = detectionResult.circleCode;
+            }
+        }
+
+        if (!operatorForPlans) {
+            toast.error("Please select a network operator.");
+            return;
+        }
+        if (!circleForPlans) {
+            toast.error("Please select a circle.");
+            return;
+        }
+
+        try {
+            setPlansLoading(true);
+            const { data } = await api.get("/recharge/plans", {
+                params: {
+                    mobile: sanitizedMobile,
+                    operator: operatorForPlans,
+                    circle: circleForPlans,
+                },
+            });
+
+            const normalized = data?.data ? normalizePlans(data.data) : [];
+            setMobilePlans(normalized);
+            setHasFetchedPlans(true);
+            setMobilePlansPage(1);
+
+            if (normalized.length === 0 && showToastOnEmpty) {
+                toast("No plans found for selected operator/circle. You can enter amount manually.");
+            }
+        } catch (error) {
+            console.error("Live plan fetch failed:", error);
+            setMobilePlans([]);
+            setHasFetchedPlans(true);
+            toast.error(
+                error?.response?.data?.message || "Unable to fetch plans right now."
+            );
+        } finally {
+            setPlansLoading(false);
+        }
+    };
+
+    // Auto-detect on every new valid mobile number
+    useEffect(() => {
+        const sanitizedMobile = String(mobileNumber || "").replace(/\D/g, "").slice(0, 10);
+
+        if (!/^\d{10}$/.test(sanitizedMobile)) {
+            setDetectedOperatorInfo(null);
+            setHasTriedDetection(false);
+            setMobileOperator("");
+            lastDetectedMobileRef.current = "";
+            return;
+        }
+
+        if (sanitizedMobile === lastDetectedMobileRef.current) {
+            return;
+        }
+        lastDetectedMobileRef.current = sanitizedMobile;
+
+        const timeoutId = setTimeout(async () => {
+            await detectOperatorAndCircle(sanitizedMobile);
+        }, 500);
 
         return () => clearTimeout(timeoutId);
+    }, [mobileNumber, planCircles]);
+
+    useEffect(() => {
+        setMobilePlans([]);
+        setHasFetchedPlans(false);
+        setMobilePlansPage(1);
+        setMobileAmount("");
     }, [mobileOperator, mobileNumber, selectedCircle]);
 
     useEffect(() => {
@@ -218,65 +449,6 @@ const Recharge = () => {
         safeMobilePlansPage * MOBILE_PLANS_PER_PAGE
     );
 
-    const mapProviderCompanyToOperatorId = (company) => {
-        const normalized = String(company || "").toLowerCase();
-        if (normalized.includes("airtel")) return "airtel";
-        if (normalized.includes("jio")) return "jio";
-        if (
-            normalized.includes("vi") ||
-            normalized.includes("voda") ||
-            normalized.includes("vodafone")
-        ) {
-            return "vi";
-        }
-        if (normalized.includes("bsnl")) return "bsnl";
-        return "";
-    };
-
-    useEffect(() => {
-        if (!/^\d{10}$/.test(mobileNumber)) {
-            setDetectedOperatorInfo(null);
-            setHasTriedDetection(false);
-            return;
-        }
-
-        const timeoutId = setTimeout(async () => {
-            try {
-                setIsDetectingOperator(true);
-                setHasTriedDetection(true);
-                const { data } = await api.get("/recharge/operator-fetch", {
-                    params: { mobile: mobileNumber },
-                });
-
-                if (data?.success) {
-                    const detectedOperatorId = mapProviderCompanyToOperatorId(data.company);
-                    if (detectedOperatorId) {
-                        setMobileOperator(detectedOperatorId);
-                    }
-
-                    if (data.circle_code) {
-                        setSelectedCircle(String(data.circle_code).padStart(2, "0"));
-                    }
-
-                    setDetectedOperatorInfo({
-                        company: data.company,
-                        circle: data.circle,
-                        circleCode: data.circle_code,
-                    });
-                } else {
-                    setDetectedOperatorInfo(null);
-                }
-            } catch (error) {
-                console.error("Operator detect failed:", error);
-                setDetectedOperatorInfo(null);
-            } finally {
-                setIsDetectingOperator(false);
-            }
-        }, 500);
-
-        return () => clearTimeout(timeoutId);
-    }, [mobileNumber]);
-
     const handleRecharge = async (e, type) => {
         e.preventDefault();
 
@@ -291,17 +463,19 @@ const Recharge = () => {
             amount = dthAmount;
         }
 
-        if (!operator || !rechargeNumber || !amount) {
+        if (!operator || !rechargeNumber) {
             toast.error("Please fill in all details");
             return;
         }
 
+        const numericAmount = Number(amount);
+        if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+            toast.error("Please enter a valid amount");
+            return;
+        }
+
         if (type === "mobile") {
-            if (mobilePlans.length === 0) {
-                toast.error("No plans fetched. Please fetch and select a valid plan.");
-                return;
-            }
-            if (!isMobileAmountFromFetchedPlans) {
+            if (hasFetchedPlans && mobilePlans.length > 0 && !isMobileAmountFromFetchedPlans) {
                 toast.error("Please select amount only from available plans.");
                 return;
             }
@@ -321,7 +495,11 @@ const Recharge = () => {
         if (!pendingRecharge) return;
         const { operator, rechargeNumber, amount, type } = pendingRecharge;
         if (type === "mobile") {
-            if (mobilePlans.length === 0 || !validMobilePlanAmounts.has(Number(amount))) {
+            if (
+                hasFetchedPlans &&
+                mobilePlans.length > 0 &&
+                !validMobilePlanAmounts.has(Number(amount))
+            ) {
                 toast.error("Selected amount is not in fetched plan list.");
                 return;
             }
@@ -364,14 +542,28 @@ const Recharge = () => {
                     if (type === "mobile") {
                         setMobileNumber("");
                         setMobileAmount("");
+                        setMobileOperator("");
+                        setDetectedOperatorInfo(null);
+                        setHasTriedDetection(false);
+                        setMobilePlans([]);
+                        setHasFetchedPlans(false);
                     }
                     if (type === "dth") {
                         setDthNumber("");
                         setDthAmount("");
+                        setDthOperator("");
                     }
 
                     setShowPaymentModal(false);
                     setPendingRecharge(null);
+
+                    // Refresh wallet balance
+                    try {
+                        const statsRes = await api.get("mlm/get-stats");
+                        setWalletBalance(statsRes.data?.walletBalance || 0);
+                    } catch (err) {
+                        console.error("Error refreshing balance:", err);
+                    }
                 } else {
                     toast.error(data.message || "Wallet recharge failed", {
                         id: toastId,
@@ -392,9 +584,19 @@ const Recharge = () => {
                     rechargeNumber,
                 });
                 rechargeDebugLog("create-order response", orderData);
-
                 if (!orderData.success) {
                     toast.error("Failed to initiate order", { id: toastId });
+                    setIsProcessingPayment(false);
+                    return;
+                }
+                if (!orderData?.order?.id || !orderData?.order?.amount) {
+                    throw new Error("Invalid payment order response from server");
+                }
+
+                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+                if (!razorpayKeyId) {
+                    console.error("Razorpay key is missing in frontend env");
+                    alert("Payment configuration error. Please contact support.");
                     setIsProcessingPayment(false);
                     return;
                 }
@@ -402,14 +604,20 @@ const Recharge = () => {
                 toast.dismiss(toastId);
 
                 const options = {
-                    key:
-                        import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SQbbsEM3Dlfgi2",
+                    key: razorpayKeyId,
                     amount: orderData.order.amount,
                     currency: "INR",
                     name: "Sanyukt Parivaar",
                     description: "Recharge Payment",
                     order_id: orderData.order.id,
                     handler: async function (response) {
+                        if (!response || !response.razorpay_payment_id) {
+                            console.error("Invalid Razorpay response", response);
+                            alert("Payment failed. Try again.");
+                            setIsProcessingPayment(false);
+                            return;
+                        }
+
                         let verifyToastId;
                         try {
                             rechargeDebugLog("razorpay handler response", response);
@@ -431,6 +639,9 @@ const Recharge = () => {
                                 verifyPayload
                             );
                             rechargeDebugLog("verify-payment response", verifyData);
+                            if (!verifyData || typeof verifyData !== "object") {
+                                throw new Error("Invalid verification response from server");
+                            }
 
                             if (verifyData.success) {
                                 triggerSuccessAlert("Payment Successful!", amount);
@@ -438,10 +649,16 @@ const Recharge = () => {
                                 if (type === "mobile") {
                                     setMobileNumber("");
                                     setMobileAmount("");
+                                    setMobileOperator("");
+                                    setDetectedOperatorInfo(null);
+                                    setHasTriedDetection(false);
+                                    setMobilePlans([]);
+                                    setHasFetchedPlans(false);
                                 }
                                 if (type === "dth") {
                                     setDthNumber("");
                                     setDthAmount("");
+                                    setDthOperator("");
                                 }
 
                                 setShowPaymentModal(false);
@@ -504,17 +721,26 @@ const Recharge = () => {
         }
     };
 
+    const handleManualDetection = async () => {
+        const sanitizedMobile = String(mobileNumber || "").replace(/\D/g, "").slice(0, 10);
+        if (!/^\d{10}$/.test(sanitizedMobile)) {
+            toast.error("Please enter a valid 10-digit mobile number first");
+            return;
+        }
+        await detectOperatorAndCircle(sanitizedMobile, { forceRedetect: true, showErrorToast: true });
+    };
+
     const tabs = [
         { id: "mobile", label: "Mobile Recharge", icon: Smartphone },
         { id: "dth", label: "DTH Recharge", icon: Tv },
     ];
 
     return (
-        <div className='min-h-screen bg-[#0D0D0D] flex flex-col font-sans text-[#F5E6C8] pt-24'>
+        <div className='min-h-screen bg-[#0D0D0D] flex flex-col font-sans text-[#F5E6C8]'>
             {/* ── SUCCESS ALERT BANNER (Responsive) ── */}
             <AnimatePresence>
                 {showSuccessAlert && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: -100 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -100 }}
@@ -540,17 +766,16 @@ const Recharge = () => {
                                 ✕
                             </button>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
 
             {/* 1. PAGE BANNER - Responsive */}
-            <section className='relative min-h-[160px] md:min-h-[240px] flex items-center justify-center overflow-hidden bg-[#0D0D0D] py-8 md:py-12'>
+            <section className='relative min-h-[160px] md:min-h-[240px] flex items-center justify-center overflow-hidden bg-[#0D0D0D] pt-[76px] pb-8 md:pt-[96px] md:pb-12'>
                 <div
                     className='absolute inset-0 bg-cover bg-center opacity-100'
                     style={{
-                        backgroundImage:
-                            "url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070')",
+                        backgroundImage: "url('/hero2.png')",
                     }}
                 ></div>
                 <div className='absolute inset-0 bg-[#0D0D0D]/40 bg-gradient-to-r from-[#0D0D0D]/90 via-[#0D0D0D]/60 to-transparent'></div>
@@ -584,7 +809,7 @@ const Recharge = () => {
 
                 {/* 3. DONATION SECTION - Fully Responsive */}
                 <section className='mb-8 relative'>
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -690,14 +915,14 @@ const Recharge = () => {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 </section>
 
                 {/* 4. RECHARGE SERVICES SECTION - Fully Responsive */}
-                <section className='mb-8'>
-                    <div className='bg-[#1A1A1A] rounded-2xl border border-[#C8A96A]/20 overflow-hidden'>
+                <section className='mb-4 max-w-6xl mx-auto'>
+                    <div className='bg-[#1A1A1A] rounded-none border border-[#C8A96A]/20 overflow-hidden shadow-2xl'>
                         {/* Responsive Tabs */}
-                        <div className='grid grid-cols-2 gap-1 bg-[#0D0D0D]/50 border-b border-[#C8A96A]/10 p-2'>
+                        <div className='grid grid-cols-2 gap-1 bg-[#0D0D0D]/50 border-b border-[#C8A96A]/10 p-1'>
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -705,13 +930,13 @@ const Recharge = () => {
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`py-3 md:py-5 px-2 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 transition-all rounded-lg ${isActive
+                                        className={`py-2 md:py-4 px-2 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 transition-all rounded-none ${isActive
                                             ? "bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] shadow-lg"
                                             : "text-[#F5E6C8]/40 hover:text-[#C8A96A]"
                                             }`}
                                     >
-                                        <Icon className={`w-4 h-4 md:w-5 md:h-5 ${isActive ? "text-[#0D0D0D]" : ""}`} />
-                                        <span className={`font-black text-[9px] md:text-[11px] uppercase tracking-wider ${isActive ? "text-[#0D0D0D]" : ""}`}>
+                                        <Icon className={`w-3.5 h-3.5 md:w-5 md:h-5 ${isActive ? "text-[#0D0D0D]" : ""}`} />
+                                        <span className={`font-black text-[8px] md:text-[11px] uppercase tracking-wider ${isActive ? "text-[#0D0D0D]" : ""}`}>
                                             {tab.label}
                                         </span>
                                     </button>
@@ -720,61 +945,97 @@ const Recharge = () => {
                         </div>
 
                         {/* Tab Content - Responsive Layout */}
-                        <div className='p-3 md:p-6'>
+                        <div className='p-2.5 md:p-5'>
                             <AnimatePresence mode='wait'>
                                 {activeTab === "mobile" && (
-                                    <motion.div key='mobile' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='flex flex-col lg:flex-row gap-6 lg:gap-8'>
-                                        {/* Left Form Section */}
-                                        <div className='flex-1 space-y-4'>
-                                            <div className='bg-[#1A1A1A] p-4 md:p-6 rounded-xl border border-[#C8A96A]/20'>
-                                                <h3 className='text-xl md:text-2xl font-serif font-bold text-[#C8A96A] mb-4'>Mobile Recharge</h3>
-                                                <form onSubmit={(e) => handleRecharge(e, "mobile")} className='space-y-4'>
+                                    <Motion.div 
+                                        key='mobile' 
+                                        initial={{ opacity: 0 }} 
+                                        animate={{ opacity: 1 }} 
+                                        exit={{ opacity: 0 }} 
+                                        className='flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center'
+                                    >
+                                        <div className='lg:max-w-lg flex-1 space-y-2.5'>
+                                            <div className='bg-[#1A1A1A] p-3 md:p-5 rounded-none border border-[#C8A96A]/20'>
+                                                <h3 className='text-lg md:text-2xl font-serif font-bold text-[#C8A96A] mb-2.5'>Mobile Recharge</h3>
+                                                <form onSubmit={(e) => handleRecharge(e, "mobile")} className='space-y-2.5'>
                                                     <div>
-                                                        <label className='text-xs font-black text-[#C8A96A] uppercase tracking-wider flex items-center gap-2 mb-2'>
-                                                            <Smartphone className='w-4 h-4' /> Mobile Number
+                                                        <label className='text-[10px] md:text-sm font-black text-[#C8A96A] uppercase tracking-[0.3em] flex items-center gap-2 mb-1.5'>
+                                                            <Smartphone className='w-3.5 h-3.5 md:w-5 md:h-5' /> Mobile Number
                                                         </label>
                                                         <input
                                                             type='tel'
                                                             value={mobileNumber}
-                                                            onChange={(e) => setMobileNumber(e.target.value)}
+                                                            onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
                                                             placeholder='Enter 10-digit number'
-                                                            className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/30 focus:border-[#C8A96A] rounded-lg text-[#F5E6C8] outline-none text-base'
+                                                            className='w-full px-4 py-2 bg-[#0D0D0D] border-2 border-[#C8A96A]/20 focus:border-[#C8A96A] rounded-none text-[#F5E6C8] outline-none text-base md:text-xl font-black transition-all placeholder:text-gray-700'
                                                             maxLength='10'
                                                             required
                                                         />
                                                         {isDetectingOperator && <p className='text-[10px] text-[#C8A96A]/70 mt-1'>Detecting operator and circle...</p>}
                                                         {!isDetectingOperator && detectedOperatorInfo && (
-                                                            <p className='text-[10px] text-green-500 mt-1'>Auto-detected: {detectedOperatorInfo.company} | {detectedOperatorInfo.circle} ({detectedOperatorInfo.circleCode})</p>
+                                                            <div className='flex items-center justify-between mt-1'>
+                                                                <p className='text-[10px] text-green-500'>
+                                                                    Auto-detected: {detectedOperatorInfo.company || "Operator"} | {detectedOperatorInfo.circle || "Circle"} ({detectedOperatorInfo.circleCode || "N/A"})
+                                                                </p>
+                                                                <button
+                                                                    type='button'
+                                                                    onClick={handleManualDetection}
+                                                                    className='text-[10px] text-[#C8A96A] hover:text-[#D4AF37] flex items-center gap-1'
+                                                                >
+                                                                    <RefreshCw className='w-3 h-3' /> Redetect
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                        {!isDetectingOperator && !detectedOperatorInfo && hasTriedDetection && mobileNumber.length === 10 && (
+                                                            <div className='flex items-center justify-between mt-1 gap-2'>
+                                                                <p className='text-[10px] text-[#F5E6C8]/40'>Auto-detection failed. Select circle manually.</p>
+                                                                <button
+                                                                    type='button'
+                                                                    onClick={handleManualDetection}
+                                                                    className='text-[10px] text-[#C8A96A] hover:text-[#D4AF37] flex items-center gap-1'
+                                                                >
+                                                                    <RefreshCw className='w-3 h-3' /> Retry
+                                                                </button>
+                                                            </div>
                                                         )}
                                                     </div>
 
                                                     <div>
-                                                        <label className='text-xs font-black text-[#C8A96A] uppercase tracking-wider flex items-center gap-2 mb-2'>
-                                                            <CircleUser className='w-4 h-4' /> Network
+                                                        <label className='text-[10px] md:text-sm font-black text-[#C8A96A] uppercase tracking-[0.3em] flex items-center gap-2 mb-1.5'>
+                                                            <CircleUser className='w-3.5 h-3.5 md:w-5 md:h-5' /> Network
                                                         </label>
-                                                        <div className='grid grid-cols-4 gap-2'>
+                                                        <div className='grid grid-cols-4 gap-1.5 md:gap-3'>
                                                             {mobileOperators.map((op) => (
-                                                                <button
-                                                                    key={op.id}
-                                                                    type='button'
-                                                                    onClick={() => setMobileOperator(op.id)}
-                                                                    className={`p-2 rounded-lg border-2 transition-all ${mobileOperator === op.id ? 'border-[#C8A96A] bg-[#C8A96A]/20' : 'border-[#C8A96A]/20 bg-[#0D0D0D]'}`}
-                                                                >
-                                                                    <img src={op.logo} alt={op.name} className='h-6 w-auto mx-auto' />
-                                                                </button>
+                                                                <div key={op.id} className='flex flex-col items-center gap-2'>
+                                                                    <button
+                                                                        type='button'
+                                                                        onClick={() => setMobileOperator(op.id)}
+                                                                        className={`w-full h-16 md:h-20 flex items-center justify-center rounded-none border-2 transition-all group overflow-hidden ${
+                                                                            mobileOperator === op.id ? 'border-[#C8A96A] bg-white' : 'border-white/5 bg-white/5 hover:bg-white/10'
+                                                                        }`}
+                                                                    >
+                                                                        <img src={op.logo} alt={op.name} className={`w-6 h-6 md:w-10 md:h-10 object-contain transition-all duration-300 ${mobileOperator === op.id ? 'scale-110' : 'grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105'}`} />
+                                                                    </button>
+                                                                    <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.1em] text-center transition-colors ${
+                                                                        mobileOperator === op.id ? 'text-[#C8A96A]' : 'text-white/40'
+                                                                    }`}>
+                                                                        {op.name}
+                                                                    </span>
+                                                                </div>
                                                             ))}
                                                         </div>
                                                     </div>
 
                                                     {/* Circle Selection */}
                                                     <div>
-                                                        <label className='text-xs font-black text-[#C8A96A] uppercase tracking-wider flex items-center gap-2 mb-2'>
-                                                            <MapPin className='w-4 h-4' /> Circle
+                                                        <label className='text-[10px] md:text-sm font-black text-[#C8A96A] uppercase tracking-[0.3em] flex items-center gap-2 mb-1.5'>
+                                                            <MapPin className='w-3.5 h-3.5 md:w-5 md:h-5' /> Circle
                                                         </label>
                                                         <select
                                                             value={selectedCircle}
                                                             onChange={(e) => setSelectedCircle(e.target.value)}
-                                                            className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-lg text-[#F5E6C8] outline-none text-sm'
+                                                            className='w-full px-4 py-2 bg-[#0D0D0D] border-2 border-[#C8A96A]/20 rounded-none text-[#F5E6C8] outline-none text-sm md:text-base font-black transition-all'
                                                         >
                                                             {planCircles.length === 0 && <option value='10'>DELHI (10)</option>}
                                                             {planCircles.map((circle) => (
@@ -783,32 +1044,51 @@ const Recharge = () => {
                                                                 </option>
                                                             ))}
                                                         </select>
-                                                        {hasTriedDetection && !isDetectingOperator && !detectedOperatorInfo ? (
-                                                            <p className='mt-1 text-[10px] text-[#F5E6C8]/40'>Auto-detection failed. Select circle manually.</p>
-                                                        ) : (
-                                                            <p className='mt-1 text-[10px] text-[#F5E6C8]/30'>Circle code will be sent with plan/recharge fetch.</p>
-                                                        )}
+                                                        <p className='mt-1 text-[10px] text-[#F5E6C8]/30'>Circle code will be sent with plan/recharge fetch.</p>
+                                                    </div>
+
+                                                    <div className='flex gap-2'>
+                                                        <button
+                                                            type='button'
+                                                            onClick={() => fetchPlansForCurrentSelection({ forceRedetect: !mobileOperator })}
+                                                            disabled={
+                                                                plansLoading ||
+                                                                !/^\d{10}$/.test(mobileNumber) ||
+                                                                !selectedCircle
+                                                            }
+                                                            className='flex-1 py-2.5 bg-[#0D0D0D] border border-[#C8A96A]/40 text-[#C8A96A] font-black text-[11px] uppercase tracking-wider rounded-lg disabled:opacity-40 disabled:cursor-not-allowed'
+                                                        >
+                                                            {plansLoading ? "Fetching Plans..." : "Fetch Plans"}
+                                                        </button>
                                                     </div>
 
                                                     <div>
-                                                        <div className='flex justify-between items-center mb-2'>
-                                                            <label className='text-xs font-black text-[#C8A96A] uppercase tracking-wider'>Amount (₹)</label>
+                                                        <div className='flex justify-between items-center mb-1.5'>
+                                                            <label className='text-[10px] md:text-sm font-black text-[#C8A96A] uppercase tracking-[0.3em]'>Amount (₹)</label>
                                                             {mobileOperator && (
-                                                                <button type='button' onClick={() => setShowPlansModal(true)} className='text-[10px] text-[#C8A96A] flex items-center gap-1'>
-                                                                    <Search className='w-3 h-3' /> Browse Plans
+                                                                <button type='button' onClick={() => setShowPlansModal(true)} className='text-[11px] md:text-xs font-black text-[#C8A96A] flex items-center gap-1 uppercase tracking-wider'>
+                                                                    <Search className='w-3.5 h-3.5' /> Browse Plans
                                                                 </button>
                                                             )}
                                                         </div>
                                                         <input
-                                                            type='text'
+                                                            type='tel'
                                                             value={mobileAmount}
-                                                            readOnly
-                                                            placeholder='Select from plans'
-                                                            className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-lg text-[#F5E6C8] font-bold'
+                                                            onChange={(e) =>
+                                                                setMobileAmount(
+                                                                    e.target.value.replace(/\D/g, "").slice(0, 5)
+                                                                )
+                                                            }
+                                                            placeholder={
+                                                                hasFetchedPlans && mobilePlans.length > 0
+                                                                    ? "Select from plans or type amount"
+                                                                    : "Enter amount"
+                                                            }
+                                                            className='w-full px-4 py-2 bg-[#0D0D0D] border-2 border-[#C8A96A]/20 rounded-none text-[#C8A96A] font-black text-lg md:text-2xl text-center outline-none transition-all'
                                                         />
                                                     </div>
 
-                                                    <button type='submit' disabled={isProcessingPayment} className='w-full py-3 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black text-sm uppercase tracking-wider rounded-lg disabled:opacity-50'>
+                                                    <button type='submit' disabled={isProcessingPayment} className='w-full py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black text-xs md:text-sm uppercase tracking-wider rounded-none disabled:opacity-50'>
                                                         {isProcessingPayment ? "Processing..." : "Recharge Now"}
                                                     </button>
                                                 </form>
@@ -817,7 +1097,7 @@ const Recharge = () => {
 
                                         {/* Right Plans Panel */}
                                         <div className='lg:w-96 flex-shrink-0'>
-                                            <div className='bg-[#1A1A1A] rounded-xl border border-[#C8A96A]/20 h-[450px] flex flex-col'>
+                                            <div className={`bg-[#1A1A1A] rounded-none border border-[#C8A96A]/20 flex flex-col transition-all duration-500 overflow-hidden ${mobileOperator ? 'h-[450px]' : 'h-[120px]'}`}>
                                                 <div className='p-3 border-b border-[#C8A96A]/10'>
                                                     <h4 className='text-xs font-black text-[#C8A96A] uppercase tracking-wider'>
                                                         {mobileOperator ? `${mobileOperator.toUpperCase()} Plans` : "Select Operator"}
@@ -830,6 +1110,8 @@ const Recharge = () => {
                                                         <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>Enter mobile number first</p>
                                                     ) : plansLoading ? (
                                                         <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>Loading plans...</p>
+                                                    ) : !hasFetchedPlans ? (
+                                                        <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>Tap "Fetch Plans" to load plans</p>
                                                     ) : mobilePlans.length === 0 ? (
                                                         <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>No plans available for selected circle</p>
                                                     ) : (
@@ -837,7 +1119,7 @@ const Recharge = () => {
                                                             <button
                                                                 key={plan.id}
                                                                 onClick={() => setMobileAmount(plan.amount)}
-                                                                className={`w-full p-3 rounded-lg border text-left transition-all ${Number(mobileAmount) === plan.amount ? 'border-[#C8A96A] bg-[#C8A96A]/10' : 'border-[#C8A96A]/10 bg-[#0D0D0D]'}`}
+                                                                className={`w-full p-3 rounded-none border text-left transition-all ${Number(mobileAmount) === plan.amount ? 'border-[#C8A96A] bg-[#C8A96A]/10' : 'border-[#C8A96A]/10 bg-[#0D0D0D]'}`}
                                                             >
                                                                 <div className='flex justify-between items-center'>
                                                                     <span className='text-lg font-bold text-[#C8A96A]'>₹{plan.amount}</span>
@@ -862,12 +1144,12 @@ const Recharge = () => {
                                                 )}
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 )}
 
                                 {activeTab === "dth" && (
-                                    <motion.div key='dth' initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='max-w-2xl mx-auto'>
-                                        <div className='bg-[#1A1A1A] p-6 rounded-xl border border-[#C8A96A]/20'>
+                                    <Motion.div key='dth' initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='max-w-2xl mx-auto'>
+                                        <div className='bg-[#1A1A1A] p-6 rounded-none border border-[#C8A96A]/20'>
                                             <h3 className='text-2xl font-serif font-bold text-[#C8A96A] mb-4'>DTH Recharge</h3>
                                             <form onSubmit={(e) => handleRecharge(e, "dth")} className='space-y-4'>
                                                 <div>
@@ -879,7 +1161,7 @@ const Recharge = () => {
                                                         value={dthNumber}
                                                         onChange={(e) => setDthNumber(e.target.value)}
                                                         placeholder='Enter your registered ID'
-                                                        className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-lg text-[#F5E6C8] outline-none'
+                                                        className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-none text-[#F5E6C8] outline-none'
                                                         required
                                                     />
                                                 </div>
@@ -893,7 +1175,7 @@ const Recharge = () => {
                                                                 key={op.id}
                                                                 type='button'
                                                                 onClick={() => setDthOperator(op.id)}
-                                                                className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center ${dthOperator === op.id ? 'border-[#C8A96A] bg-[#C8A96A]/20' : 'border-[#C8A96A]/20 bg-[#0D0D0D]'}`}
+                                                                className={`p-3 rounded-none border-2 transition-all flex flex-col items-center ${dthOperator === op.id ? 'border-[#C8A96A] bg-[#C8A96A]/20' : 'border-[#C8A96A]/20 bg-[#0D0D0D]'}`}
                                                             >
                                                                 <span className='font-bold text-sm'>{op.logo}</span>
                                                                 <span className='text-[9px] mt-1 text-[#F5E6C8]/60'>{op.name}</span>
@@ -910,16 +1192,16 @@ const Recharge = () => {
                                                         value={dthAmount}
                                                         onChange={(e) => setDthAmount(e.target.value)}
                                                         placeholder='Enter amount'
-                                                        className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-lg text-[#F5E6C8] outline-none'
+                                                        className='w-full px-4 py-3 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-none text-[#F5E6C8] outline-none'
                                                         required
                                                     />
                                                 </div>
-                                                <button type='submit' disabled={isProcessingPayment} className='w-full py-3 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black rounded-lg text-sm uppercase tracking-wider'>
+                                                <button type='submit' disabled={isProcessingPayment} className='w-full py-3 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black rounded-none text-sm uppercase tracking-wider'>
                                                     {isProcessingPayment ? "Processing..." : "Recharge Now"}
                                                 </button>
                                             </form>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 )}
                             </AnimatePresence>
                         </div>
