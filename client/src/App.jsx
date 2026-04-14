@@ -49,6 +49,7 @@ const App = () => {
 
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isAccountRoute = location.pathname.startsWith("/my-account");
+  const isFlushHeroRoute = location.pathname === "/recharge";
 
   return (
     <>
