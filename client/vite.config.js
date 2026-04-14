@@ -20,8 +20,7 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 2000,
-    outDir: 'public'
+    outDir: 'dist'
   }
 })
-
 

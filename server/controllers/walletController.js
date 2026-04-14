@@ -4,6 +4,43 @@ const Deduction = require('../models/Deduction');
 const IncomeHistory = require('../models/IncomeHistory');
 const Transaction = require('../models/Transaction');
 
+exports.getAllWithdrawals = async (req, res) => {
+    try {
+        const { status, method, search } = req.query;
+        let query = {};
+
+        if (status && status !== 'All') query.status = status;
+        if (method && method !== 'All') query.method = method;
+
+        if (search) {
+            const users = await User.find({
+                $or: [
+                    { userName: { $regex: search, $options: 'i' } },
+                    { memberId: { $regex: search, $options: 'i' } },
+                    { mobile: { $regex: search, $options: 'i' } }
+                ]
+            }).select('_id');
+            const userIds = users.map(u => u._id);
+            query.$or = [
+                { userId: { $in: userIds } },
+                { referenceNo: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const withdrawals = await Withdrawal.find(query)
+            .populate('userId', 'userName memberId mobile')
+            .sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            withdrawals
+        });
+    } catch (err) {
+        console.error('GetAllWithdrawals Error:', err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
 exports.getDeductionReport = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -205,18 +242,31 @@ exports.requestWithdrawal = async (req, res) => {
                 relatedWithdrawalId: withdrawal._id,
                 status: 'Processed'
             });
-        } catch (dbErr) {
-            // Error handling for DB records
-        }
 
-        res.json({
-            success: true,
-            message: 'Withdrawal request submitted successfully',
-            withdrawal: withdrawal || { amount: netAmount, referenceNo: 'PENDING' },
-            deductions: { tds: tdsAmount, processingFee }
-        });
+            return res.json({
+                success: true,
+                message: 'Withdrawal request submitted successfully',
+                withdrawal,
+                deductions: { tds: tdsAmount, processingFee }
+            });
+
+        } catch (dbErr) {
+            console.error('--- WITHDRAWAL DB FAILURE ---');
+            console.error(dbErr);
+
+            // ROLLBACK: Refund the user's balance
+            user.walletBalance += amount;
+            await user.save();
+
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to record withdrawal. Your balance has been refunded.',
+                error: dbErr.message
+            });
+        }
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Internal Server Error during withdrawal' });
+        console.error('General Withdrawal Error:', err);
+        res.status(500).json({ success: false, message: 'Internal Server Error during withdrawal process' });
     }
 };
 
@@ -404,11 +454,103 @@ exports.updateWithdrawalStatus = async (req, res) => {
         const withdrawal = await Withdrawal.findById(id);
         if (!withdrawal) return res.status(404).json({ success: false, message: 'Withdrawal not found' });
 
+        // If status is changed to Rejected, REFUND the amount to user's wallet
+        if (status === 'Rejected' && withdrawal.status !== 'Rejected') {
+            const user = await User.findById(withdrawal.userId);
+            if (user) {
+                // The amount deducted initially was 'netAmount + tds + fee' = original 'amount'
+                // But withdrawal.amount is 'netAmount'. We need the original amount.
+                // Let's find associated deductions to get the full amount back.
+                const deductions = await Deduction.find({ relatedWithdrawalId: withdrawal._id });
+                const totalDeductions = deductions.reduce((sum, d) => sum + d.amount, 0);
+                const refundAmount = withdrawal.amount + totalDeductions;
+
+                user.walletBalance += refundAmount;
+                await user.save();
+
+                // Create a refund transaction/history entry
+                await IncomeHistory.create({
+                    userId: user._id,
+                    amount: refundAmount,
+                    type: 'Refund',
+                    description: `Refund for Rejected Withdrawal (${withdrawal.referenceNo})`,
+                    status: 'Processed'
+                });
+            }
+        }
+
         withdrawal.status = status;
         if (adminNote) withdrawal.adminNote = adminNote;
         if (status === 'Completed') withdrawal.processedDate = new Date();
 
         await withdrawal.save();
+
+        // ── SEND EMAIL NOTIFICATION ──────────────────────────────────────────
+        try {
+            const user = await User.findById(withdrawal.userId);
+            if (user && user.email) {
+                let subject = '';
+                let html = '';
+
+                if (status === 'Approved') {
+                    subject = `Withdrawal Request Approved - ${withdrawal.referenceNo}`;
+                    html = `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #C8A96A;">Withdrawal Approved</h2>
+                            <p>Dear ${user.userName || 'Member'},</p>
+                            <p>Your withdrawal request <strong>${withdrawal.referenceNo}</strong> has been approved by the administrator.</p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <p style="margin: 0;"><strong>Amount:</strong> ₹${withdrawal.amount.toLocaleString('en-IN')}</p>
+                                <p style="margin: 5px 0 0;"><strong>Method:</strong> ${withdrawal.method}</p>
+                            </div>
+                            <p>Funds are being processed and will be settled shortly. ${adminNote ? `<br><br><strong>Admin Note:</strong> ${adminNote}` : ''}</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #999;">This is an automated notification from Sanyukt Parivaar.</p>
+                        </div>
+                    `;
+                } else if (status === 'Completed') {
+                    subject = `Withdrawal Successfully Settled - ${withdrawal.referenceNo}`;
+                    html = `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #28a745;">Withdrawal Completed</h2>
+                            <p>Dear ${user.userName || 'Member'},</p>
+                            <p>Great news! Your withdrawal request <strong>${withdrawal.referenceNo}</strong> has been successfully settled.</p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <p style="margin: 0;"><strong>Settled Amount:</strong> ₹${withdrawal.amount.toLocaleString('en-IN')}</p>
+                                <p style="margin: 5px 0 0;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN')}</p>
+                            </div>
+                            <p>Please check your bank account or UPI for the funds. ${adminNote ? `<br><br><strong>Admin Note:</strong> ${adminNote}` : ''}</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #999;">Thank you for being a part of Sanyukt Parivaar.</p>
+                        </div>
+                    `;
+                } else if (status === 'Rejected') {
+                    subject = `Withdrawal Request Rejected - ${withdrawal.referenceNo}`;
+                    html = `
+                        <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+                            <h2 style="color: #dc3545;">Withdrawal Rejected</h2>
+                            <p>Dear ${user.userName || 'Member'},</p>
+                            <p>Your withdrawal request <strong>${withdrawal.referenceNo}</strong> has been rejected.</p>
+                            <p><strong>Reason:</strong> ${adminNote || 'Insufficient details or administrative policy.'}</p>
+                            <div style="background: #fff5f5; padding: 15px; border-radius: 5px; border: 1px solid #feb2b2; margin: 20px 0;">
+                                <p style="margin: 0; color: #c53030;"><strong>Important:</strong> The full amount has been refunded to your wallet account.</p>
+                            </div>
+                            <p>Please review the reason and submit a new request if necessary.</p>
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #999;">Sanyukt Parivaar Support Team</p>
+                        </div>
+                    `;
+                }
+
+                if (html) {
+                    const sendEmail = require('../utils/sendEmail');
+                    await sendEmail(user.email, subject, `Your withdrawal status is now ${status}.`, html);
+                }
+            }
+        } catch (emailErr) {
+            console.error('Failed to send status update email:', emailErr);
+            // We don't return error here because the status update itself succeeded
+        }
 
         res.json({
             success: true,
@@ -416,6 +558,8 @@ exports.updateWithdrawalStatus = async (req, res) => {
             withdrawal
         });
     } catch (err) {
+        console.error('UpdateWithdrawalStatus Error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
