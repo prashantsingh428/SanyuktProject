@@ -815,7 +815,7 @@ const Header = () => {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <StyledAppBar position="fixed">
-                <Container maxWidth={false} sx={{ px: { xs: 2, lg: 3 } }}>
+                <Container maxWidth={false} sx={{ px: { xs: 2, sm: 2.5, lg: 3 } }}>
                     <Toolbar disableGutters sx={{
                         height: '100%',
                         position: 'relative',
