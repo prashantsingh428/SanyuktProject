@@ -10,6 +10,7 @@ router.get("/admin/users", protect, adminOnly, mlmAdminController.getAllUsers);
 router.post("/admin/update-user-status", protect, adminOnly, mlmAdminController.updateUserStatus);
 router.get("/admin/income-reports", protect, adminOnly, mlmAdminController.getIncomeReports);
 router.get("/admin/binary-tree/:userId", protect, adminOnly, mlmAdminController.getBinaryTree);
+router.get("/admin/system-stats", protect, adminOnly, mlmAdminController.getSystemMLMStats);
 
 // Daily Tasks (Triggered by Admin or Cron)
 router.post("/admin/calculate-binary", protect, adminOnly, async (req, res) => {

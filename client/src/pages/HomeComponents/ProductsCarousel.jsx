@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { ChevronDown, ChevronRight, ShoppingCart, Star, ArrowRight } from 'lucide-react';
 import { API_URL } from '../../api';
 
@@ -17,10 +17,10 @@ const ProductsCarousel = ({
     handleNavigation
 }) => {
     return (
-        <section className="py-10 md:py-16 bg-[#121212] relative overflow-hidden" >
+        <section className="py-2 md:py-5 bg-[#121212] relative overflow-hidden" >
             <div className="container mx-auto px-4 relative z-10">
                 {/* Section Header */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-4">
                     <div className="text-center md:text-left max-w-2xl">
                         <span className="text-[#C8A96A] font-bold text-[10px] tracking-widest uppercase mb-1 block">
                             Discover Quality
@@ -54,7 +54,7 @@ const ProductsCarousel = ({
                 {/* Products Carousel */}
                 <div
                     ref={carouselRef}
-                    className="flex gap-5 overflow-x-auto pb-8 pt-4 snap-x snap-mandatory scrollbar-hide no-scrollbar"
+                    className="flex gap-4 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory scrollbar-hide no-scrollbar"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {loading ? (
@@ -101,7 +101,7 @@ const ProductsCarousel = ({
                                     key={productId}
                                     className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] snap-center"
                                 >
-                                    <motion.div
+                                    <Motion.div
                                         whileHover={{ y: -6 }}
                                         className="luxury-box overflow-hidden transition-all duration-500 group relative"
                                     >
@@ -112,7 +112,7 @@ const ProductsCarousel = ({
                                         >
 
                                             {imageUrl && !imageErrors[productId] ? (
-                                                <motion.img
+                                                <Motion.img
                                                     whileHover={{ scale: 1.15 }}
                                                     transition={{ duration: 0.8, ease: "easeOut" }}
                                                     src={imageUrl}
@@ -151,12 +151,12 @@ const ProductsCarousel = ({
 
                                         {/* Product Details */}
                                         <div
-                                            className="p-3.5 cursor-pointer group/details"
+                                            className="p-3 cursor-pointer group/details"
                                             onClick={() => onProductClick(product)}
                                         >
                                             <div className="flex items-center gap-1 mb-1">
                                                 {renderStars(rating)}
-                                                <span className="text-[8px] font-bold text-[#F5E6C8]/40 uppercase tracking-widest ml-1">
+                                                <span className="text-[11px] font-black text-[#F5E6C8]/80 uppercase tracking-widest ml-1">
                                                     {reviews}
                                                 </span>
                                             </div>
@@ -165,7 +165,7 @@ const ProductsCarousel = ({
                                                 <h3 className="text-sm font-bold text-[#F5E6C8] truncate group-hover:text-[#C8A96A] group-hover/details:text-[#C8A96A] transition-colors">
                                                     {product.name}
                                                 </h3>
-                                                <span className="w-fit text-[9px] font-bold bg-[#C8A96A]/10 text-[#C8A96A] px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-[#C8A96A]/20">
+                                                <span className="w-fit text-[11px] font-black bg-[#C8A96A]/10 text-[#C8A96A] px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-[#C8A96A]/20">
                                                     {category === "Beauty and cosmetic home based products" ? "Beauty & Cosmetics" : category}
                                                 </span>
                                             </div>
@@ -176,13 +176,13 @@ const ProductsCarousel = ({
                                                         ₹{price}
                                                     </span>
                                                     {oldPrice > price && (
-                                                        <span className="text-[#F5E6C8]/30 text-[10px] line-through font-medium">
+                                                        <span className="text-[#F5E6C8]/60 text-[10px] line-through font-medium">
                                                             MRP ₹{oldPrice}
                                                         </span>
                                                     )}
                                                 </div>
                                                 <div className="flex flex-col items-end">
-                                                    <span className="bg-orange-50 text-[#F7931E] px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border border-orange-100">
+                                                    <span className="bg-orange-50 text-[#F7931E] px-2 py-0.5 rounded-lg text-[11px] font-black uppercase tracking-widest border border-orange-100">
                                                         BV {bv}
                                                     </span>
                                                 </div>
@@ -193,7 +193,7 @@ const ProductsCarousel = ({
                                                     onClick={() => handleNavigation('/checkout', { state: { product } })}
                                                     className="luxury-button w-full"
                                                 >
-                                                    Instant Buy
+                                                    Buy Now
                                                 </button>
 
                                                 <button
@@ -207,7 +207,7 @@ const ProductsCarousel = ({
                                                 </button>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </Motion.div>
                                 </div>
                             );
                         })

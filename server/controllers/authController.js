@@ -1,3 +1,4 @@
+
 const User = require("../models/User");
 const BinaryTree = require("../models/BinaryTree");
 const bcrypt = require("bcryptjs");
@@ -39,7 +40,7 @@ exports.register = async (req, res) => {
             const pkg = PACKAGE_DATA[req.body.packageType] || { bv: 0, pv: 0, capping: 0 };
 
             // Generate Member ID
-            const generateMemberId = () => 'SPRL' + Math.floor(1000 + Math.random() * 9000).toString();
+            const generateMemberId = () => 'SPRL' + Math.floor(100000 + Math.random() * 900000).toString();
             let newMemberId = generateMemberId();
             while (await User.findOne({ memberId: newMemberId })) {
                 newMemberId = generateMemberId();
@@ -77,13 +78,19 @@ exports.register = async (req, res) => {
         await user.save();
         console.log(`[AUTH] User saved, sending OTP to ${email}`);
 
-        sendEmail(email, "Registration OTP", `Your OTP is ${otp}`).catch(err => {
+        try {
+            await sendEmail(email, "Registration OTP", `Your OTP is ${otp}`);
+        } catch (err) {
             console.error("[AUTH] Registration OTP Email Failed:", err.message);
-        });
+            return res.status(502).json({
+                success: false,
+                message: `OTP could not be sent: ${err.message}`
+            });
+        }
 
-        res.json({ 
-            success: true, 
-            message: "OTP Sent to Email. Please check your inbox (and spam folder)." 
+        res.json({
+            success: true,
+            message: "OTP Sent to Email. Please check your inbox (and spam folder)."
         });
 
     } catch (error) {
@@ -187,7 +194,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { id: user._id, role: user.role },
             secret,
-            { expiresIn: "1d" }
+            { expiresIn: "24h" }
         );
 
         console.log("Login SUCCESS for user:", user._id);
@@ -234,13 +241,19 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         console.log(`[AUTH] Password reset OTP generated for ${normalizedEmail}`);
-        sendEmail(normalizedEmail, "Reset Password OTP", `Your OTP is ${otp}`).catch(err => {
+        try {
+            await sendEmail(normalizedEmail, "Reset Password OTP", `Your OTP is ${otp}`);
+        } catch (err) {
             console.error("[AUTH] Forgot Password OTP Email Failed:", err.message);
-        });
+            return res.status(502).json({
+                success: false,
+                message: `OTP could not be sent: ${err.message}`
+            });
+        }
 
-        res.json({ 
-            success: true, 
-            message: "OTP Sent for Reset. Please check your email." 
+        res.json({
+            success: true,
+            message: "OTP Sent for Reset. Please check your email."
         });
     } catch (error) {
         console.error(`[AUTH ERROR] Forgot password: ${error.message}`, error.stack);
@@ -301,7 +314,8 @@ exports.resendOtp = async (req, res) => {
         res.json({ message: "New OTP Sent Successfully" });
 
     } catch (error) {
-        res.status(500).json({ message: "Server Error" });
+        console.error("[AUTH] Resend OTP Failed:", error.message);
+        res.status(500).json({ message: error.message || "Server Error" });
     }
 };
 
@@ -381,7 +395,7 @@ exports.profile = async (req, res) => {
     try {
         let user = req.user;
         if (!user.memberId) {
-            const generateMemberId = () => 'SPRL' + Math.floor(1000 + Math.random() * 9000).toString();
+            const generateMemberId = () => 'SPRL' + Math.floor(100000 + Math.random() * 900000).toString();
             let newMemberId = generateMemberId();
             while (await User.findOne({ memberId: newMemberId })) {
                 newMemberId = generateMemberId();
