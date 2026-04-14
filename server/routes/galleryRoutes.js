@@ -2,7 +2,12 @@ const express = require("express");
 const router = express.Router();
 const { getAllImages, addImage, deleteImage, updateImage, getGallery } = require("../controllers/galleryController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const upload = require("../middleware/upload");
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: "uploads/gallery",
+    filename: (req, file, cb) => { cb(null, Date.now() + "-" + file.originalname) }
+});
+const upload = multer({ storage });
 
 router.get("/all", getAllImages);
 router.post("/add", protect, adminOnly, upload.single("image"), addImage);

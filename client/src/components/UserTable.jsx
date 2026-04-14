@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, FileText, Download } from 'lucide-react';
 import api from '../api';
 import toast from 'react-hot-toast';
 

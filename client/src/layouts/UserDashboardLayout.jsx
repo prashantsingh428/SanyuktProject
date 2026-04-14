@@ -23,7 +23,17 @@ const getRankColor = (rank) => {
 
 const UserDashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [userData, setUserData] = useState(null);
+    const [userData] = useState(() => {
+        try {
+            const user = localStorage.getItem('user');
+            return user ? JSON.parse(user) : null;
+        } catch (error) {
+            console.error("Error parsing user data in dashboard layout:", error);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            return null;
+        }
+    });
     const [stats, setStats] = useState(null);
     const [openDropdown, setOpenDropdown] = useState(null);
     const navigate = useNavigate();
@@ -31,32 +41,7 @@ const UserDashboardLayout = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    useEffect(() => {
-        const user = localStorage.getItem('user');
-        if (user) {
-            try {
-                setUserData(JSON.parse(user));
-                fetchStats();
-            } catch (error) {
-                console.error("Error parsing user data in dashboard layout:", error);
-                localStorage.removeItem('user');
-                localStorage.removeItem('token');
-                navigate('/login');
-            }
-        } else {
-            navigate('/login');
-        }
-
-        if (isMobile) {
-            setSidebarOpen(false);
-        }
-
-        const handleExternalToggle = () => setSidebarOpen(prev => !prev);
-        window.addEventListener('toggle-dashboard-sidebar', handleExternalToggle);
-        return () => window.removeEventListener('toggle-dashboard-sidebar', handleExternalToggle);
-    }, [isMobile, navigate]);
-
-    const fetchStats = async () => {
+    async function fetchStats() {
         try {
             const response = await api.get('/mlm/get-stats');
             if (response.data) {
@@ -65,7 +50,24 @@ const UserDashboardLayout = () => {
         } catch (error) {
             console.error("Error fetching stats in layout:", error);
         }
-    };
+    }
+
+    useEffect(() => {
+        if (!userData) {
+            navigate('/login');
+            return;
+        }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchStats();
+
+        if (isMobile) {
+            setSidebarOpen(false);
+        }
+
+        const handleExternalToggle = () => setSidebarOpen(prev => !prev);
+        window.addEventListener('toggle-dashboard-sidebar', handleExternalToggle);
+        return () => window.removeEventListener('toggle-dashboard-sidebar', handleExternalToggle);
+    }, [isMobile, navigate, userData]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -167,36 +169,18 @@ const UserDashboardLayout = () => {
     if (!userData) return null;
 
     return (
-        <div className="min-h-screen bg-[#0D0D0D] flex">
+        <div className="min-h-screen overflow-x-hidden bg-[#0D0D0D] flex">
             {/* Sidebar */}
             <aside
-                className={`fixed left-0 h-[calc(100vh-60px)] md:h-[calc(100vh-80px)] top-[60px] md:top-[80px] bg-[#1A1A1A] text-white transition-all duration-300 z-50 shadow-none overflow-y-auto no-scrollbar border-r border-white/5
+                className={`fixed left-0 h-[calc(100vh-88px)] md:h-[calc(100vh-115px)] top-[88px] md:top-[115px] bg-[#1A1A1A] text-white transition-all duration-300 z-50 shadow-none overflow-y-auto no-scrollbar border-r border-white/5
                     ${sidebarOpen ? 'w-72' : 'w-0 md:w-20 overflow-hidden'}`}
             >
                 <div className={`flex flex-col h-full transition-all duration-300 ${sidebarOpen ? 'p-0' : 'p-0 py-6'}`}>
-                    {/* Brand / Logo Area */}
-                    <div className={`flex items-center mb-6 pt-6 ${sidebarOpen ? 'px-6 justify-between' : 'justify-center'}`}>
-                        <div className={`flex items-center ${sidebarOpen ? 'space-x-3' : 'flex-col space-y-4'}`}>
-                            <button
-                                onClick={() => setSidebarOpen(!sidebarOpen)}
-                                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all active:scale-95
-                                    ${sidebarOpen ? 'bg-white/5 hover:bg-white/10' : 'bg-[#C8A96A]/20 hover:bg-[#C8A96A]/30 border border-[#C8A96A]/20'}`}
-                                title={sidebarOpen ? "Toggle Menu" : "Open Menu"}
-                            >
-                                {sidebarOpen ? <Shield className="w-6 h-6 text-[#C8A96A]" /> : <Menu className="w-6 h-6 text-[#C8A96A]" />}
-                            </button>
-                            {sidebarOpen && (
-                                <Link to="/" className="leading-none text-white hover:opacity-80 transition-opacity flex flex-col pt-1">
-                                    <h2 className="font-black text-2xl whitespace-nowrap uppercase tracking-tighter">SANYUKT</h2>
-                                    <p className="text-[10px] text-[#C8A96A] uppercase tracking-[0.4em] font-black -mt-0.5">Parivaar</p>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
+
 
                     {/* Highly Compact Profile Summary */}
                     {sidebarOpen && (
-                        <div className="mb-6 px-6 flex items-center gap-4">
+                        <div className="mb-6 px-6 pt-10 flex items-center gap-4">
                             <div className="relative shrink-0">
                                 <div className="w-14 h-14 rounded-full border-2 border-[#C8A96A]/30 p-0.5 bg-[#0D0D0D] overflow-hidden">
                                     <img
@@ -313,17 +297,26 @@ const UserDashboardLayout = () => {
                                         <div className="bg-black/40 py-1.5 space-y-0.5 mx-2 rounded-2xl border border-white/5 my-1 shadow-inner">
                                             {item.children.map((child) => {
                                                 const childActive = location.pathname === child.path;
+                                                const isMatchingItem = ['first_silver', 'first_gold', 'first_diamond'].includes(child.id);
+                                                const matchingTone =
+                                                    child.id === 'first_silver' ? 'text-[#D7DCE2]' :
+                                                    child.id === 'first_gold' ? 'text-[#D4AF37]' :
+                                                    child.id === 'first_diamond' ? 'text-[#F4E7C1]' :
+                                                    'text-[#F5E6C8]';
                                                 return (
                                                     <Link
                                                         key={child.id}
                                                         to={child.path}
                                                         onClick={() => isMobile && setSidebarOpen(false)}
-                                                        className={`block pl-12 pr-4 py-2 text-[13px] transition-all rounded-xl mx-2 ${childActive
-                                                            ? 'text-[#C8A96A] font-bold bg-[#C8A96A]/10'
-                                                            : 'text-white/60 hover:text-[#C8A96A] hover:bg-white/5 font-bold'
+                                                        className={`block pl-12 pr-4 py-2.5 text-[18px] transition-all rounded-xl mx-2 font-black tracking-tight ${childActive
+                                                            ? 'text-[#C8A96A] bg-[#C8A96A]/12'
+                                                            : `${isMatchingItem ? `${matchingTone} hover:text-[#F5E6C8] bg-[#C8A96A]/[0.03]` : 'text-[#F5E6C8]'} hover:bg-[#C8A96A]/10`
                                                             }`}
                                                     >
-                                                        {child.name}
+                                                        <span className="inline-flex items-center gap-2">
+                                                            {isMatchingItem && <span className="text-[#C8A96A]">•</span>}
+                                                            {child.name}
+                                                        </span>
                                                     </Link>
                                                 );
                                             })}
@@ -356,21 +349,21 @@ const UserDashboardLayout = () => {
 
             {/* Main Content Area */}
             <main
-                className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-80px)] text-white
+                className={`flex-1 flex flex-col transition-all duration-300 min-h-[calc(100vh-88px)] md:min-h-[calc(100vh-115px)] text-white overflow-x-hidden
                     ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}
             >
-                <div className="flex-1 px-4 md:px-8 pb-8 pt-0 animate-fadeIn relative">
+                <div className="flex-1 pb-8 pt-0 animate-fadeIn relative">
                     {!sidebarOpen && isMobile && (
-                        <div className="py-5 mb-4 flex items-center space-x-4 text-[#C8A96A] md:hidden">
+                        <div className="py-5 mb-4 px-4 flex items-center space-x-4 text-[#C8A96A] md:hidden">
                             <button
                                 onClick={() => setSidebarOpen(true)}
-                                className="w-14 h-14 flex items-center justify-center bg-[#1A1A1A] shadow-xl shadow-black/40 border border-[#C8A96A]/20 rounded-[2rem] active:scale-95 transition-all text-[#C8A96A]"
+                                className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 flex items-center justify-center bg-[#1A1A1A] shadow-xl shadow-black/40 border border-[#C8A96A]/20 rounded-[1.5rem] sm:rounded-[2rem] active:scale-95 transition-all text-[#C8A96A]"
                             >
-                                <Menu size={28} />
+                                <Menu size={24} />
                             </button>
-                            <div className="flex flex-col leading-none">
-                                <span className="font-black text-2xl tracking-tighter uppercase">Menu</span>
-                                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Navigation</span>
+                            <div className="flex min-w-0 flex-col leading-none">
+                                <span className="font-black text-xl sm:text-2xl tracking-tighter uppercase">Menu</span>
+                                <span className="text-[9px] sm:text-[10px] font-black text-white/40 uppercase tracking-widest">Navigation</span>
                             </div>
                         </div>
                     )}
@@ -393,6 +386,21 @@ const UserDashboardLayout = () => {
                 
                 /* Selection Color */
                 ::selection { background: rgba(200, 169, 106, 0.28); color: #C8A96A; }
+
+                /* Print cleanup: hide dashboard shell so print pages use full width */
+                @media print {
+                    aside {
+                        display: none !important;
+                    }
+                    main {
+                        margin-left: 0 !important;
+                        min-height: auto !important;
+                        width: 100% !important;
+                    }
+                    body, html {
+                        background: #fff !important;
+                    }
+                }
             `}</style>
         </div>
     );

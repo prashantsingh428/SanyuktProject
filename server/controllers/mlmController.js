@@ -163,8 +163,9 @@ exports.distributeProfitSharing = async (totalTurnover) => {
  */
 exports.getMLMStats = async (req, res) => {
     try {
-        console.log("Fetching MLM stats for user:", req.user._id);
-        const user = await User.findById(req.user._id);
+        const targetUserId = (req.user.role === 'admin' && req.params.userId) ? req.params.userId : req.user._id;
+        console.log("Fetching MLM stats for user:", targetUserId);
+        const user = await User.findById(targetUserId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
