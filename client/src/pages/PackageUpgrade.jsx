@@ -2,10 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import {
     Package, Shield, Zap, Star, CheckCircle2,
-    Wallet, AlertCircle, X, Loader2, CheckCircle, Info
+    Wallet, AlertCircle, X, Loader2, CheckCircle, Info, ArrowRight, ShieldCheck
 } from 'lucide-react';
 import api from '../api';
 import toast from 'react-hot-toast';
+
+const loadRazorpay = () => {
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
 
 // ── Package definitions ───────────────────────────────────────────────────────
 const PACKAGES = [
@@ -16,10 +26,10 @@ const PACKAGES = [
         bv: '250 BV',
         pv: '0.25 PV',
         capping: '₹2,000 / day',
-        color: 'from-[#1A1A1A] to-[#0D0D0D]', // Darker base
+        color: 'from-[#1A1A1A] to-[#0D0D0D]',
         borderActive: 'ring-[#C8A96A]',
         badge: 'bg-[#C8A96A]/10 text-[#C8A96A]',
-        btnColor: 'luxury-button', // Using global class
+        btnColor: 'luxury-button',
         icon: Shield,
         features: [
             '250 Business Volume',
@@ -71,7 +81,7 @@ const PACKAGES = [
     },
 ];
 
-// ── Components ───────────────────────────────────────────────────────────────
+// ── UI Components ─────────────────────────────────────────────────────────────
 
 const FeatureRow = ({ label, silver, gold, diamond, isIcon = false }) => (
     <div className="grid grid-cols-4 py-4 border-b border-[#C8A96A]/10 items-center">
@@ -122,7 +132,7 @@ const FAQItem = ({ question, answer }) => {
                 className="w-full py-5 sm:py-6 flex items-center justify-between text-left group gap-4"
             >
                 <span className="text-base sm:text-lg font-serif font-bold text-[#F5E6C8] group-hover:text-[#C8A96A] transition-colors uppercase tracking-tight">{question}</span>
-                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all shrink-0 ${isOpen ? 'bg-[#C8A96A] text-[#0D0D0D] rotate-180' : 'bg-[#0D0D0D] border border-[#C8A96A]/30 text-[#C8A96A]'}`}>
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all ${isOpen ? 'bg-[#C8A96A] text-[#0D0D0D] rotate-180' : 'bg-[#0D0D0D] border border-[#C8A96A]/30 text-[#C8A96A]'}`}>
                     <Star className="w-4 h-4 fill-current" />
                 </div>
             </button>
@@ -170,115 +180,111 @@ const FAQSection = () => (
 );
 
 // ── Confirm Modal ─────────────────────────────────────────────────────────────
-const ConfirmModal = ({ pkg, walletBalance, onConfirm, onRazorpay, onCancel, loading }) => {
-    const canAfford = walletBalance >= pkg.price;
+const ConfirmModal = ({ pkg, currentBalance, onConfirm, onCancel, loading }) => {
+    const [payMethod, setPayMethod] = useState('razorpay');
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/90 backdrop-blur-md px-4 pt-28 overflow-y-auto">
-            <Motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <Motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                className="luxury-box w-full max-w-md p-8 shadow-gold-900/20 shadow-2xl"
+                className="w-full max-w-md overflow-hidden rounded-[2rem] border border-[#C8A96A]/20 bg-[#111111] shadow-2xl relative"
             >
-                {/* Gold top accent */}
-                <div className="h-0.5 bg-gradient-to-r from-transparent via-[#C8A96A] to-transparent w-full absolute top-0 left-0" />
-
-                {/* Header */}
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <h2 className="text-2xl font-serif font-bold text-[#F5E6C8] leading-none mb-1">Confirm Activation</h2>
-                        <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-[0.2em]">Review order details</p>
+                {/* Header with Background Pattern */}
+                <div className="relative h-32 bg-black flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 opacity-20" 
+                        style={{ 
+                            backgroundImage: `radial-gradient(circle at 2px 2px, #C8A96A 1px, transparent 0)`,
+                            backgroundSize: '24px 24px'
+                        }} 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#111111]" />
+                    <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-[#C8A96A]/30 bg-black/50 backdrop-blur-md">
+                        {pkg.icon ? <pkg.icon className="h-8 w-8 text-[#C8A96A]" /> : <Zap className="h-8 w-8 text-[#C8A96A]" />}
                     </div>
-                    <button onClick={onCancel} className="w-10 h-10 border border-[#C8A96A]/20 flex items-center justify-center rounded-full hover:bg-[#C8A96A]/10 transition">
-                        <X className="w-5 h-5 text-[#C8A96A]" />
-                    </button>
                 </div>
 
-                {/* Package summary */}
-                <div className={`bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-3xl p-6 mb-8 relative group overflow-hidden`}>
-                    <div className="flex items-center gap-5 relative z-10">
-                        <div className="w-16 h-16 bg-[#C8A96A]/10 border border-[#C8A96A]/20 rounded-2xl flex items-center justify-center">
-                            <pkg.icon className="w-8 h-8 text-[#C8A96A]" strokeWidth={1.5} />
-                        </div>
-                        <div>
-                            <p className="text-[#C8A96A]/60 text-[10px] font-black uppercase tracking-[0.3em] mb-1">{pkg.name} Tier</p>
-                            <p className="text-3xl font-serif font-bold text-[#F5E6C8]">₹{pkg.price.toLocaleString('en-IN')}</p>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 mt-6 relative z-10 pt-6 border-t border-[#C8A96A]/10">
-                        <div className="text-center">
-                            <p className="text-[8px] text-[#C8A96A]/40 uppercase font-black tracking-widest mb-1">BV</p>
-                            <p className="text-xs font-bold text-[#F5E6C8]">{pkg.bv}</p>
-                        </div>
-                        <div className="text-center border-x border-[#C8A96A]/10">
-                            <p className="text-[8px] text-[#C8A96A]/40 uppercase font-black tracking-widest mb-1">PV</p>
-                            <p className="text-xs font-bold text-[#F5E6C8]">{pkg.pv}</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-[8px] text-[#C8A96A]/40 uppercase font-black tracking-widest mb-1">Cap</p>
-                            <p className="text-xs font-bold text-[#F5E6C8]">{pkg.capping.split(' ')[0]}</p>
-                        </div>
-                    </div>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#C8A96A]/5 rounded-full blur-3xl" />
-                </div>
+                <div className="p-8 text-center pt-4">
+                    <h3 className="text-xl font-black uppercase tracking-widest text-[#F5E6C8]">
+                        Confirm Activation
+                    </h3>
+                    <p className="mt-2 text-sm text-[#F5E6C8]/60">
+                        You are about to activate the <span className="text-[#C8A96A] font-bold">{pkg.name}</span> package.
+                    </p>
 
-                {/* Wallet info */}
-                <div className={`rounded-3xl p-5 mb-8 flex items-center gap-4 border ${canAfford ? 'bg-[#0D0D0D] border-[#C8A96A]/30' : 'bg-red-950/20 border-red-500/30'}`}>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${canAfford ? 'bg-[#C8A96A]/10 text-[#C8A96A]' : 'bg-red-500/10 text-red-500'}`}>
-                        <Wallet className="w-6 h-6" />
-                    </div>
-                    <div className="flex-1">
-                        <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest">Available Credit</p>
-                        <p className={`text-xl font-bold ${canAfford ? 'text-[#F5E6C8]' : 'text-red-400'}`}>
-                            ₹{walletBalance.toLocaleString('en-IN')}
-                        </p>
-                    </div>
-                    {canAfford ? (
-                        <div className="w-6 h-6 bg-[#C8A96A]/20 rounded-full flex items-center justify-center">
-                            <CheckCircle className="w-4 h-4 text-[#C8A96A]" />
+                    <div className="my-6 space-y-4">
+                        <div className="rounded-2xl border border-[#C8A96A]/10 bg-black/40 p-5">
+                            <div className="flex justify-between text-[11px] font-black uppercase tracking-tighter text-[#F5E6C8]/40 mb-3">
+                                <span>Package Price</span>
+                                <span className="text-[#C8A96A]">₹{pkg.price}</span>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-3 p-3 rounded-xl border border-transparent bg-black/60 cursor-pointer hover:border-[#C8A96A]/20 transition-all">
+                                    <input 
+                                        type="radio" 
+                                        name="payMethod" 
+                                        value="razorpay" 
+                                        checked={payMethod === 'razorpay'}
+                                        onChange={(e) => setPayMethod(e.target.value)}
+                                        className="h-4 w-4 accent-[#C8A96A]"
+                                    />
+                                    <div className="flex flex-1 items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <ShieldCheck size={14} className="text-[#C8A96A]" />
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-[#F5E6C8]">Razorpay</span>
+                                        </div>
+                                        <span className="text-[10px] items-center py-0.5 px-2 rounded-full bg-[#C8A96A]/10 text-[#C8A96A] font-bold">Recommended</span>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center gap-3 p-3 rounded-xl border border-transparent bg-black/60 cursor-pointer hover:border-[#C8A96A]/20 transition-all">
+                                    <input 
+                                        type="radio" 
+                                        name="payMethod" 
+                                        value="wallet" 
+                                        checked={payMethod === 'wallet'}
+                                        onChange={(e) => setPayMethod(e.target.value)}
+                                        className="h-4 w-4 accent-[#C8A96A]"
+                                    />
+                                    <div className="flex flex-1 items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Wallet size={14} className="text-[#F5E6C8]/70" />
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-[#F5E6C8]">E-Wallet</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[9px] text-[#F5E6C8]/40 uppercase font-black">Balance</div>
+                                            <div className={`text-[11px] font-bold ${currentBalance < pkg.price ? 'text-red-500' : 'text-[#F5E6C8]'}`}>
+                                                ₹{(Number(currentBalance) || 0).toFixed(2)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    ) : (
-                        <AlertCircle className="w-6 h-6 text-red-500" />
-                    )}
-                </div>
-
-                {!canAfford && (
-                    <div className="p-4 border-l-2 border-red-500 bg-red-500/5 mb-8">
-                        <p className="text-[10px] text-red-400 font-bold leading-relaxed uppercase tracking-widest">
-                            Deficit of ₹{(pkg.price - walletBalance).toLocaleString('en-IN')}<br/>
-                            Top up or use alternative billing method.
-                        </p>
                     </div>
-                )}
 
-                {/* Actions */}
-                <div className="space-y-4">
                     <button
-                        onClick={onConfirm}
-                        disabled={!canAfford || loading}
-                        className="luxury-button w-full h-14 relative group overflow-hidden disabled:opacity-30"
+                        onClick={() => onConfirm(payMethod)}
+                        disabled={loading || (payMethod === 'wallet' && currentBalance < pkg.price)}
+                        className="group relative h-14 w-full overflow-hidden rounded-2xl bg-[#C8A96A] text-[13px] font-black uppercase tracking-[0.2em] text-[#0D0D0D] transition-transform active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
                     >
-                        <span className="relative z-10 flex items-center justify-center gap-3">
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Settle via Wallet'}
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                        <div className="flex items-center justify-center gap-2">
+                            {loading ? (
+                                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                            ) : (
+                                <>
+                                    <span>Proceed to Pay</span>
+                                    <ArrowRight size={18} className="translate-x-0 transition-transform group-hover:translate-x-1" />
+                                </>
+                            )}
+                        </div>
                     </button>
-                    
-                    {!loading && (
-                        <button
-                            onClick={onRazorpay}
-                            className="w-full h-14 border border-[#C8A96A]/20 rounded-2px text-[10px] font-black uppercase tracking-[0.3em] text-[#C8A96A] hover:bg-[#C8A96A]/10 transition flex items-center justify-center gap-3"
-                        >
-                            <Shield className="w-4 h-4" />
-                            Global Merchant Gateway
-                        </button>
-                    )}
 
                     <button
                         onClick={onCancel}
                         disabled={loading}
-                        className="w-full text-[10px] font-black text-[#F5E6C8]/40 uppercase tracking-widest hover:text-[#F5E6C8] transition py-2"
+                        className="mt-4 w-full text-[10px] font-black text-[#F5E6C8]/40 uppercase tracking-widest hover:text-[#F5E6C8] transition py-2"
                     >
                         Cancel Selection
                     </button>
@@ -290,13 +296,12 @@ const ConfirmModal = ({ pkg, walletBalance, onConfirm, onRazorpay, onCancel, loa
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const PackageUpgrade = () => {
-    const [status, setStatus] = useState(null);   // current package status from API
+    const [status, setStatus] = useState(null);
     const [loadingStatus, setLoadingStatus] = useState(true);
-    const [selectedPkg, setSelectedPkg] = useState(null);  // pkg object for confirm modal
+    const [selectedPkg, setSelectedPkg] = useState(null);
     const [activating, setActivating] = useState(false);
-    const [success, setSuccess] = useState(null);   // activated pkg name
+    const [success, setSuccess] = useState(null);
 
-    // ── Fetch current status ──────────────────────────────────────────────────
     useEffect(() => {
         const fetchStatus = async () => {
             try {
@@ -311,40 +316,94 @@ const PackageUpgrade = () => {
         fetchStatus();
     }, []);
 
-    // ── Activate handler ──────────────────────────────────────────────────────
-    const handleActivate = async () => {
+    const handleActivate = async (payMethod = 'wallet') => {
         if (!selectedPkg) return;
         setActivating(true);
         try {
+            if (payMethod === 'razorpay') {
+                const resScript = await loadRazorpay();
+                if (!resScript) {
+                    toast.error('Razorpay SDK failed to load');
+                    setActivating(false);
+                    return;
+                }
+
+                const { data: orderData } = await api.post('/orders/razorpay-order', {
+                    amount: selectedPkg.price
+                });
+                if (!orderData || !orderData.id) throw new Error('Payment order creation failed');
+
+                const options = {
+                    key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_SQbbsEM3Dlfgi2', // Fallback for local testing
+                    amount: orderData.amount,
+                    currency: "INR",
+                    name: "Sanyukt Parivaar",
+                    description: `${selectedPkg.name} Package Activation`,
+                    order_id: orderData.id,
+                    handler: async (resp) => {
+                        try {
+                            const res = await api.post('/package/activate', {
+                                packageType: selectedPkg.id,
+                                paymentMethod: 'razorpay',
+                                razorpay_payment_id: resp.razorpay_payment_id,
+                                razorpay_order_id: resp.razorpay_order_id,
+                                razorpay_signature: resp.razorpay_signature
+                            });
+
+                            if (res.data.success) {
+                                handleActivationSuccess(res.data.data);
+                            }
+                        } catch (err) {
+                            toast.error(err.response?.data?.message || 'Activation failed');
+                            setActivating(false);
+                        }
+                    },
+                    modal: { ondismiss: () => setActivating(false) },
+                    theme: { color: "#C8A96A" }
+                };
+                
+                if (window.Razorpay) {
+                    const rzp = new window.Razorpay(options);
+                    rzp.open();
+                } else {
+                    toast.error('Razorpay failed to initialize');
+                    setActivating(false);
+                }
+                return;
+            }
+
             const res = await api.post('/package/activate', {
                 packageType: selectedPkg.id,
                 paymentMethod: 'wallet',
             });
 
             if (res.data.success) {
-                setStatus(prev => ({
-                    ...prev,
-                    packageType: selectedPkg.id,
-                    packageName: selectedPkg.name,
-                    activeStatus: true,
-                    walletBalance: res.data.data.walletBalance,
-                    bv: res.data.data.bv,
-                    pv: res.data.data.pv,
-                    dailyCapping: res.data.data.dailyCapping,
-                }));
-                setSuccess(selectedPkg.name);
-                setSelectedPkg(null);
-                toast.success(`${selectedPkg.name} package activated successfully!`);
+                handleActivationSuccess(res.data.data);
             }
         } catch (err) {
             const msg = err?.response?.data?.message || 'Activation failed. Please try again.';
             toast.error(msg);
-        } finally {
             setActivating(false);
         }
     };
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    const handleActivationSuccess = (data) => {
+        setStatus(prev => ({
+            ...prev,
+            packageType: selectedPkg.id,
+            packageName: selectedPkg.name,
+            activeStatus: true,
+            walletBalance: data.walletBalance,
+            bv: data.bv,
+            pv: data.pv,
+            dailyCapping: data.dailyCapping,
+        }));
+        setSuccess(selectedPkg.name);
+        setSelectedPkg(null);
+        setActivating(false);
+        toast.success(`${selectedPkg.name} package activated successfully!`);
+    };
+
     const isCurrentPkg = (id) => status?.packageType === id && status?.activeStatus;
     const isLowerPkg = (id) => {
         const prices = { '599': 599, '1299': 1299, '2699': 2699 };
@@ -352,7 +411,6 @@ const PackageUpgrade = () => {
         return status?.activeStatus && prices[id] <= currentPrice;
     };
 
-    // ── Loading ───────────────────────────────────────────────────────────────
     if (loadingStatus) return (
         <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D]">
             <div className="text-center">
@@ -362,122 +420,14 @@ const PackageUpgrade = () => {
         </div>
     );
 
-    // ── Razorpay Integration ───────────────────────────────────────────────
-    const loadRazorpay = () => {
-        return new Promise((resolve) => {
-            const script = document.createElement('script');
-            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-            script.onload = () => resolve(true);
-            script.onerror = () => resolve(false);
-            document.body.appendChild(script);
-        });
-    };
-
-    const handleRazorpayPayment = async () => {
-        if (!selectedPkg) return;
-        setActivating(true);
-
-        const resScript = await loadRazorpay();
-        if (!resScript) {
-            toast.error('Razorpay SDK failed to load. Are you online?');
-            setActivating(false);
-            return;
-        }
-
-        try {
-            // 1. Create order on backend
-            // Note: Reusing /orders/razorpay-order if exists, or adding direct support
-            const { data: orderData } = await api.post('/orders/razorpay-order', {
-                amount: selectedPkg.price,
-                isPackage: true,
-                packageType: selectedPkg.id
-            });
-            if (!orderData || !orderData.id || !orderData.amount) {
-                throw new Error('Invalid payment order response from server');
-            }
-            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
-            if (!razorpayKeyId) {
-                console.error("Razorpay key is missing in frontend env");
-                alert("Payment configuration error. Please contact support.");
-                setActivating(false);
-                return;
-            }
-
-            const options = {
-                key: razorpayKeyId,
-                amount: orderData.amount,
-                currency: "INR",
-                name: "Sanyukt Parivaar",
-                description: `Activate ${selectedPkg.name} Package`,
-                order_id: orderData.id,
-                handler: async (response) => {
-                    if (!response || !response.razorpay_payment_id) {
-                        console.error("Invalid Razorpay response", response);
-                        alert("Payment failed. Try again.");
-                        setActivating(false);
-                        return;
-                    }
-
-                    try {
-                        const verifyRes = await api.post('/package/activate', {
-                            packageType: selectedPkg.id,
-                            paymentMethod: 'razorpay',
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        });
-                        if (!verifyRes?.data || typeof verifyRes.data !== 'object') {
-                            throw new Error('Invalid activation response from server');
-                        }
-
-                        if (verifyRes.data.success) {
-                            setStatus(prev => ({
-                                ...prev,
-                                packageType: selectedPkg.id,
-                                packageName: selectedPkg.name,
-                                activeStatus: true,
-                                walletBalance: verifyRes.data.data.walletBalance,
-                                bv: verifyRes.data.data.bv,
-                                pv: verifyRes.data.data.pv,
-                                dailyCapping: verifyRes.data.data.dailyCapping,
-                            }));
-                            setSuccess(selectedPkg.name);
-                            setSelectedPkg(null);
-                            toast.success(`${selectedPkg.name} package activated!`);
-                        }
-                    } catch (err) {
-                        toast.error(err.response?.data?.message || 'Verification failed');
-                    }
-                },
-                prefill: {
-                    name: status?.userName || '',
-                    email: status?.email || '',
-                },
-                theme: { color: "#0A7A2F" },
-            };
-
-            const paymentObject = new window.Razorpay(options);
-            paymentObject.open();
-
-        } catch (err) {
-            console.error('Razorpay Error:', err);
-            toast.error('Failed to initiate Razorpay payment.');
-        } finally {
-            setActivating(false);
-        }
-    };
-
-    // ─────────────────────────────────────────────────────────────────────────
     return (
         <>
-            {/* ── Confirm Modal ── */}
             <AnimatePresence>
                 {selectedPkg && (
                     <ConfirmModal
                         pkg={selectedPkg}
-                        walletBalance={status?.walletBalance || 0}
+                        currentBalance={status?.walletBalance || 0}
                         onConfirm={handleActivate}
-                        onRazorpay={handleRazorpayPayment}
                         onCancel={() => setSelectedPkg(null)}
                         loading={activating}
                     />
@@ -485,77 +435,66 @@ const PackageUpgrade = () => {
             </AnimatePresence>
 
             <div className="pb-12 px-3 sm:px-4 max-w-7xl mx-auto min-h-screen bg-[#0D0D0D] font-sans selection:bg-[#C8A96A]/30">
-
-                {/* ── Success Banner ── */}
+                {/* Success Banner */}
                 <AnimatePresence>
                     {success && (
                         <Motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="mb-8 luxury-box p-5 flex items-center gap-4 shadow-gold-900/20 shadow-2xl relative"
+                            className="mb-8 luxury-box p-5 flex items-center gap-4 relative"
                         >
                             <div className="w-14 h-14 bg-[#C8A96A]/10 border border-[#C8A96A]/30 rounded-full flex items-center justify-center shrink-0">
                                 <CheckCircle className="w-7 h-7 text-[#C8A96A]" strokeWidth={1.5} />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-xs text-[#C8A96A]/60 font-black uppercase tracking-widest mb-1">Upgrade Successful</p>
-                                <p className="text-xl sm:text-2xl font-serif font-bold text-[#F5E6C8] capitalize">{success} Tier Unlocked</p>
-                                <p className="text-sm text-[#C8A96A]/60 font-medium italic">Your legacy in the binary ecosystem has been established.</p>
+                            <div className="flex-1">
+                                <p className="text-xs text-[#C8A96A]/60 font-black uppercase mb-1">Upgrade Successful</p>
+                                <p className="text-xl sm:text-2xl font-serif font-bold text-[#F5E6C8]">{success} Tier Unlocked</p>
                             </div>
                             <button onClick={() => setSuccess(null)} className="luxury-button !p-2 shrink-0">
                                 <X className="w-4 h-4" />
                             </button>
-                            <div className="absolute top-0 right-0 h-full w-1 bg-gradient-to-b from-[#C8A96A] to-transparent" />
                         </Motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* ── Header ── */}
-                <div className="relative mb-8 sm:mb-12 py-6 sm:py-10 text-center overflow-hidden">
-                    {/* Background Accents */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#C8A96A]/5 blur-[120px] rounded-full -z-10" />
-                    
+                {/* Header */}
+                <div className="relative mb-8 sm:mb-12 py-10 text-center">
                     <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="relative z-10"
                     >
-                        <div className="inline-block mb-4 px-5 py-1.5 rounded-full border border-[#C8A96A]/20 bg-[#C8A96A]/5">
-                            <span className="text-xs font-black uppercase tracking-[0.3em] text-[#C8A96A]">Package Tiers</span>
-                        </div>
-                        <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-[#F5E6C8] uppercase tracking-tight mb-4 sm:mb-6">
-                            Upgrade Your <span className="text-[#C8A96A]">Package</span>
+                        <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-[#F5E6C8] uppercase mb-4">
+                            Upgrade Their <span className="text-[#C8A96A]">Potential</span>
                         </h1>
-                        <p className="max-w-xl mx-auto text-[#F5E6C8]/50 font-semibold text-sm sm:text-base leading-relaxed italic">
-                            Ascend to a premium tier and manifest the full potential of your high-performance business ecosystem.
+                        <p className="max-w-xl mx-auto text-[#F5E6C8]/50 font-semibold italic">
+                            Elevate your business capabilities by transitioning to a superior package tier.
                         </p>
                     </Motion.div>
                 </div>
 
-                {/* ── Wallet Balance Strip ── */}
-                <div className="mb-8 sm:mb-10 luxury-box p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 group shadow-2xl">
-                    <div className="flex items-center gap-4 sm:gap-5">
-                        <div className="w-14 h-14 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl flex items-center justify-center text-[#C8A96A] group-hover:border-[#C8A96A]/50 transition-colors shrink-0">
-                            <Wallet className="w-7 h-7" strokeWidth={1.5} />
+                {/* Balance Strip */}
+                <div className="mb-8 luxury-box p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl flex items-center justify-center text-[#C8A96A]">
+                            <Wallet className="w-7 h-7" />
                         </div>
                         <div>
-                            <p className="text-xs text-[#C8A96A]/60 font-black uppercase tracking-widest mb-1">Capital Reserves</p>
-                            <p className="text-2xl sm:text-3xl font-serif font-bold text-[#F5E6C8]">
+                            <p className="text-xs text-[#C8A96A]/60 font-black uppercase mb-1">Digital Credits</p>
+                            <p className="text-2xl font-serif font-bold text-[#F5E6C8]">
                                 ₹{(status?.walletBalance || 0).toLocaleString('en-IN')}
                             </p>
                         </div>
                     </div>
                     {status?.activeStatus && (
-                        <div className={`flex items-center gap-3 px-5 sm:px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider border border-[#C8A96A]/30 bg-[#C8A96A]/5 text-[#C8A96A]`}>
-                            <div className="w-2 h-2 rounded-full bg-[#C8A96A]" />
-                            Current: {status.packageName} Tier Active
+                        <div className="px-5 py-2 rounded-full text-xs font-black uppercase border border-[#C8A96A]/30 bg-[#C8A96A]/5 text-[#C8A96A]">
+                            Current: {status.packageName} Active
                         </div>
                     )}
                 </div>
 
-                {/* ── Package Cards ── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
+                {/* Package Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
                     {PACKAGES.map((pkg, index) => {
                         const isCurrent = isCurrentPkg(pkg.id);
                         const isLower = isLowerPkg(pkg.id);
@@ -567,145 +506,64 @@ const PackageUpgrade = () => {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className={`luxury-box flex flex-col h-full transform transition-all duration-700 hover:scale-[1.02] hover:shadow-gold-900/30
-                                    ${isCurrent ? `!border-[#C8A96A]/60 shadow-gold-900/20` : ''}`}
+                                className={`luxury-box flex flex-col h-full hover:scale-[1.02] transition-transform ${isCurrent ? '!border-[#C8A96A]/60' : ''}`}
                             >
-                                {/* Header */}
-                                <div className={`bg-gradient-to-br ${pkg.color} p-5 sm:p-6 relative overflow-hidden`}>
-                                    <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-[#C8A96A]/5 rounded-full blur-2xl opacity-50" />
-                                    <div className="relative z-10 text-center">
-                                        <div className="flex justify-center mb-4">
-                                            <div className="p-4 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl text-[#C8A96A] shadow-2xl">
-                                                <Icon className="w-8 h-8" strokeWidth={1} />
-                                            </div>
+                                <div className={`bg-gradient-to-br ${pkg.color} p-6 text-center border-b border-[#C8A96A]/10`}>
+                                    <div className="flex justify-center mb-4">
+                                        <div className="p-4 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl text-[#C8A96A]">
+                                            <Icon className="w-8 h-8" />
                                         </div>
-                                        {isCurrent && (
-                                            <span className="inline-block px-4 py-1.5 bg-[#C8A96A] text-[#0D0D0D] rounded-full text-[11px] font-black uppercase tracking-widest mb-4">
-                                                Active Standing
-                                            </span>
-                                        )}
-                                        <h3 className="text-2xl font-serif font-bold text-[#F5E6C8] uppercase tracking-widest mb-2">{pkg.name}</h3>
-                                        <div className="text-4xl sm:text-5xl font-serif font-bold text-[#C8A96A] tracking-tighter">₹{pkg.price.toLocaleString('en-IN')}</div>
                                     </div>
-                                    {/* Gold line bottom */}
-                                    <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#C8A96A]/40 to-transparent" />
+                                    <h3 className="text-2xl font-serif font-bold text-[#F5E6C8] uppercase tracking-widest mb-2">{pkg.name}</h3>
+                                    <div className="text-4xl font-serif font-bold text-[#C8A96A]">₹{pkg.price}</div>
                                 </div>
 
-                                {/* Stats Strip */}
-                                <div className="bg-[#121212] px-5 sm:px-6 py-4 border-b border-[#C8A96A]/10 grid grid-cols-2 gap-4">
+                                <div className="px-6 py-4 border-b border-[#C8A96A]/5 grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-[11px] text-[#C8A96A]/60 font-black uppercase tracking-wider mb-1">Volume Yield</p>
-                                        <p className="text-xl font-bold text-[#F5E6C8] tracking-tight">{pkg.bv}</p>
+                                        <p className="text-[10px] text-[#C8A96A]/60 font-black uppercase">Volume</p>
+                                        <p className="text-lg font-bold text-[#F5E6C8]">{pkg.bv}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[11px] text-[#C8A96A]/60 font-black uppercase tracking-wider mb-1">Point Merit</p>
-                                        <p className="text-xl font-bold text-[#F5E6C8] tracking-tight">{pkg.pv}</p>
+                                        <p className="text-[10px] text-[#C8A96A]/60 font-black uppercase">Points</p>
+                                        <p className="text-lg font-bold text-[#F5E6C8]">{pkg.pv}</p>
                                     </div>
                                 </div>
 
-                                {/* Daily Capping */}
-                                <div className="px-5 sm:px-6 py-4 border-b border-[#C8A96A]/5 flex items-center gap-4">
-                                    <div className="w-11 h-11 rounded-xl bg-[#C8A96A]/10 border border-[#C8A96A]/20 flex items-center justify-center text-[#C8A96A] shrink-0">
-                                        <Zap className="w-5 h-5" strokeWidth={1.5} />
-                                    </div>
-                                    <div>
-                                        <p className="text-[11px] text-[#C8A96A]/60 font-black uppercase tracking-wider mb-1">Earning Capping</p>
-                                        <p className="text-xl sm:text-2xl font-serif font-bold text-[#F5E6C8]">{pkg.capping}</p>
-                                    </div>
-                                </div>
-
-                                {/* Features */}
-                                <div className="px-5 sm:px-6 py-5 sm:py-6 flex-1">
-                                    <ul className="space-y-3">
+                                <div className="p-6 flex-1">
+                                    <ul className="space-y-3 mb-6">
                                         {pkg.features.map((f, i) => (
                                             <li key={i} className="flex items-center gap-3">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-[#C8A96A] shrink-0" />
-                                                <span className="text-[13px] font-bold text-[#F5E6C8]/70 uppercase tracking-wide leading-tight">{f}</span>
+                                                <CheckCircle2 className="w-4 h-4 text-[#C8A96A]/40" />
+                                                <span className="text-xs font-bold text-[#F5E6C8]/70 uppercase">{f}</span>
                                             </li>
                                         ))}
                                     </ul>
-                                </div>
-
-                                {/* Action */}
-                                <div className="p-6 pt-0">
-                                    {isCurrent ? (
-                                        <div className="w-full py-4 rounded-xl border border-[#C8A96A]/40 bg-[#C8A96A]/5 text-[#C8A96A] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2">
-                                            <CheckCircle2 className="w-4 h-4" /> Currently Active
-                                        </div>
-                                    ) : isLower ? (
-                                        <div className="w-full py-4 rounded-xl border border-white/5 bg-white/5 text-white/30 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 cursor-not-allowed">
-                                            Legacy Tier Established
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => setSelectedPkg(pkg)}
-                                            className="luxury-button w-full h-14 group relative overflow-hidden"
-                                        >
-                                            <span className="relative z-10 flex items-center justify-center gap-3">
-                                                <Package className="w-4 h-4" />
-                                                Upgrade Now
-                                            </span>
-                                            <div className="absolute inset-0 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                                        </button>
-                                    )}
+                                    <div className="mt-auto">
+                                        {isCurrent ? (
+                                            <div className="w-full py-4 text-center text-[#C8A96A] text-[10px] font-black uppercase border border-[#C8A96A]/30 bg-[#C8A96A]/5 rounded-xl">
+                                                Active Standing
+                                            </div>
+                                        ) : isLower ? (
+                                            <div className="w-full py-4 text-center text-white/20 text-[10px] font-black uppercase border border-white/5 bg-white/5 rounded-xl">
+                                                Legacy Tier
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => setSelectedPkg(pkg)}
+                                                className="luxury-button w-full h-12 flex items-center justify-center gap-2"
+                                            >
+                                                Apply Upgrade
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </Motion.div>
                         );
                     })}
                 </div>
 
-                {/* ── Trust Section ── */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-20">
-                    <div className="luxury-box p-5 sm:p-6 flex items-center gap-4 sm:gap-5 group hover:border-[#C8A96A]/60 transition-colors">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl flex items-center justify-center text-[#C8A96A] group-hover:scale-110 transition-transform shrink-0">
-                            <Shield className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1} />
-                        </div>
-                        <div>
-                            <p className="font-serif font-black text-[#F5E6C8] uppercase text-sm tracking-wider mb-0.5">Fortified Settle</p>
-                            <p className="text-xs text-[#C8A96A]/50 font-bold uppercase tracking-wider">Verified Merchant Tunnels</p>
-                        </div>
-                    </div>
-                    <div className="luxury-box p-5 sm:p-6 flex items-center gap-4 sm:gap-5 group hover:border-[#C8A96A]/60 transition-colors">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl flex items-center justify-center text-[#C8A96A] group-hover:scale-110 transition-transform shrink-0">
-                            <Zap className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1} />
-                        </div>
-                        <div>
-                            <p className="font-serif font-black text-[#F5E6C8] uppercase text-sm tracking-wider mb-0.5">Instant Upgrade</p>
-                            <p className="text-xs text-[#C8A96A]/50 font-bold uppercase tracking-wider">Zero Latency Activation</p>
-                        </div>
-                    </div>
-                    <div className="luxury-box p-5 sm:p-6 flex items-center gap-4 sm:gap-5 group hover:border-[#C8A96A]/60 transition-colors">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl flex items-center justify-center text-[#C8A96A] group-hover:scale-110 transition-transform shrink-0">
-                            <Star className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1} />
-                        </div>
-                        <div>
-                            <p className="font-serif font-black text-[#F5E6C8] uppercase text-sm tracking-wider mb-0.5">Concierge Elite</p>
-                            <p className="text-xs text-[#C8A96A]/50 font-bold uppercase tracking-wider">Dedicated Master Support</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ── Comparison Table ── */}
                 <ComparisonTable />
-
-                {/* ── FAQ Section ── */}
                 <FAQSection />
-
-                {/* ── Info Note ── */}
-                <div className="mt-8 luxury-box p-5 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0D0D0D] border border-[#C8A96A]/20 flex items-center justify-center text-[#C8A96A] shrink-0">
-                        <Info className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1} />
-                    </div>
-                    <div>
-                        <h4 className="font-serif font-bold text-[#F5E6C8] uppercase tracking-wider mb-2 text-base">Package Details</h4>
-                        <p className="text-sm text-[#F5E6C8]/50 font-medium leading-relaxed italic">
-                            Upon upgrade, Business Volume and Merit Points are integrated into the system.<br/>
-                            Royalties are distributed to sponsors. The central engine calculates matched yields nocturnally, 
-                            synchronizing your growth with the highest efficiency benchmarks.
-                        </p>
-                    </div>
-                </div>
-
             </div>
         </>
     );

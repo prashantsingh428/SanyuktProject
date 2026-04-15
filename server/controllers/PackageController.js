@@ -1,6 +1,9 @@
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const IncomeHistory = require("../models/IncomeHistory");
 const BinaryTree = require("../models/BinaryTree");
+const { distributeDirectIncome } = require("../services/incomeService");
+const { propagateBinaryVolume } = require("../services/binaryService");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
 
@@ -36,6 +39,8 @@ const PACKAGES = {
  *  7. Record in IncomeHistory + Deduction
  */
 exports.activatePackage = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const { packageType, paymentMethod = "wallet" } = req.body;
         const userId = req.user._id;
@@ -43,15 +48,23 @@ exports.activatePackage = async (req, res) => {
         // ── 1. Validate ──────────────────────────────────────────────────────
         const pkg = PACKAGES[packageType];
         if (!pkg) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ success: false, message: "Invalid package type. Choose 599, 1299 or 2699." });
         }
 
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+        const user = await User.findById(userId).session(session);
+        if (!user) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
 
         // ── 2. Already on same or higher package? ────────────────────────────
         const currentPkg = PACKAGES[user.packageType];
         if (user.activeStatus && currentPkg && currentPkg.price >= pkg.price) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({
                 success: false,
                 message: `You are already active on a ${currentPkg.name} or higher package.`
@@ -61,6 +74,8 @@ exports.activatePackage = async (req, res) => {
         // ── 3. Payment verification (Wallet or Razorpay) ─────────────────────
         if (paymentMethod === "wallet") {
             if ((user.walletBalance || 0) < pkg.price) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(400).json({
                     success: false,
                     message: `Insufficient wallet balance. Required: ₹${pkg.price}, Available: ₹${user.walletBalance || 0}`
@@ -71,6 +86,8 @@ exports.activatePackage = async (req, res) => {
             const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
             
             if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(400).json({ success: false, message: "Missing Razorpay payment details." });
             }
 
@@ -81,6 +98,8 @@ exports.activatePackage = async (req, res) => {
                 .digest("hex");
 
             if (expectedSignature !== razorpay_signature) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(400).json({ success: false, message: "Invalid payment signature verification failed." });
             }
             
@@ -89,16 +108,18 @@ exports.activatePackage = async (req, res) => {
                     const orderDetails = await razorpay.orders.fetch(razorpay_order_id);
                     const actualPaid = orderDetails.amount / 100;
                     if (actualPaid !== Number(pkg.price)) {
+                        await session.abortTransaction();
+                        session.endSession();
                         return res.status(400).json({ success: false, message: "Payment amount mismatch. Fraudulent request detected." });
                     }
                 } catch (err) {
                     console.error("Failed to fetch razorpay order in PackageController:", err);
+                    await session.abortTransaction();
+                    session.endSession();
                     return res.status(500).json({ success: false, message: "Failed to verify transaction amount." });
                 }
             }
         }
-        // For "upi" / "cash" - admin will verify separately, but we still activate
-        // (In production: verify Razorpay payment_id here before activating)
 
         // ── 4. Activate user ─────────────────────────────────────────────────
         const prevBV = user.bv || 0;
@@ -110,81 +131,32 @@ exports.activatePackage = async (req, res) => {
         user.bv = prevBV + pkg.bv;
         user.pv = prevPV + pkg.pv;
 
-        await user.save();
+        await user.save({ session });
 
         // ── 5. Distribute Direct Income to sponsor ────────────────────────────
-        // Direct income Rule: ₹50 for 0.5 PV or above packages
-        if (user.sponsorId && pkg.directIncome > 0) {
-            const sponsor = await User.findOne({ memberId: user.sponsorId });
-            if (sponsor && sponsor.activeStatus) {
-                const directIncome = pkg.directIncome;
-                sponsor.walletBalance = (sponsor.walletBalance || 0) + directIncome;
-                sponsor.totalDirectIncome = (sponsor.totalDirectIncome || 0) + directIncome;
-                await sponsor.save();
+        await distributeDirectIncome({ userId: user._id, session });
 
-                await IncomeHistory.create({
-                    userId: sponsor._id,
-                    fromUserId: user._id,
-                    amount: directIncome,
-                    type: "Direct",
-                    description: `Direct income from ${user.userName || user.memberId} - ${pkg.name} package activation`,
-                });
-            }
-        }
-
-        // ── 6. Update upline Binary Tree PV/BV ───────────────────────────────
-        let currentParentId = user.parentId;
-        let childId = user._id;
-
-        while (currentParentId) {
-            const parent = await User.findById(currentParentId);
-            if (!parent) break;
-
-            const isLeft = parent.left && parent.left.toString() === childId.toString();
-            const isRight = parent.right && parent.right.toString() === childId.toString();
-
-            if (isLeft) {
-                parent.leftTeamPV = (parent.leftTeamPV || 0) + pkg.pv;
-                if (parent.leftColor) {
-                    parent.leftColor.bv = (parent.leftColor.bv || 0) + pkg.bv;
-                    parent.leftColor.pv = (parent.leftColor.pv || 0) + pkg.pv;
-                }
-            } else if (isRight) {
-                parent.rightTeamPV = (parent.rightTeamPV || 0) + pkg.pv;
-                if (parent.rightColor) {
-                    parent.rightColor.bv = (parent.rightColor.bv || 0) + pkg.bv;
-                    parent.rightColor.pv = (parent.rightColor.pv || 0) + pkg.pv;
-                }
-            }
-
-            await parent.save();
-
-            // Sync BinaryTree collection
-            if (isLeft || isRight) {
-                await BinaryTree.findOneAndUpdate(
-                    { userId: parent._id },
-                    {
-                        $inc: {
-                            [isLeft ? "leftPV" : "rightPV"]: pkg.pv,
-                            [isLeft ? "leftBV" : "rightBV"]: pkg.bv,
-                        }
-                    },
-                    { upsert: true }
-                );
-            }
-
-            childId = parent._id;
-            currentParentId = parent.parentId;
-        }
+        // ── 6. Standardized Volume Propagation ───────────────────────────────
+        await propagateBinaryVolume({
+            sourceUserId: user._id,
+            pv: pkg.pv,
+            bv: pkg.bv,
+            session,
+        });
 
         // ── 7. IncomeHistory - self activation record ─────────────────────────
-        await IncomeHistory.create({
-            userId: user._id,
-            fromUserId: user._id,
-            amount: pkg.price,
-            type: "Direct",
-            description: `${pkg.name} package activated - ₹${pkg.price}`,
-        });
+        await IncomeHistory.create([
+            {
+                userId: user._id,
+                fromUserId: user._id,
+                amount: pkg.price,
+                type: "Direct",
+                description: `${pkg.name} package activated - ₹${pkg.price}`,
+            }
+        ], { session });
+
+        await session.commitTransaction();
+        session.endSession();
 
         return res.json({
             success: true,
@@ -200,7 +172,10 @@ exports.activatePackage = async (req, res) => {
         });
 
     } catch (err) {
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        console.error("Activation error:", err);
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({ success: false, message: "Internal server error: " + err.message });
     }
 };
 

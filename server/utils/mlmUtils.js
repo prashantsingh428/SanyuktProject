@@ -121,21 +121,28 @@ exports.distributeLevelIncome = async (user) => {
  * Distributes Direct Income to the sponsor.
  */
 exports.distributeDirectIncome = async (user) => {
-    // Plan ke hisaab se: ₹50 per referral — SABHI packages pe milta hai
-    // Condition: Sirf tab jab sponsor active ho (koi bhi package)
+    // Requirement: ₹50 per referral
+    // Condition: Referrer must have at least 0.5 PV plan (₹1299 or higher)
     if (!user.sponsorId) return;
 
     try {
         const sponsor = await User.findOne({ memberId: user.sponsorId.toUpperCase() });
         if (!sponsor) return;
 
-        // Sponsor active hona chahiye
+        // Check if sponsor is active
         if (!sponsor.activeStatus) {
-            console.log(`Sponsor ${sponsor.memberId} active nahi hai, direct income skip`);
+            console.log(`Sponsor ${sponsor.memberId} is not active, skipping direct income.`);
             return;
         }
 
-        const amount = 50; // Plan: ₹50 per referral fixed
+        // Requirement: Referrer must have at least 0.5 PV
+        const sponsorPV = sponsor.pv || 0;
+        if (sponsorPV < 0.5) {
+            console.log(`Sponsor ${sponsor.memberId} has only ${sponsorPV} PV (minimum 0.5 PV required for Direct Income). Skipping.`);
+            return;
+        }
+
+        const amount = 50; 
         sponsor.walletBalance = (sponsor.walletBalance || 0) + amount;
         sponsor.totalDirectIncome = (sponsor.totalDirectIncome || 0) + amount;
         await sponsor.save();
@@ -145,7 +152,7 @@ exports.distributeDirectIncome = async (user) => {
             amount,
             type: 'Direct',
             fromUserId: user._id,
-            description: `Direct income from ${user.memberId} registration (₹50)`
+            description: `Direct referral income from ${user.memberId} (SP PV: ${sponsorPV})`
         });
 
         console.log(`✅ Direct income ₹50 → Sponsor ${sponsor.memberId} from ${user.memberId}`);

@@ -105,23 +105,60 @@ const PairBox = ({ theme, label, value }) => (
     </div>
 );
 
-const NoticePanel = ({ notices }) => (
-    <div className="overflow-hidden rounded-[2px] border border-[#c8a96a]/16 bg-[#111111] shadow-[0_14px_36px_rgba(0,0,0,0.35)]">
-        <div className="bg-[#1a1a1a] px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-[#c8a96a]">
-            Notifications
-        </div>
-        <div className="space-y-px bg-[#c8a96a]/10 p-px">
-            {notices.map((notice, index) => (
-                <div key={`${notice}-${index}`} className="flex items-start gap-2 bg-[#161616] px-3 py-2">
-                    <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#c8a96a]/12 text-[#c8a96a]">
-                        <Bell size={9} />
-                    </div>
-                    <p className="text-[11px] leading-5 text-[#f5e6c8]/78">{notice}</p>
+const NoticePanel = ({ notices }) => {
+    const [currentIndex, setCurrentIndex] = React.useState(0);
+    const [isAnimating, setIsAnimating] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!notices || notices.length <= 1) return;
+
+        const interval = setInterval(() => {
+            setIsAnimating(true);
+            setTimeout(() => {
+                setCurrentIndex((prev) => (prev + 1) % notices.length);
+                setIsAnimating(false);
+            }, 500); // Wait for fade out
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [notices]);
+
+    if (!notices || notices.length === 0) return null;
+
+    return (
+        <div className="overflow-hidden rounded-[2px] border border-[#c8a96a]/18 bg-[#111111] shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
+            <div className="flex items-center justify-between bg-[#1a1a1a] px-3 py-2.5">
+                <span className="text-[11px] font-black uppercase tracking-[0.16em] text-[#c8a96a]">
+                    Live Updates
+                </span>
+                <div className="flex gap-1">
+                    {notices.map((_, i) => (
+                        <div
+                            key={i}
+                            className={`h-1 w-3 rounded-full transition-all duration-300 ${
+                                i === currentIndex ? 'bg-[#c8a96a]' : 'bg-[#c8a96a]/20'
+                            }`}
+                        />
+                    ))}
                 </div>
-            ))}
+            </div>
+            <div className="relative h-[54px] bg-[#c8a96a]/5">
+                <div
+                    className={`absolute inset-0 flex items-center gap-3 px-4 py-3 transition-all duration-500 ease-in-out ${
+                        isAnimating ? 'translate-y-[-10px] opacity-0' : 'translate-y-0 opacity-100'
+                    }`}
+                >
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#c8a96a]/15 text-[#c8a96a] shadow-[0_0_12px_rgba(200,169,106,0.2)]">
+                        <Bell size={10} />
+                    </div>
+                    <p className="text-[12px] font-medium italic leading-none tracking-wide text-[#f5e6c8]/90">
+                        {notices[currentIndex]}
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const DashboardOverview = () => {
     const [loading, setLoading] = useState(true);
@@ -231,14 +268,18 @@ const DashboardOverview = () => {
 
     const notices = useMemo(() => {
         const currentRank = stats?.rank || userData?.rank || 'Member';
+        const walletAmt = formatMoney(viewModel.eWallet);
+        const personalPV = Number(stats?.pv || 0).toFixed(2);
 
         return [
             `Welcome ${userData?.userName || userData?.memberId || 'Member'}, current rank is ${currentRank}.`,
+            `E-Wallet Balance: ₹${walletAmt}. Ready for withdrawals or recharges!`,
+            `Your Personal PV: ${personalPV}. High PV unlocks better matching bonuses.`,
             `Network summary: ${networkCounts.downline} total members, ${networkCounts.activeDirects} active directs.`,
             `Current PV carry is ${formatSimplePair(viewModel.currentPvLeft, viewModel.currentPvRight)}.`,
             `Total PV summary is ${formatSimplePair(viewModel.totalPvLeft, viewModel.totalPvRight)}.`,
         ];
-    }, [networkCounts.activeDirects, networkCounts.downline, stats?.rank, userData?.memberId, userData?.rank, userData?.userName, viewModel.currentPvLeft, viewModel.currentPvRight, viewModel.totalPvLeft, viewModel.totalPvRight]);
+    }, [networkCounts.activeDirects, networkCounts.downline, stats?.pv, stats?.rank, userData?.memberId, userData?.rank, userData?.userName, viewModel.currentPvLeft, viewModel.currentPvRight, viewModel.eWallet, viewModel.totalPvLeft, viewModel.totalPvRight]);
 
     if (loading) {
         return (

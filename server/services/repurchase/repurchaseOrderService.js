@@ -164,22 +164,18 @@ const placeRepurchaseOrder = async ({
                 await order.save({ session });
                 createdOrders.push(order);
 
-                const repurchaseRows = await Repurchase.create(
-                    [
-                        {
-                            userId: user._id,
-                            orderId: order._id,
-                            amount: item.itemTotal,
-                            walletType: normalizedWalletType,
-                            bv: item.itemBV,
-                            referenceId: `repurchase:${order._id}`,
-                            status: "completed",
-                        },
-                    ],
+                const repurchaseDoc = await Repurchase.create(
+                    {
+                        userId: user._id,
+                        orderId: order._id,
+                        amount: item.itemTotal,
+                        walletType: normalizedWalletType,
+                        bv: item.itemBV,
+                        referenceId: `repurchase:${order._id}`,
+                        status: "completed",
+                    },
                     { session }
                 );
-
-                const repurchaseDoc = repurchaseRows[0];
                 createdRepurchases.push(repurchaseDoc);
 
                 const selfIncome = await processSelfRepurchaseBonus({

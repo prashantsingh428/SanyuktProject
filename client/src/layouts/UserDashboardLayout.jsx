@@ -106,6 +106,7 @@ const UserDashboardLayout = () => {
             path: '/my-account/bonus/first/silver',
             badge: '0',
             children: [
+                { name: 'Shop Package (Activation)', path: '/my-account/package-upgrade', id: 'first_purchase_shop' },
                 { name: 'Silver Matching', path: '/my-account/bonus/first/silver', id: 'first_silver' },
                 { name: 'Gold Matching', path: '/my-account/bonus/first/gold', id: 'first_gold' },
                 { name: 'Diamond Matching', path: '/my-account/bonus/first/diamond', id: 'first_diamond' },

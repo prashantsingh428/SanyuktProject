@@ -349,7 +349,10 @@ const userSchema = new mongoose.Schema(
         dailyPV: {
             type: Number,
             default: 0
-        }
+        },
+        paymentId: String,
+        razorpayOrderId: String,
+        paymentMethod: String,
     },
     { timestamps: true }
 );

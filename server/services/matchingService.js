@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Order = require("../models/Order");
 const IncomeHistory = require("../models/IncomeHistory");
-const { createIncomeEntry } = require("./incomeService");
+const { createIncomeEntry, distributeDirectIncome } = require("./incomeService");
 const { creditWallet } = require("./walletService");
 const {
     propagateBinaryVolume,
@@ -441,6 +441,9 @@ const processQualifiedFirstPurchase = async ({
 
             await user.save({ session });
             await syncBinaryTreeSnapshot({ user, session });
+
+            // Distribute Direct Income (Qualified sponsor gets ₹50)
+            await distributeDirectIncome({ userId: user._id, session });
 
             const affectedUplineIds = await propagateBinaryVolume({
                 sourceUserId: user._id,

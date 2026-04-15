@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react';
 import { CreditCard, MapPin, PackagePlus, Receipt, ShoppingBag, UserRound } from 'lucide-react';
 import api from '../../api';
 
+const loadRazorpay = () => {
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
+
 const sectionTitleClass = 'text-[13px] font-black uppercase tracking-[0.14em] text-[#C8A96A]';
 const fieldLabelClass = 'mb-2 block text-[11px] font-black uppercase tracking-[0.12em] text-[#F5E6C8]/70';
 const fieldClass = 'w-full rounded-2xl border border-[#C8A96A]/15 bg-[#111111] px-4 py-3 text-sm text-[#F5E6C8] outline-none transition placeholder:text-[#F5E6C8]/30 focus:border-[#C8A96A]/50 focus:bg-[#141414]';
@@ -102,6 +112,71 @@ export default function PlaceOrderPage() {
         setFeedback({ type: '', message: '' });
 
         try {
+            const isRazorpay = payFrom === 'razorpay';
+
+            if (isRazorpay) {
+                const resScript = await loadRazorpay();
+                if (!resScript) {
+                    throw new Error('Razorpay SDK failed to load');
+                }
+
+                // 1. Create Razorpay order
+                const { data: orderData } = await api.post('/orders/razorpay-order', {
+                    amount: netPayable
+                });
+
+                if (!orderData || !orderData.id) throw new Error('Payment order creation failed');
+
+                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+                return new Promise((resolve, reject) => {
+                    const options = {
+                        key: razorpayKeyId,
+                        amount: orderData.amount,
+                        currency: "INR",
+                        name: "Sanyukt Parivaar",
+                        description: "First Purchase Products",
+                        order_id: orderData.id,
+                        handler: async (resp) => {
+                            try {
+                                const finalPayload = {
+                                    directSellerId,
+                                    cart,
+                                    payFrom: 'razorpay',
+                                    orderTo,
+                                    shippingAddress,
+                                    accountPassword,
+                                    razorpay_payment_id: resp.razorpay_payment_id,
+                                    razorpay_order_id: resp.razorpay_order_id,
+                                    razorpay_signature: resp.razorpay_signature
+                                };
+                                const { data: result } = await api.post('/orders/first-purchase', finalPayload);
+                                handleSuccess(result);
+                                resolve();
+                            } catch (err) {
+                                setFeedback({ type: 'error', message: err.response?.data?.message || 'Payment verification failed' });
+                                setSubmitting(false);
+                                reject(err);
+                            }
+                        },
+                        modal: {
+                            ondismiss: () => {
+                                setSubmitting(false);
+                                setFeedback({ type: 'error', message: 'Payment cancelled' });
+                            }
+                        },
+                        prefill: {
+                            name: storedUser?.userName,
+                            email: storedUser?.email,
+                            contact: storedUser?.mobile
+                        },
+                        theme: { color: "#C8A96A" }
+                    };
+                    const rzp = new window.Razorpay(options);
+                    rzp.open();
+                });
+            }
+
             const { data } = await api.post('/orders/first-purchase', {
                 directSellerId,
                 cart,
@@ -111,25 +186,29 @@ export default function PlaceOrderPage() {
                 accountPassword,
             });
 
-            setCart([]);
-            setPayFrom('');
-            setOrderTo('');
-            setAccountPassword('');
-            setDirectSellerId('');
-            setName('');
-            setFeedback({
-                type: 'success',
-                message: data?.message || 'First purchase order place ho gaya.',
-            });
+            handleSuccess(data);
         } catch (error) {
             console.error('First purchase order error:', error);
             setFeedback({
                 type: 'error',
                 message: error?.response?.data?.message || error?.message || 'Order place nahi ho paaya.',
             });
-        } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleSuccess = (data) => {
+        setCart([]);
+        setPayFrom('');
+        setOrderTo('');
+        setAccountPassword('');
+        setDirectSellerId('');
+        setName('');
+        setFeedback({
+            type: 'success',
+            message: data?.message || 'First purchase order place ho gaya.',
+        });
+        setSubmitting(false);
     };
 
     const billingStats = [
@@ -271,7 +350,8 @@ export default function PlaceOrderPage() {
                             <div>
                                 <label className={fieldLabelClass}>Pay From</label>
                                 <select value={payFrom} onChange={(e) => setPayFrom(e.target.value)} className={fieldClass}>
-                                    <option value="">Select Wallet</option>
+                                    <option value="">Select Payment Method</option>
+                                    <option value="razorpay">Razorpay (Online)</option>
                                     <option value="product-wallet">Product Wallet</option>
                                     <option value="e-wallet">E-Wallet</option>
                                 </select>

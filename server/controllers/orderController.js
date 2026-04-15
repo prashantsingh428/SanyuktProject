@@ -152,21 +152,38 @@ exports.placeFirstPurchase = async (req, res) => {
         const isMatch = await bcrypt.compare(accountPassword, user.password);
         if (!isMatch) return res.status(401).json({ message: "Account password galat hai" });
 
-        const normalizedWalletType = normalizeWalletType(payFrom);
-        if (!["product-wallet", "e-wallet"].includes(normalizedWalletType)) {
+        const isRazorpay = payFrom === "razorpay";
+        const normalizedWalletType = isRazorpay ? "online" : normalizeWalletType(payFrom);
+
+        if (!isRazorpay && !["product-wallet", "e-wallet"].includes(normalizedWalletType)) {
             return res.status(400).json({ message: "Invalid wallet selected" });
         }
 
-        // Total calculate karo
         const totalAmount = cart.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 0)), 0);
         const totalBV = cart.reduce((sum, item) => sum + ((Number(item.bv || 0)) * Number(item.quantity || 0)), 0);
         const totalPV = totalBV / 1000;
 
-        const currentWallet = await getWalletBalance(req.user._id, normalizedWalletType);
-        if (currentWallet.balance < totalAmount) {
-            return res.status(400).json({
-                message: `${normalizedWalletType === "product-wallet" ? "Product wallet" : "E-wallet"} mein insufficient balance. Available: Rs ${currentWallet.balance}, Required: Rs ${totalAmount}`,
-            });
+        // Razorpay verify logic
+        if (isRazorpay) {
+            const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+            if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+                return res.status(400).json({ message: "Payment details missing" });
+            }
+            const body = razorpay_order_id + "|" + razorpay_payment_id;
+            const expectedSignature = crypto
+                .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+                .update(body)
+                .digest("hex");
+            if (expectedSignature !== razorpay_signature) {
+                return res.status(400).json({ message: "Invalid payment signature" });
+            }
+        } else {
+            const currentWallet = await getWalletBalance(req.user._id, normalizedWalletType);
+            if (currentWallet.balance < totalAmount) {
+                return res.status(400).json({
+                    message: `${normalizedWalletType === "product-wallet" ? "Product wallet" : "E-wallet"} mein insufficient balance. Available: Rs ${currentWallet.balance}, Required: Rs ${totalAmount}`,
+                });
+            }
         }
 
         // Har product ke liye alag Order create karo
@@ -201,20 +218,24 @@ exports.placeFirstPurchase = async (req, res) => {
             createdOrders.push(order);
         }
 
-        const walletLedger = await createWalletLedgerEntry({
-            userId: req.user._id,
-            walletType: normalizedWalletType,
-            txType: "debit",
-            amount: totalAmount,
-            sourceType: "first-purchase-order",
-            sourceId: createdOrders[0]?._id || null,
-            description: `First purchase order payment (${createdOrders.length} item(s))`,
-            meta: {
-                orderIds: createdOrders.map((order) => order._id),
-                orderTo: orderTo || "self",
-                directSellerId: directSellerId || "",
-            },
-        });
+        let balanceAfter = 0;
+        if (!isRazorpay) {
+            const walletLedger = await createWalletLedgerEntry({
+                userId: req.user._id,
+                walletType: normalizedWalletType,
+                txType: "debit",
+                amount: totalAmount,
+                sourceType: "first-purchase-order",
+                sourceId: createdOrders[0]?._id || null,
+                description: `First purchase order payment (${createdOrders.length} item(s))`,
+                meta: {
+                    orderIds: createdOrders.map((order) => order._id),
+                    orderTo: orderTo || "self",
+                    directSellerId: directSellerId || "",
+                },
+            });
+            balanceAfter = walletLedger.balanceAfter;
+        }
 
         // MLM income trigger karo (non-blocking)
         try {
@@ -246,7 +267,7 @@ exports.placeFirstPurchase = async (req, res) => {
             totalAmount,
             totalBV,
             walletUsed: normalizedWalletType,
-            balanceAfter: walletLedger.balanceAfter,
+            balanceAfter: isRazorpay ? undefined : balanceAfter,
         });
 
     } catch (error) {

@@ -79,6 +79,7 @@ import OrderHistoryPage from '../pages/ProductOrder/OrderHistoryPage.jsx'
 import ProductWalletRequest from '../pages/ProductOrder/ProductWallletRequest.jsx'
 import ProductWalletTransaction from '../pages/ProductOrder/ProductWalletTransaction.jsx'
 import RepurchaseWalletTransaction from '../pages/ProductOrder/RepurchaseWalletTransaction.jsx'
+import PackageUpgrade from '../pages/PackageUpgrade.jsx'
 
 // ✅ Admin imports
 import AdminLayout from '../layouts/AdminLayout.jsx'
@@ -161,6 +162,7 @@ const MainRoutes = () => {
                 <Route path='orders/wallet-request' element={<ProductWalletRequest />} />
                 <Route path='orders/wallet-transaction' element={<ProductWalletTransaction />} />
                 <Route path='orders/repurchase-wallet-transaction' element={<RepurchaseWalletTransaction />} />
+                <Route path='package-upgrade' element={<PackageUpgrade />} />
 
                 <Route path='bonus/first' element={<Navigate to="/my-account/bonus/first/silver" replace />} />
                 <Route path='bonus/first/silver' element={<SilverMatching />} />

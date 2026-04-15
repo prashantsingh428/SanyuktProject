@@ -122,7 +122,7 @@ const closeRepurchasePool = async ({
                         processedBy,
                     },
                 ],
-                { session }
+                { session, ordered: true }
             );
 
             const closingDoc = poolClosingRows[0];

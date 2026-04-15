@@ -113,7 +113,7 @@ const creditWallet = async ({
         );
     }
 
-    const createdEntries = await WalletLedger.create(ledgerRows, { session });
+    const createdEntries = await WalletLedger.create(ledgerRows, { session, ordered: true });
     const ledgerEntry =
         createdEntries.find((entry) => entry.walletType === normalizedWalletType) ||
         createdEntries[0];
@@ -206,7 +206,7 @@ const debitWallet = async ({
         );
     }
 
-    const createdEntries = await WalletLedger.create(ledgerRows, { session });
+    const createdEntries = await WalletLedger.create(ledgerRows, { session, ordered: true });
     const ledgerEntry =
         createdEntries.find((entry) => entry.walletType === normalizedWalletType) ||
         createdEntries[0];

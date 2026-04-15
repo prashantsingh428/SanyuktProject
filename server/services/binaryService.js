@@ -5,10 +5,10 @@ const getLeftChildId = (user) => user?.leftChildId || user?.left || null;
 const getRightChildId = (user) => user?.rightChildId || user?.right || null;
 
 const resolveTotalLeftPV = (user) =>
-    Number(user?.totalLeftPV != null ? user.totalLeftPV : user?.leftTeamPV || 0);
+    Number(user?.totalLeftPV || user?.leftTeamPV || 0);
 
 const resolveTotalRightPV = (user) =>
-    Number(user?.totalRightPV != null ? user.totalRightPV : user?.rightTeamPV || 0);
+    Number(user?.totalRightPV || user?.rightTeamPV || 0);
 
 const resolveUsedLeftPV = (user) => Number(user?.usedLeftPV || 0);
 const resolveUsedRightPV = (user) => Number(user?.usedRightPV || 0);

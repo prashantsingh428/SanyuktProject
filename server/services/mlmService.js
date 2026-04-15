@@ -1,8 +1,19 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const Razorpay = require("razorpay");
+
+let razorpay;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+    razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET
+    });
+}
 
 const User = require("../models/User");
 const BinaryTree = require("../models/BinaryTree");
+const { distributeDirectIncome } = require("./incomeService");
 
 class MlmServiceError extends Error {
     constructor(statusCode, message, details) {
@@ -296,6 +307,42 @@ async function registerUserUnderSponsor(payload) {
         let result;
         const packageDetails = PACKAGE_DATA[payload?.packageType] || { bv: 0, pv: 0, capping: 0 };
 
+        // Razorpay Verification if paid plan
+        if (payload?.packageType !== 'none' && payload?.paymentMethod === 'razorpay') {
+            const { paymentId, razorpayOrderId, razorpaySignature } = payload;
+            
+            if (!paymentId || !razorpayOrderId || !razorpaySignature) {
+                throw createError(400, "Payment details are missing for the selected plan.");
+            }
+
+            const body = razorpayOrderId + "|" + paymentId;
+            const expectedSignature = crypto
+                .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+                .update(body)
+                .digest("hex");
+
+            if (expectedSignature !== razorpaySignature) {
+                throw createError(400, "Invalid payment signature. Transaction failed.");
+            }
+
+            // Optional: Verify amount from Razorpay
+            if (razorpay) {
+                try {
+                    const orderDetails = await razorpay.orders.fetch(razorpayOrderId);
+                    const expectedAmount = (PACKAGE_DATA[payload.packageType]?.price || parseInt(payload.packageType)) * 100;
+                    // Note: PACKAGE_DATA in this file doesn't have price, but the packageType string IS the price in this system
+                    const actualPrice = parseInt(payload.packageType);
+                    if (orderDetails.amount !== actualPrice * 100) {
+                        throw createError(400, "Payment amount mismatch.");
+                    }
+                } catch (err) {
+                    console.error("Razorpay verification error:", err);
+                    if (err instanceof MlmServiceError) throw err;
+                    // Skip if fetch fails but signature was valid (optional safety)
+                }
+            }
+        }
+
         await session.withTransaction(async () => {
             const sponsor = await validateSponsorId(sponsorId, { session });
             const existingUser = await applySession(
@@ -337,6 +384,7 @@ async function registerUserUnderSponsor(payload) {
                     parentId: placement.parentId,
                     position: placement.position,
                     password: hashedPassword,
+                    activeStatus: payload?.packageType !== 'none',
                     bv: packageDetails.bv,
                     pv: packageDetails.pv,
                     dailyCapping: packageDetails.capping,
@@ -346,6 +394,11 @@ async function registerUserUnderSponsor(payload) {
 
                 await user.save({ session });
                 await ensurePlacementLinked(user, { sponsorObjectId: sponsor._id, session });
+
+                // Distribute Direct Income if active
+                if (user.activeStatus) {
+                    await distributeDirectIncome({ userId: user._id, session });
+                }
             } else {
                 if (!user.parentId) {
                     placement = await resolvePlacementForSponsor(sponsor.memberId, {
@@ -370,6 +423,7 @@ async function registerUserUnderSponsor(payload) {
                     sponsorName: sponsor.userName,
                     parent: sponsor._id,
                     password: hashedPassword,
+                    activeStatus: payload?.packageType !== 'none',
                     bv: packageDetails.bv,
                     pv: packageDetails.pv,
                     dailyCapping: packageDetails.capping,
@@ -383,6 +437,11 @@ async function registerUserUnderSponsor(payload) {
 
                 await user.save({ session });
                 await ensurePlacementLinked(user, { sponsorObjectId: sponsor._id, session });
+
+                // Distribute Direct Income if active
+                if (user.activeStatus) {
+                    await distributeDirectIncome({ userId: user._id, session });
+                }
             }
 
             result = {

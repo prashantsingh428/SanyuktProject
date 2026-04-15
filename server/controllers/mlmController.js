@@ -15,6 +15,12 @@ const {
     resolveGenerationWalletCreditAmount,
 } = require("../services/generationWalletCappingService");
 const { getWalletBalance, createWalletLedgerEntry } = require("../utils/walletLedgerUtils");
+const {
+    resolveTotalLeftPV,
+    resolveTotalRightPV,
+    getLeftChildId,
+    getRightChildId,
+} = require("../services/binaryService");
 
 exports.calculateDailyMatchingBonus = async () => {
     try {
@@ -239,6 +245,11 @@ exports.getMLMStats = async (req, res) => {
             repurchaseWalletSummary.balance || 0
         );
 
+        const totalLeft = await exports.countDownline(getLeftChildId(user));
+        const totalRight = await exports.countDownline(getRightChildId(user));
+        const leftPV = resolveTotalLeftPV(user);
+        const rightPV = resolveTotalRightPV(user);
+
         const stats = {
             walletBalance: Number(user.walletBalance || 0),
             repurchaseWalletBalance: derivedRepurchaseWalletBalance,
@@ -261,6 +272,21 @@ exports.getMLMStats = async (req, res) => {
                 current: Number(user.pv || 0),
                 target: 10200,
             },
+            // Comprehensive Team Stats
+            totalLeft,
+            totalRight,
+            totalDownline: totalLeft + totalRight,
+            leftPV,
+            rightPV,
+            totalLeftPV: leftPV,
+            totalRightPV: rightPV,
+            binaryTree: {
+                leftPV,
+                rightPV,
+                totalLeft,
+                totalRight,
+                matchedPV: Number(user.matchedPV || 0),
+            }
         };
 
         return res.json(stats);
