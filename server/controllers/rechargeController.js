@@ -189,12 +189,20 @@ const performInspayRecharge = async (mobile, opId, amount, serviceType = 'mobile
         });
 
         let errorMessage = error.message;
+        let isIpError = false;
         if (error.response?.data) {
             errorMessage = error.response.data.message || error.response.data.opid || error.message;
+            isIpError = String(errorMessage).toLowerCase().includes('white list ip');
+        }
+
+        if (isIpError) {
+            console.error('\x1b[31m%s\x1b[0m', 'CRITICAL: IP Whitelisting required in Inspay/EkycHub panel.');
+            console.error('\x1b[31m%s\x1b[0m', `Message: ${errorMessage}`);
         }
 
         return {
             success: false,
+            isIpError,
             response: {
                 status: 'Failure',
                 message: errorMessage
@@ -252,6 +260,8 @@ const fetchLivePlansFromProvider = async ({ mobile, operator, circle, orderid })
         timeout: 25000
     });
 
+    rechargeDebugLog('Provider Response (Plans Fetch):', response.data);
+
     return {
         opcode,
         generatedOrderId,
@@ -280,6 +290,8 @@ const fetchOperatorCircleFromProvider = async ({ mobile, orderid }) => {
         },
         timeout: 20000
     });
+
+    rechargeDebugLog('Provider Response (Operator Fetch):', response.data);
 
     return {
         generatedOrderId,
@@ -433,8 +445,14 @@ exports.getRechargePlans = async (req, res) => {
         }
 
         if (providerResponse?.status !== 'Success' && providerResponse?.status !== 'success') {
+            const isIpError = String(providerResponse?.message || '').toLowerCase().includes('white list ip');
+            if (isIpError) {
+                console.error('\x1b[31m%s\x1b[0m', 'CRITICAL: IP Whitelisting required in Inspay/EkycHub panel.');
+                console.error('\x1b[31m%s\x1b[0m', `Message: ${providerResponse.message}`);
+            }
             return res.status(400).json({
                 success: false,
+                isIpError,
                 message: providerResponse?.message || 'Provider failed to fetch plans',
                 ...providerResponse
             });
@@ -499,8 +517,14 @@ exports.getOperatorAndCircle = async (req, res) => {
         });
 
         if (providerResponse?.status !== 'Success' && providerResponse?.status !== 'success') {
+            const isIpError = String(providerResponse?.message || '').toLowerCase().includes('white list ip');
+            if (isIpError) {
+                console.error('\x1b[31m%s\x1b[0m', 'CRITICAL: IP Whitelisting required in Inspay/EkycHub panel.');
+                console.error('\x1b[31m%s\x1b[0m', `Message: ${providerResponse.message}`);
+            }
             return res.status(400).json({
                 success: false,
+                isIpError,
                 message: providerResponse?.message || 'Provider failed to detect operator/circle',
                 ...providerResponse
             });
@@ -633,7 +657,7 @@ exports.verifyPayment = async (req, res) => {
 
             // Only process Inspay recharge if not a donation
             if (transaction.type !== 'donation') {
-                const { success, response, orderid } = await performInspayRecharge(
+                const { success, response, isIpError, orderid } = await performInspayRecharge(
                     transaction.rechargeNumber,
                     transaction.operator,
                     transaction.amount,
@@ -645,12 +669,14 @@ exports.verifyPayment = async (req, res) => {
                         transactionId,
                         providerMessage: response?.message,
                         providerOpid: response?.opid,
-                        providerStatus: response?.status
+                        providerStatus: response?.status,
+                        isIpError
                     });
                     transaction.status = 'failed';
                     await transaction.save();
                     return res.status(400).json({
                         success: false,
+                        isIpError,
                         message: response?.message || "Recharge failed",
                         error: response
                     });
@@ -723,7 +749,7 @@ exports.walletRecharge = async (req, res) => {
         }
 
         // Process recharge through Inspay
-        const { success, response, orderid } = await performInspayRecharge(
+        const { success, response, isIpError, orderid } = await performInspayRecharge(
             rechargeNumber,
             operator,
             amount,
@@ -733,6 +759,7 @@ exports.walletRecharge = async (req, res) => {
         if (!success) {
             return res.status(400).json({
                 success: false,
+                isIpError,
                 message: response?.message || "Recharge failed",
                 error: response
             });

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { addressData } from '../data/addressData';
 import { registerUser } from '../services/api/auth';
+import { ButtonLoader } from '../components/Loader';
 
 const RegistrationForm = () => {
     const navigate = useNavigate();
@@ -463,9 +464,9 @@ const RegistrationForm = () => {
                         <button
                             type="submit"
                             disabled={loading || !agreed}
-                            className={`luxury-button w-full relative z-10 flex items-center justify-center p-3.5 font-black tracking-widest text-sm ${loading || !agreed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`luxury-button w-full relative z-10 flex items-center justify-center p-3.5 font-black tracking-widest text-sm min-h-[52px] ${loading || !agreed ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            {loading ? 'PROCESSING...' : 'CREATE ACCOUNT'}
+                            {loading ? <ButtonLoader /> : 'CREATE ACCOUNT'}
                         </button>
 
                         <p className="mt-8 text-center text-[11px] md:text-xs font-black uppercase tracking-widest text-[#F5E6C8]/55">

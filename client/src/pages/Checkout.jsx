@@ -7,6 +7,7 @@ import { addressData } from '../data/addressData';
 import { ChevronDown, Search } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
+import { ButtonLoader } from '../components/Loader';
 
 const CheckoutPage = () => {
     const location = useLocation();
@@ -151,6 +152,13 @@ const CheckoutPage = () => {
         });
     };
 
+    const resolveRazorpayKeyId = (serverKey) => {
+        return (
+            String(import.meta.env.VITE_RAZORPAY_KEY_ID || '').trim() ||
+            String(serverKey || '').trim()
+        );
+    };
+
     const handlePlaceOrder = async () => {
         // Validate form fields with regex
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -212,7 +220,7 @@ const CheckoutPage = () => {
             if (!rpOrder || !rpOrder.id || !rpOrder.amount || !rpOrder.currency) {
                 throw new Error('Invalid payment order response from server');
             }
-            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            const razorpayKeyId = resolveRazorpayKeyId(rpOrder?.key);
             if (!razorpayKeyId) {
                 console.error("Razorpay key is missing in frontend env");
                 alert("Payment configuration error. Please contact support.");
@@ -760,17 +768,10 @@ const CheckoutPage = () => {
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={loading}
-                                className={`w-full py-4 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-xs font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''
+                                className={`w-full py-4 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-xs font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all min-h-[56px] ${loading ? 'opacity-70 cursor-not-allowed' : ''
                                     }`}
                             >
-                                {loading ? (
-                                    <div className="flex items-center justify-center gap-3">
-                                        <div className="w-4 h-4 border-2 border-[#0D0D0D] border-t-transparent rounded-full animate-spin"></div>
-                                        Processing...
-                                    </div>
-                                ) : (
-                                    'Place Order'
-                                )}
+                                {loading ? <ButtonLoader /> : 'Place Order'}
                             </button>
 
                             {/* Trust Badges */}

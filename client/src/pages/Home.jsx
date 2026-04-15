@@ -25,13 +25,9 @@ const QuickServices = React.lazy(() => import('./HomeComponents/QuickServices'))
 import ProductDetailsModal from '../components/ProductDetailsModal';
 import PaymentMethodModal from '../components/PaymentMethodModal';
 import BrowsePlansModal from '../components/BrowsePlansModal';
+import { SectionLoader } from '../components/Loader';
 
-// Simple loading fallback
-const SectionLoader = () => (
-    <div className="w-full py-20 flex items-center justify-center bg-[#0D0D0D]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C8A96A]"></div>
-    </div>
-);
+// Hero slides data
 
 const HomePage = () => {
     const navigate = useNavigate();

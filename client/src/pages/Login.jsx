@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { loginUser } from '../services/api/auth';
+import { ButtonLoader } from '../components/Loader';
 
 const UserLogin = () => {
     const navigate = useNavigate();
@@ -241,10 +242,10 @@ const UserLogin = () => {
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="luxury-button w-full relative z-10 flex items-center justify-center gap-3 p-4 disabled:opacity-50"
+                                            className="luxury-button w-full relative z-10 flex items-center justify-center gap-3 p-4 disabled:opacity-50 min-h-[56px]"
                                         >
-                                            <span className="relative z-10 flex items-center justify-center gap-3">
-                                                {isLoading ? 'Verifying...' : 'LOGIN'}
+                                            <span className="relative z-10 flex items-center justify-center gap-3 w-full h-full">
+                                                {isLoading ? <ButtonLoader /> : 'LOGIN'}
                                             </span>
                                         </button>
                                     </div>

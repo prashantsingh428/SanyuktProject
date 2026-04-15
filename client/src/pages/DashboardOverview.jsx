@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import api from '../api';
 import ProfileBanner from '../components/ProfileBanner';
+import { SectionLoader } from '../components/Loader';
 
 const firstNumber = (...values) => {
     for (const value of values) {
@@ -242,12 +243,7 @@ const DashboardOverview = () => {
     if (loading) {
         return (
             <div className="flex min-h-[68vh] items-center justify-center rounded-[2px] border border-[#c8a96a]/16 bg-[#111111]">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#2b2b2b] border-t-[#c8a96a]" />
-                    <span className="text-[11px] font-black uppercase tracking-[0.18em] text-[#c8a96a]">
-                        Loading Dashboard
-                    </span>
-                </div>
+                <SectionLoader text="Loading Dashboard" />
             </div>
         );
     }

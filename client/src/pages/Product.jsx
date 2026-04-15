@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { X as CloseIcon } from 'lucide-react';
 import ProductDetailsModal from '../components/ProductDetailsModal';
+import { SectionLoader } from '../components/Loader';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
@@ -246,10 +247,7 @@ const ProductsPage = () => {
             {/* Products Grid */}
             <div className="max-w-7xl mx-auto px-4 py-4">
                 {loading ? (
-                    <div className="text-center py-10">
-                        <div className="inline-block animate-spin w-12 h-12 border-4 border-[#C8A96A] border-t-transparent shadow-[0_0_15px_rgba(200,169,106,0.3)]"></div>
-                        <p className="mt-4 text-[#C8A96A] font-medium tracking-widest uppercase text-xs">Loading Excellence...</p>
-                    </div>
+                    <SectionLoader text="Loading Excellence..." />
                 ) : filteredProducts.length === 0 ? (
                     <div className="text-center py-10 luxury-box bg-[#1A1A1A]">
                         <div className="text-6xl mb-4">✨</div>

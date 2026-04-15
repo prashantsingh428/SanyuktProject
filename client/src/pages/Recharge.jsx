@@ -35,6 +35,7 @@ import {
     dthOperators,
     mobileOperators,
 } from "../data/operators";
+import { ButtonLoader, SectionLoader } from "../components/Loader";
 
 const Recharge = () => {
     const rechargeDebugEnabled = String(import.meta.env.VITE_RECHARGE_DEBUG || "")
@@ -310,7 +311,11 @@ const Recharge = () => {
         } catch (error) {
             console.error("Operator detect failed:", error);
             setDetectedOperatorInfo(null);
-            if (showErrorToast) {
+            
+            const isIpError = error.response?.data?.isIpError;
+            if (isIpError) {
+                toast.error("API Error: IP Address not whitelisted. Please update IP in Inspay panel.", { duration: 6000 });
+            } else if (showErrorToast) {
                 toast.error("Operator detection failed. Please select network manually.");
             }
             return { detected: false, operatorId: "", circleCode: "" };
@@ -391,9 +396,15 @@ const Recharge = () => {
             console.error("Live plan fetch failed:", error);
             setMobilePlans([]);
             setHasFetchedPlans(true);
-            toast.error(
-                error?.response?.data?.message || "Unable to fetch plans right now."
-            );
+            
+            const isIpError = error.response?.data?.isIpError;
+            if (isIpError) {
+                toast.error("API Error: IP Address not whitelisted. Please update IP in Inspay panel.", { duration: 6000 });
+            } else {
+                toast.error(
+                    error?.response?.data?.message || "Unable to fetch plans right now."
+                );
+            }
         } finally {
             setPlansLoading(false);
         }
@@ -711,11 +722,17 @@ const Recharge = () => {
                 data: error?.response?.data,
                 message: error?.message,
             });
-            toast.error(
-                error?.response?.data?.message ||
-                "Something went wrong. Please try again.",
-                { id: toastId }
-            );
+
+            const isIpError = error.response?.data?.isIpError;
+            if (isIpError) {
+                toast.error("API Error: IP Address not whitelisted. Please update IP in Inspay panel.", { id: toastId, duration: 8000 });
+            } else {
+                toast.error(
+                    error?.response?.data?.message ||
+                    "Something went wrong. Please try again.",
+                    { id: toastId }
+                );
+            }
         } finally {
             setIsProcessingPayment(false);
         }
@@ -807,7 +824,118 @@ const Recharge = () => {
                     </p>
                 </section>
 
-                {/* 3. RECHARGE SERVICES SECTION - Fully Responsive */}
+                {/* 3. DONATION SECTION - Fully Responsive */}
+                <section className='mb-8 relative'>
+                    <Motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className='bg-gradient-to-br from-[#1A1A1A] via-[#0D0D0D] to-[#121212] border border-[#C8A96A]/20 rounded-2xl shadow-2xl overflow-hidden'
+                    >
+                        <div className='p-4 md:p-6 lg:p-8'>
+                            <div className='max-w-5xl mx-auto'>
+                                {/* Header */}
+                                <div className='text-center mb-6 md:mb-8'>
+                                    <div className='inline-flex items-center gap-2 py-1 px-3 bg-[#C8A96A]/10 backdrop-blur-md border border-[#C8A96A]/20 rounded-full mb-3'>
+                                        <Heart className='w-3 h-3 md:w-4 md:h-4 text-[#C8A96A]' />
+                                        <span className='text-[#C8A96A] font-bold text-[9px] md:text-[10px] uppercase tracking-[0.3em]'>
+                                            The Spirit of Giving
+                                        </span>
+                                    </div>
+                                    <h2 className='text-2xl md:text-3xl font-serif font-bold text-[#F5E6C8] mb-2'>
+                                        Empower <span className='text-[#C8A96A]'>Generations</span>
+                                    </h2>
+                                    <p className='text-xs md:text-sm text-[#F5E6C8]/60 max-w-2xl mx-auto font-light'>
+                                        Your generosity fuels our mission of collective growth.
+                                    </p>
+                                </div>
+
+                                {/* Features Grid - Responsive */}
+                                <div className='grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8'>
+                                    {[
+                                        { title: "Secure Vault", icon: Shield, subtitle: "ENCRYPTED" },
+                                        { title: "Tax Benefits", icon: Receipt, subtitle: "CERTIFIED" },
+                                        { title: "Community", icon: Users, subtitle: "GLOBAL" },
+                                        { title: "Instant Impact", icon: Zap, subtitle: "VERIFIED" },
+                                    ].map((feature, i) => (
+                                        <div key={i} className='bg-[#1A1A1A]/50 backdrop-blur-xl p-3 border border-[#C8A96A]/10 rounded-xl'>
+                                            <div className='w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] rounded-lg flex items-center justify-center mb-2'>
+                                                <feature.icon className='w-4 h-4 md:w-5 md:h-5 text-[#0D0D0D]' />
+                                            </div>
+                                            <h4 className='text-[#F5E6C8] font-bold text-xs md:text-sm'>{feature.title}</h4>
+                                            <p className='text-[#C8A96A]/40 text-[8px] md:text-[9px] mt-1 font-black tracking-widest uppercase'>
+                                                {feature.subtitle}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Responsive Grid for Donation Content */}
+                                <div className='grid lg:grid-cols-5 gap-4 md:gap-6'>
+                                    <div className='lg:col-span-3 space-y-4'>
+                                        <div className='bg-[#1A1A1A]/80 backdrop-blur-3xl rounded-2xl p-4 border border-[#C8A96A]/10'>
+                                            <div className='mb-3'>
+                                                <span className='inline-block px-3 py-1 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-[8px] md:text-[9px] font-black uppercase tracking-widest rounded-md mb-2'>
+                                                    Exclusive
+                                                </span>
+                                                <h3 className='text-lg md:text-xl font-serif font-bold text-[#F5E6C8]'>Direct Contributions</h3>
+                                            </div>
+                                            <div className='bg-[#0D0D0D] rounded-xl p-3 border border-[#C8A96A]/20 mb-3'>
+                                                <p className='text-[#C8A96A] text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] mb-2'>DIGITAL UPI ADDRESS</p>
+                                                <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3'>
+                                                    <span className='text-xs md:text-sm font-mono font-bold text-[#F5E6C8]/90 break-all'>
+                                                        20260325575843-iservuqrsbrp@cbin
+                                                    </span>
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText("20260325575843-iservuqrsbrp@cbin");
+                                                            toast.success("UPI Copied!");
+                                                        }}
+                                                        className='px-4 py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-bold text-[10px] uppercase tracking-widest rounded-lg'
+                                                    >
+                                                        Copy
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {userData && (
+                                            <div className='bg-[#C8A96A]/5 backdrop-blur-3xl rounded-2xl p-4 border border-[#C8A96A]/10'>
+                                                <h4 className='text-[#F5E6C8] font-bold text-xs uppercase tracking-widest mb-3'>Personal Referral Hub</h4>
+                                                <div className='bg-[#0D0D0D]/50 rounded-xl p-3 border border-[#C8A96A]/10 flex flex-col sm:flex-row items-start sm:items-center gap-3'>
+                                                    <p className='flex-1 text-[#F5E6C8] font-mono text-[10px] md:text-[11px] truncate w-full'>
+                                                        {window.location.origin + "/donate?for=" + (userData.memberId || userData._id)}
+                                                    </p>
+                                                    <div className='flex gap-2'>
+                                                        <button onClick={() => {
+                                                            navigator.clipboard.writeText(window.location.origin + "/donate?for=" + (userData.memberId || userData._id));
+                                                            toast.success("Link Copied!");
+                                                        }} className='p-2 bg-[#1A1A1A] rounded-lg text-[#C8A96A] border border-[#C8A96A]/10'>
+                                                            <Copy className='w-4 h-4' />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className='lg:col-span-2 space-y-4'>
+                                        <div className='bg-[#1A1A1A] p-4 rounded-2xl border border-[#C8A96A]/20 text-center'>
+                                            <div className='bg-[#0D0D0D] p-3 rounded-xl border border-[#C8A96A]/40 inline-block mx-auto mb-3'>
+                                                <img src='/qr.jpeg' alt='QR' className='w-24 h-24 md:w-32 md:h-32 object-contain' onError={(e) => e.target.src = "https://via.placeholder.com/150?text=SCAN"} />
+                                            </div>
+                                            <div className='flex justify-center scale-90 md:scale-100'>
+                                                <RazorpayPaymentButton buttonId='pl_SROihejcCAh8Vm' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Motion.div>
+                </section>
+
+                {/* 4. RECHARGE SERVICES SECTION - Fully Responsive */}
                 <section className='mb-4 max-w-6xl mx-auto'>
                     <div className='bg-[#1A1A1A] rounded-none border border-[#C8A96A]/20 overflow-hidden shadow-2xl'>
                         {/* Responsive Tabs */}
@@ -945,9 +1073,9 @@ const Recharge = () => {
                                                                 !/^\d{10}$/.test(mobileNumber) ||
                                                                 !selectedCircle
                                                             }
-                                                            className='flex-1 py-2.5 bg-[#0D0D0D] border border-[#C8A96A]/40 text-[#C8A96A] font-black text-[11px] uppercase tracking-wider rounded-lg disabled:opacity-40 disabled:cursor-not-allowed'
+                                                            className='flex-1 py-2.5 bg-[#0D0D0D] border border-[#C8A96A]/40 text-[#C8A96A] font-black text-[11px] uppercase tracking-wider rounded-lg disabled:opacity-40 disabled:cursor-not-allowed relative min-h-[42px]'
                                                         >
-                                                            {plansLoading ? "Fetching Plans..." : "Fetch Plans"}
+                                                            {plansLoading ? <ButtonLoader color="#C8A96A" /> : "Fetch Plans"}
                                                         </button>
                                                     </div>
 
@@ -977,8 +1105,8 @@ const Recharge = () => {
                                                         />
                                                     </div>
 
-                                                    <button type='submit' disabled={isProcessingPayment} className='w-full py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black text-xs md:text-sm uppercase tracking-wider rounded-none disabled:opacity-50'>
-                                                        {isProcessingPayment ? "Processing..." : "Recharge Now"}
+                                                    <button type='submit' disabled={isProcessingPayment} className='w-full py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black text-xs md:text-sm uppercase tracking-wider rounded-none disabled:opacity-50 relative min-h-[40px]'>
+                                                        {isProcessingPayment ? <ButtonLoader /> : "Recharge Now"}
                                                     </button>
                                                 </form>
                                             </div>
@@ -998,7 +1126,7 @@ const Recharge = () => {
                                                     ) : !/^\d{10}$/.test(mobileNumber) ? (
                                                         <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>Enter mobile number first</p>
                                                     ) : plansLoading ? (
-                                                        <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>Loading plans...</p>
+                                                        <SectionLoader text="Loading live plans..." />
                                                     ) : !hasFetchedPlans ? (
                                                         <p className='text-center text-[#F5E6C8]/40 text-xs py-8'>Tap "Fetch Plans" to load plans</p>
                                                     ) : mobilePlans.length === 0 ? (
@@ -1085,8 +1213,8 @@ const Recharge = () => {
                                                         required
                                                     />
                                                 </div>
-                                                <button type='submit' disabled={isProcessingPayment} className='w-full py-3 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black rounded-none text-sm uppercase tracking-wider'>
-                                                    {isProcessingPayment ? "Processing..." : "Recharge Now"}
+                                                <button type='submit' disabled={isProcessingPayment} className='w-full py-3 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-black rounded-none text-sm uppercase tracking-wider relative min-h-[48px]'>
+                                                    {isProcessingPayment ? <ButtonLoader /> : "Recharge Now"}
                                                 </button>
                                             </form>
                                         </div>
@@ -1095,117 +1223,6 @@ const Recharge = () => {
                             </AnimatePresence>
                         </div>
                     </div>
-                </section>
-
-                {/* 4. DONATION SECTION - Fully Responsive */}
-                <section className='mb-8 relative'>
-                    <Motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className='bg-gradient-to-br from-[#1A1A1A] via-[#0D0D0D] to-[#121212] border border-[#C8A96A]/20 rounded-2xl shadow-2xl overflow-hidden'
-                    >
-                        <div className='p-4 md:p-6 lg:p-8'>
-                            <div className='max-w-5xl mx-auto'>
-                                {/* Header */}
-                                <div className='text-center mb-6 md:mb-8'>
-                                    <div className='inline-flex items-center gap-2 py-1 px-3 bg-[#C8A96A]/10 backdrop-blur-md border border-[#C8A96A]/20 rounded-full mb-3'>
-                                        <Heart className='w-3 h-3 md:w-4 md:h-4 text-[#C8A96A]' />
-                                        <span className='text-[#C8A96A] font-bold text-[9px] md:text-[10px] uppercase tracking-[0.3em]'>
-                                            The Spirit of Giving
-                                        </span>
-                                    </div>
-                                    <h2 className='text-2xl md:text-3xl font-serif font-bold text-[#F5E6C8] mb-2'>
-                                        Empower <span className='text-[#C8A96A]'>Generations</span>
-                                    </h2>
-                                    <p className='text-xs md:text-sm text-[#F5E6C8]/60 max-w-2xl mx-auto font-light'>
-                                        Your generosity fuels our mission of collective growth.
-                                    </p>
-                                </div>
-
-                                {/* Features Grid - Responsive */}
-                                <div className='grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8'>
-                                    {[
-                                        { title: "Secure Vault", icon: Shield, subtitle: "ENCRYPTED" },
-                                        { title: "Tax Benefits", icon: Receipt, subtitle: "CERTIFIED" },
-                                        { title: "Community", icon: Users, subtitle: "GLOBAL" },
-                                        { title: "Instant Impact", icon: Zap, subtitle: "VERIFIED" },
-                                    ].map((feature, i) => (
-                                        <div key={i} className='bg-[#1A1A1A]/50 backdrop-blur-xl p-3 border border-[#C8A96A]/10 rounded-xl'>
-                                            <div className='w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-[#C8A96A] to-[#D4AF37] rounded-lg flex items-center justify-center mb-2'>
-                                                <feature.icon className='w-4 h-4 md:w-5 md:h-5 text-[#0D0D0D]' />
-                                            </div>
-                                            <h4 className='text-[#F5E6C8] font-bold text-xs md:text-sm'>{feature.title}</h4>
-                                            <p className='text-[#C8A96A]/40 text-[8px] md:text-[9px] mt-1 font-black tracking-widest uppercase'>
-                                                {feature.subtitle}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Responsive Grid for Donation Content */}
-                                <div className='grid lg:grid-cols-5 gap-4 md:gap-6'>
-                                    <div className='lg:col-span-3 space-y-4'>
-                                        <div className='bg-[#1A1A1A]/80 backdrop-blur-3xl rounded-2xl p-4 border border-[#C8A96A]/10'>
-                                            <div className='mb-3'>
-                                                <span className='inline-block px-3 py-1 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-[8px] md:text-[9px] font-black uppercase tracking-widest rounded-md mb-2'>
-                                                    Exclusive
-                                                </span>
-                                                <h3 className='text-lg md:text-xl font-serif font-bold text-[#F5E6C8]'>Direct Contributions</h3>
-                                            </div>
-                                            <div className='bg-[#0D0D0D] rounded-xl p-3 border border-[#C8A96A]/20 mb-3'>
-                                                <p className='text-[#C8A96A] text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] mb-2'>DIGITAL UPI ADDRESS</p>
-                                                <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3'>
-                                                    <span className='text-xs md:text-sm font-mono font-bold text-[#F5E6C8]/90 break-all'>
-                                                        20260325575843-iservuqrsbrp@cbin
-                                                    </span>
-                                                    <button
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText("20260325575843-iservuqrsbrp@cbin");
-                                                            toast.success("UPI Copied!");
-                                                        }}
-                                                        className='px-4 py-2 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] font-bold text-[10px] uppercase tracking-widest rounded-lg'
-                                                    >
-                                                        Copy
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {userData && (
-                                            <div className='bg-[#C8A96A]/5 backdrop-blur-3xl rounded-2xl p-4 border border-[#C8A96A]/10'>
-                                                <h4 className='text-[#F5E6C8] font-bold text-xs uppercase tracking-widest mb-3'>Personal Referral Hub</h4>
-                                                <div className='bg-[#0D0D0D]/50 rounded-xl p-3 border border-[#C8A96A]/10 flex flex-col sm:flex-row items-start sm:items-center gap-3'>
-                                                    <p className='flex-1 text-[#F5E6C8] font-mono text-[10px] md:text-[11px] truncate w-full'>
-                                                        {window.location.origin + "/donate?for=" + (userData.memberId || userData._id)}
-                                                    </p>
-                                                    <div className='flex gap-2'>
-                                                        <button onClick={() => {
-                                                            navigator.clipboard.writeText(window.location.origin + "/donate?for=" + (userData.memberId || userData._id));
-                                                            toast.success("Link Copied!");
-                                                        }} className='p-2 bg-[#1A1A1A] rounded-lg text-[#C8A96A] border border-[#C8A96A]/10'>
-                                                            <Copy className='w-4 h-4' />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className='lg:col-span-2 space-y-4'>
-                                        <div className='bg-[#1A1A1A] p-4 rounded-2xl border border-[#C8A96A]/20 text-center'>
-                                            <div className='bg-[#0D0D0D] p-3 rounded-xl border border-[#C8A96A]/40 inline-block mx-auto mb-3'>
-                                                <img src='/qr.jpeg' alt='QR' className='w-24 h-24 md:w-32 md:h-32 object-contain' onError={(e) => e.target.src = "https://via.placeholder.com/150?text=SCAN"} />
-                                            </div>
-                                            <div className='flex justify-center scale-90 md:scale-100'>
-                                                <RazorpayPaymentButton buttonId='pl_SROihejcCAh8Vm' />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Motion.div>
                 </section>
             </main>
 

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../api';
+import { ButtonLoader, SectionLoader } from '../../components/Loader';
 
 const TDS_RATE = 0.05;
 const PROCESSING_RATE = 0.02;
@@ -378,10 +379,14 @@ const WalletWithdrawalPage = ({
                                 <button
                                     type="submit"
                                     disabled={!canSubmit || submitting}
-                                    className="inline-flex items-center justify-center gap-2 rounded-[2px] bg-[#C8A96A] px-6 py-3 text-[12px] font-black uppercase tracking-[0.18em] text-[#0D0D0D] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="inline-flex items-center justify-center gap-2 rounded-[2px] bg-[#C8A96A] px-6 py-3 text-[12px] font-black uppercase tracking-[0.18em] text-[#0D0D0D] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60 min-h-[46px] w-full"
                                 >
-                                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                                    Submit Withdrawal
+                                    {submitting ? <ButtonLoader /> : (
+                                        <>
+                                            <CheckCircle2 className="h-4 w-4" />
+                                            Submit Withdrawal
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -429,7 +434,7 @@ const WalletWithdrawalPage = ({
 
                             <div className="p-5">
                                 {loading ? (
-                                    <div className="py-10 text-center text-sm text-[#F5E6C8]/55">Loading report...</div>
+                                    <SectionLoader text="Loading report..." />
                                 ) : history.length === 0 ? (
                                     <div className="py-10 text-center text-sm text-[#F5E6C8]/55">No withdrawal records available.</div>
                                 ) : (

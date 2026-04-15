@@ -68,6 +68,10 @@ const loadRazorpay = () =>
         document.body.appendChild(script);
     });
 
+const resolveRazorpayKeyId = (serverKey) =>
+    String(import.meta.env.VITE_RAZORPAY_KEY_ID || '').trim() ||
+    String(serverKey || '').trim();
+
 // ── Withdrawal Calculation ───────────────────────────────────────────────
 const calcWithdrawal = (amount) => {
     const tds = Math.round(amount * TDS_RATE);
@@ -340,7 +344,7 @@ const WalletManagement = ({ defaultTab = 'topup' }) => {
                 return;
             }
 
-            const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+            const razorpayKeyId = resolveRazorpayKeyId(orderData?.key);
             if (!razorpayKeyId) {
                 console.error("Razorpay key is missing in frontend env");
                 alert("Payment configuration error. Please contact support.");

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Search, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import api from '../api';
 import toast from 'react-hot-toast';
+import { SectionLoader } from './Loader';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -100,9 +101,7 @@ const UserTable = ({ title, type, endpoint }) => {
 
             <div className="space-y-3 md:hidden">
                 {loading ? (
-                    <div className="flex min-h-[220px] items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#c8a96a]"></div>
-                    </div>
+                    <SectionLoader text="Loading records..." />
                 ) : currentData.length === 0 ? (
                     <div className="min-h-[220px] rounded-2xl border border-dashed border-[#c8a96a]/14 px-4 py-12 text-center text-[#f5e6c8]/55 font-bold uppercase text-[12px] tracking-widest">
                         No records found
@@ -164,8 +163,8 @@ const UserTable = ({ title, type, endpoint }) => {
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan="6" className="py-20 text-center">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500 mx-auto"></div>
+                                <td colSpan="6" className="py-10 text-center">
+                                    <SectionLoader text="Loading records..." />
                                 </td>
                             </tr>
                         ) : currentData.length === 0 ? (
