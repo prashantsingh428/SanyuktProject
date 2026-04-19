@@ -17,6 +17,9 @@ const ContactUs = () => {
     // Fetch User Profile to pre-fill form
     useEffect(() => {
         const fetchProfile = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return; // ✅ Exit if not logged in
+
             try {
                 const { data } = await api.get('/auth/profile');
                 if (data?.user) {
