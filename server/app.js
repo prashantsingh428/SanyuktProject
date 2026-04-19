@@ -96,6 +96,7 @@ app.use("/api/grievance", require("./routes/grievanceRoutes"));
 app.use("/api/recharge", require("./routes/rechargeRoutes"));
 app.use("/api/news", require("./routes/newsRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes"));
 
 // PRODUCTION: Serve static files from React build
 if (process.env.NODE_ENV === 'production') {

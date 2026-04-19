@@ -26,6 +26,8 @@ import ProductDetailsModal from '../components/ProductDetailsModal';
 import PaymentMethodModal from '../components/PaymentMethodModal';
 import BrowsePlansModal from '../components/BrowsePlansModal';
 import { SectionLoader } from '../components/Loader';
+import useRazorpay from '../hooks/useRazorpay';
+
 
 // Hero slides data
 
@@ -51,7 +53,9 @@ const HomePage = () => {
     // Payment Modal State
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [walletBalance, setWalletBalance] = useState(0);
+    const { initiatePayment, isProcessing: isRazorpayProcessing } = useRazorpay();
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
 
     // E-commerce state
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -495,113 +499,30 @@ const HomePage = () => {
                 setIsProcessingPayment(false);
             }
         } else if (method === 'online') {
-            // Razorpay logic
-            try {
-                setIsProcessingPayment(true);
-                const toastId = toast.loading("Initiating secure payment...");
-
-                // 1. Create Order on backend
-                const { data: orderData } = await api.post('/recharge/create-order', {
-                    amount: Number(amount),
+            const result = await initiatePayment({
+                amount: Number(amount),
+                description: "Mobile Recharge",
+                metadata: {
                     type: 'mobile',
                     operator,
                     rechargeNumber: mobileNumber
-                });
-
-                if (!orderData.success) {
-                    toast.error("Failed to initiate order", { id: toastId });
-                    setIsProcessingPayment(false);
-                    return;
+                },
+                prefill: {
+                    contact: (mobileNumber || "").toString().replace(/\D/g, '').slice(-10)
                 }
-                if (!orderData?.order?.id || !orderData?.order?.amount) {
-                    throw new Error("Invalid payment order response from server");
-                }
+            });
 
-                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
-                if (!razorpayKeyId) {
-                    console.error("Razorpay key is missing in frontend env");
-                    alert("Payment configuration error. Please contact support.");
-                    setIsProcessingPayment(false);
-                    return;
-                }
-
-                toast.dismiss(toastId);
-
-                // 2. Open Razorpay Checkout Widget
-                const options = {
-                    key: razorpayKeyId,
-                    amount: orderData.order.amount,
-                    currency: "INR",
-                    name: "Sanyukt Parivaar",
-                    description: "Mobile Recharge",
-                    order_id: orderData.order.id,
-                    handler: async function (response) {
-                        if (!response || !response.razorpay_payment_id) {
-                            console.error("Invalid Razorpay response", response);
-                            alert("Payment failed. Try again.");
-                            setIsProcessingPayment(false);
-                            return;
-                        }
-
-                        try {
-                            const verifyToast = toast.loading("Verifying payment...");
-
-                            // 3. Verify Payment
-                            const { data: verifyData } = await api.post('/recharge/verify-payment', {
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                transactionId: orderData.transactionId
-                            });
-                            if (!verifyData || typeof verifyData !== "object") {
-                                throw new Error("Invalid verification response from server");
-                            }
-
-                            if (verifyData.success) {
-                                toast.success("Recharge successful!", { id: verifyToast });
-                                setMobileNumber('');
-                                setOperator('');
-                                setAmount('');
-                                setShowPaymentModal(false);
-                            } else {
-                                toast.error("Payment verification failed", { id: verifyToast });
-                            }
-                        } catch (err) {
-                            console.error(err);
-                            toast.error("Error verifying payment");
-                        } finally {
-                            setIsProcessingPayment(false);
-                        }
-                    },
-                    modal: {
-                        ondismiss: function () {
-                            setIsProcessingPayment(false);
-                        }
-                    },
-                    prefill: {
-                        name: "Sanyukt Member",
-                        email: "info@sanyuktparivaar.com",
-                        contact: (mobileNumber || "").toString().replace(/\D/g, '').slice(-10)
-                    },
-                    theme: {
-                        color: "#C9A84C"
-                    }
-                };
-
-                const rzp1 = new window.Razorpay(options);
-                rzp1.on('payment.failed', function (response) {
-                    toast.error(`Payment Failed: ${response.error.description}`);
-                    setIsProcessingPayment(false);
-                });
-                rzp1.open();
-
-            } catch (error) {
-                console.error("Recharge Error:", error);
-                toast.error(error?.response?.data?.message || "Something went wrong. Please try again.");
-                setIsProcessingPayment(false);
+            if (result?.success) {
+                // If you want to trigger additional logic (like the actual recharge API)
+                // you can do it here or handle it in the backend webhook/verify call.
+                setMobileNumber('');
+                setOperator('');
+                setAmount('');
+                setShowPaymentModal(false);
             }
         }
     };
+
 
     const openPlanPopup = () => {
         setShowPlansModal(true);

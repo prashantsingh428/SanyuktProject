@@ -8,6 +8,8 @@ import { ChevronDown, Search } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
 import { ButtonLoader } from '../components/Loader';
+import useRazorpay from '../hooks/useRazorpay';
+
 
 const CheckoutPage = () => {
     const location = useLocation();
@@ -19,6 +21,8 @@ const CheckoutPage = () => {
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const { initiatePayment, isProcessing: isRazorpayProcessing } = useRazorpay();
+
 
     // State for dropdowns
     const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
@@ -130,34 +134,7 @@ const CheckoutPage = () => {
         }
     };
 
-    const loadRazorpayScript = () => {
-        return new Promise((resolve) => {
-            if (window.Razorpay) {
-                resolve(true);
-                return;
-            }
 
-            const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
-            if (existingScript) {
-                existingScript.addEventListener('load', () => resolve(true), { once: true });
-                existingScript.addEventListener('error', () => resolve(false), { once: true });
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-            script.onload = () => resolve(true);
-            script.onerror = () => resolve(false);
-            document.body.appendChild(script);
-        });
-    };
-
-    const resolveRazorpayKeyId = (serverKey) => {
-        return (
-            String(import.meta.env.VITE_RAZORPAY_KEY_ID || '').trim() ||
-            String(serverKey || '').trim()
-        );
-    };
 
     const handlePlaceOrder = async () => {
         // Validate form fields with regex
@@ -206,89 +183,37 @@ const CheckoutPage = () => {
     };
 
     const handleRazorpayPayment = async () => {
-        setLoading(true);
         try {
-            const isLoaded = await loadRazorpayScript();
-            if (!isLoaded) {
-                setSnackbar({ open: true, message: 'Razorpay SDK failed to load. Are you online?', severity: 'error' });
-                setLoading(false);
-                return;
-            }
-
-            // 1. Create order on server
-            const { data: rpOrder } = await api.post('/orders/razorpay-order', { amount: total });
-            if (!rpOrder || !rpOrder.id || !rpOrder.amount || !rpOrder.currency) {
-                throw new Error('Invalid payment order response from server');
-            }
-            const razorpayKeyId = resolveRazorpayKeyId(rpOrder?.key);
-            if (!razorpayKeyId) {
-                console.error("Razorpay key is missing in frontend env");
-                alert("Payment configuration error. Please contact support.");
-                setLoading(false);
-                return;
-            }
-
-            const options = {
-                key: razorpayKeyId,
-                amount: rpOrder.amount,
-                currency: rpOrder.currency,
-                name: "Sanyukt Parivaar",
+            const result = await initiatePayment({
+                amount: total,
                 description: `Order for ${product.name}`,
-                image: `${API_URL}/logo.png?v=20260403`,
-                order_id: rpOrder.id,
-                handler: async (response) => {
-                    if (!response || !response.razorpay_payment_id) {
-                        console.error("Invalid Razorpay response", response);
-                        alert("Payment failed. Try again.");
-                        setLoading(false);
-                        return;
-                    }
-
-                    try {
-                        // 2. Verification and Order Finalization
-                        await createOrder({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        });
-                    } catch (err) {
-                        console.error('Order finalization failed:', err);
-                        setSnackbar({ open: true, message: 'Payment captured but order finalization failed. Please contact support.', severity: 'error' });
-                        setLoading(false);
-                    }
+                metadata: {
+                    productId: product?._id || product?.id,
+                    type: 'product_order'
                 },
                 prefill: {
                     name: shippingInfo.fullName,
                     email: shippingInfo.email,
                     contact: shippingInfo.phone,
-                },
-                theme: {
-                    color: "#C8A96A",
-                },
-                modal: {
-                    ondismiss: () => {
-                        setLoading(false);
-                    }
                 }
-            };
-
-            const rzp = new window.Razorpay(options);
-            rzp.on('payment.failed', function (response) {
-                const reason =
-                    response?.error?.description ||
-                    response?.error?.reason ||
-                    response?.error?.code ||
-                    'Payment failed. Please try again.';
-                setSnackbar({ open: true, message: `Payment Failed: ${reason}`, severity: 'error' });
-                setLoading(false);
             });
-            rzp.open();
+
+            if (result?.success) {
+                // Verification is already handled by the hook
+                await createOrder({
+                    razorpay_order_id: result.payment.razorpayOrderId,
+                    razorpay_payment_id: result.payment.razorpayPaymentId,
+                    razorpay_signature: result.payment.razorpaySignature
+                });
+            } else if (result?.message !== "Payment cancelled") {
+                setSnackbar({ open: true, message: result?.message || 'Payment failed', severity: 'error' });
+            }
         } catch (error) {
             console.error('Razorpay payment error:', error);
             setSnackbar({ open: true, message: 'Error initiating payment. Please try again.', severity: 'error' });
-            setLoading(false);
         }
     };
+
 
     const createOrder = async (paymentDetails = {}) => {
         setLoading(true);
@@ -764,15 +689,15 @@ const CheckoutPage = () => {
                                 </div>
                             </div>
 
-                            {/* Place Order Button */}
                             <button
                                 onClick={handlePlaceOrder}
-                                disabled={loading}
-                                className={`w-full py-4 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-xs font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all min-h-[56px] ${loading ? 'opacity-70 cursor-not-allowed' : ''
+                                disabled={loading || isRazorpayProcessing}
+                                className={`w-full py-4 bg-gradient-to-r from-[#C8A96A] to-[#D4AF37] text-[#0D0D0D] text-xs font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all min-h-[56px] ${loading || isRazorpayProcessing ? 'opacity-70 cursor-not-allowed' : ''
                                     }`}
                             >
-                                {loading ? <ButtonLoader /> : 'Place Order'}
+                                {loading || isRazorpayProcessing ? <ButtonLoader /> : 'Place Order'}
                             </button>
+
 
                             {/* Trust Badges */}
                             <div className="mt-6 pt-6 border-t border-[#C8A96A]/10">
