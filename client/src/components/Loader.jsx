@@ -3,10 +3,10 @@ import React from 'react';
 /**
  * A small, centered spinner for use inside buttons.
  */
-export const ButtonLoader = ({ color = '#0D0D0D' }) => (
+export const ButtonLoader = ({ color = '#C8A96A' }) => (
     <div className="flex items-center justify-center w-full h-full">
         <div 
-            className="w-5 h-5 animate-spin rounded-full border-2 border-transparent border-t-current"
+            className="w-6 h-6 animate-spin rounded-full border-[3px] border-[#C8A96A]/20 border-t-current"
             style={{ color }}
         />
     </div>

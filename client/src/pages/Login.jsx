@@ -242,10 +242,10 @@ const UserLogin = () => {
                                         <button
                                             type="submit"
                                             disabled={isLoading}
-                                            className="luxury-button w-full relative z-10 flex items-center justify-center gap-3 p-4 disabled:opacity-50 min-h-[56px]"
+                                            className="luxury-button w-full relative z-10 flex items-center justify-center gap-3 p-4 disabled:opacity-50 min-h-[56px] bg-[#C8A96A] text-[#0D0D0D]"
                                         >
-                                            <span className="relative z-10 flex items-center justify-center gap-3 w-full h-full">
-                                                {isLoading ? <ButtonLoader /> : 'LOGIN'}
+                                            <span className="relative z-10 flex items-center justify-center gap-3 w-full h-full font-black">
+                                                {isLoading ? <ButtonLoader color="#0D0D0D" /> : 'LOGIN'}
                                             </span>
                                         </button>
                                     </div>
