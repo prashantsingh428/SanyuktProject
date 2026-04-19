@@ -33,6 +33,7 @@ const incomeHistorySchema = new mongoose.Schema({
             'car_fund',
             'travel_fund',
             'bike_fund',
+            'RechargeReward',
         ],
         required: true
     },
