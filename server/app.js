@@ -82,8 +82,10 @@ app.use("/api", (req, res, next) => {
 });
 
 // Routes
-app.use("/api/mlm", require("./routes/mlmRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
+app.post("/api/login", require("./controllers/authController").login);
+app.post("/api/register", require("./controllers/authController").register);
+app.use("/api/mlm", require("./routes/mlmRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
 app.use("/api", require("./routes/contactRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
