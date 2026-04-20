@@ -78,8 +78,8 @@ exports.findExtremePosition = async (sponsorId, position) => {
  * Distributes Level Income up to 20 levels.
  */
 exports.distributeLevelIncome = async (user) => {
-    // Plan ke hisaab se: 20 level income — SPONSOR CHAIN se upar jaata hai
-    // user.parent = unilevel/sponsor parent (binary nahi)
+    // Based on plan: 20 levels of income — goes up through the sponsor chain
+    // user.parent = unilevel/sponsor parent (not binary)
     try {
         let currentParentId = user.parent; // ← sponsor chain (unilevel)
         let level = 1;
@@ -88,7 +88,7 @@ exports.distributeLevelIncome = async (user) => {
             const parent = await User.findById(currentParentId);
             if (!parent) break;
 
-            // Sirf active members ko income milegi
+            // Only active members will receive income
             if (parent.activeStatus) {
                 const incomeAmount = exports.LEVEL_INCOME[level] || 0;
                 if (incomeAmount > 0) {
@@ -109,7 +109,7 @@ exports.distributeLevelIncome = async (user) => {
                 }
             }
 
-            currentParentId = parent.parent; // ← sponsor chain se upar
+            currentParentId = parent.parent; // ← up the sponsor chain
             level++;
         }
     } catch (error) {

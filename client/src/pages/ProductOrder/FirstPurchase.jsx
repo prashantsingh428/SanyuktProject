@@ -60,7 +60,7 @@ export default function PlaceOrderPage() {
                 setProductsList(Array.isArray(response.data) ? response.data : []);
             } catch (error) {
                 console.error('Error fetching products:', error);
-                setFeedback({ type: 'error', message: 'Products load nahi ho pa rahe.' });
+                setFeedback({ type: 'error', message: 'Failed to load products.' });
             } finally {
                 setProductsLoading(false);
             }
@@ -191,7 +191,7 @@ export default function PlaceOrderPage() {
             console.error('First purchase order error:', error);
             setFeedback({
                 type: 'error',
-                message: error?.response?.data?.message || error?.message || 'Order place nahi ho paaya.',
+                message: error?.response?.data?.message || error?.message || 'Failed to place order.',
             });
             setSubmitting(false);
         }
@@ -206,7 +206,7 @@ export default function PlaceOrderPage() {
         setName('');
         setFeedback({
             type: 'success',
-            message: data?.message || 'First purchase order place ho gaya.',
+            message: data?.message || 'First purchase order placed successfully.',
         });
         setSubmitting(false);
     };

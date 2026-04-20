@@ -113,7 +113,7 @@ const WalletWithdrawalPage = ({
             setHistory(Array.isArray(historyRes.data?.withdrawals) ? historyRes.data.withdrawals : []);
         } catch (error) {
             console.error(`Error fetching ${walletType} withdrawal data:`, error);
-            toast.error('Withdrawal data load nahi ho paya.');
+            toast.error('Failed to load withdrawal data.');
             setHistory([]);
             setBalance(0);
             setTotalDebits(0);
@@ -160,7 +160,7 @@ const WalletWithdrawalPage = ({
             }
         } catch (error) {
             console.error(`Error requesting ${walletType} withdrawal:`, error);
-            toast.error(error?.response?.data?.message || 'Withdrawal request submit nahi ho paya.');
+            toast.error(error?.response?.data?.message || 'Failed to submit withdrawal request.');
         } finally {
             setSubmitting(false);
         }
@@ -249,7 +249,7 @@ const WalletWithdrawalPage = ({
                                     {amount && parsedAmount > balance && (
                                         <p className="mt-2 flex items-center gap-2 text-xs text-red-400">
                                             <AlertCircle className="h-4 w-4" />
-                                            Available balance se zyada amount request nahi kar sakte.
+                                            Requested amount cannot exceed available balance.
                                         </p>
                                     )}
                                 </div>
@@ -355,7 +355,7 @@ const WalletWithdrawalPage = ({
                                         {confirmAccountNumber && accountNumber !== confirmAccountNumber && (
                                             <p className="md:col-span-2 flex items-center gap-2 text-xs text-red-400">
                                                 <AlertCircle className="h-4 w-4" />
-                                                Account number match nahi kar raha.
+                                                Account numbers do not match.
                                             </p>
                                         )}
                                     </div>

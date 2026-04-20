@@ -17,8 +17,8 @@ app.listen(PORT, () => {
 function startCronJobs() {
     const mlmController = require('./controllers/mlmController');
 
-    // Raat 11:59 PM pe matching bonus + profit sharing calculate karo
-    // Simple interval-based scheduler (node-cron install nahi ho to bhi kaam karta hai)
+    // At 11:59 PM calculate matching bonus + profit sharing
+    // Simple interval-based scheduler (works even if node-cron is not installed)
     const MIDNIGHT_MS = 24 * 60 * 60 * 1000; // 24 hours
 
     const msUntilMidnight = () => {
@@ -32,7 +32,7 @@ function startCronJobs() {
     const scheduleDailyJobs = async () => {
         console.log('[CRON] Running daily MLM jobs...');
         try {
-            // 1. Matching Bonus calculate karo
+            // 1. Calculate matching bonus
             await mlmController.calculateDailyMatchingBonus();
             console.log('[CRON] ✅ Matching bonus done');
 
@@ -48,7 +48,7 @@ function startCronJobs() {
                 console.log(`[CRON] ✅ Profit sharing done on ₹${dailyTurnover} turnover`);
             }
 
-            // 3. Ranks update karo
+            // 3. Update ranks
             await mlmController.updateAllRanks();
             console.log('[CRON] ✅ Ranks updated');
 
@@ -56,11 +56,11 @@ function startCronJobs() {
             console.error('[CRON] ❌ Error in daily jobs:', err.message);
         }
 
-        // Kal phir schedule karo
+        // Schedule again for tomorrow
         setTimeout(scheduleDailyJobs, MIDNIGHT_MS);
     };
 
-    // Pehli baar midnight tak wait karo
+    // Wait until midnight for the first run
     const firstRun = msUntilMidnight();
     console.log(`[CRON] Daily jobs scheduled — first run in ${Math.round(firstRun / 60000)} minutes`);
     setTimeout(scheduleDailyJobs, firstRun);

@@ -321,7 +321,7 @@ const MyAccount = ({ defaultTab }) => {
             if (res.data.success) setAllWalletTransactions(res.data.transactions || []);
         } catch (e) {
             console.error("Error fetching wallet transactions:", e);
-            setWalletTxError('Wallet transactions load nahi ho sake.');
+            setWalletTxError('Failed to load wallet transactions.');
         } finally { setWalletTxLoading(false); }
     };
 

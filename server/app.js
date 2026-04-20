@@ -78,7 +78,7 @@ app.use("/api", (req, res, next) => {
 // Routes
 app.use("/api/mlm", require("./routes/mlmRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api", require("./routes/authRoutes"));
+app.use("/api/wallet", require("./routes/walletRoutes"));
 app.use("/api", require("./routes/contactRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/admin/users", require("./routes/adminUserRoutes"));
@@ -91,7 +91,8 @@ app.use("/api/package", require("./routes/PackageRoutes"));
 app.use("/api/gallery", require("./routes/galleryRoutes"));
 app.use("/api/events", require("./routes/eventRoutes"));
 app.use("/api/repurchase", require("./routes/repurchaseRoutes"));
-app.use('/api/wallet', require('./routes/walletRoutes'));
+// Moved higher up
+// app.use('/api/wallet', require('./routes/walletRoutes'));
 app.use("/api/grievance", require("./routes/grievanceRoutes"));
 app.use("/api/recharge", require("./routes/rechargeRoutes"));
 app.use("/api/news", require("./routes/newsRoutes"));

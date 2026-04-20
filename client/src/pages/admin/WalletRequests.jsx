@@ -71,7 +71,7 @@ const AdminWalletRequests = () => {
                 setRequests(response.data.requests || []);
             }
         } catch (error) {
-            toast.error(error.message || 'Wallet requests load nahi ho paayi');
+            toast.error(error.message || 'Failed to load wallet requests');
         } finally {
             setLoading(false);
         }
@@ -102,13 +102,13 @@ const AdminWalletRequests = () => {
             });
 
             if (response.data.success) {
-                toast.success(response.data.message || `Request ${nextStatus.toLowerCase()} ho gayi`);
+                toast.success(response.data.message || `Request ${nextStatus.toLowerCase()} successfully`);
                 setSelectedRequest(null);
                 setAdminNote('');
                 fetchRequests();
             }
         } catch (error) {
-            toast.error(error.message || 'Status update nahi ho paaya');
+            toast.error(error.message || 'Failed to update status');
         } finally {
             setProcessing(false);
         }
@@ -120,7 +120,7 @@ const AdminWalletRequests = () => {
                 <div>
                     <h2 className="text-3xl font-serif font-bold text-[#F5E6C8]">Wallet Requests</h2>
                     <p className="mt-1 text-sm text-[#C8A96A]/60">
-                        Product aur repurchase wallet requests ko yahin se approve ya reject karo.
+                        Approve or reject product and repurchase wallet requests from here.
                     </p>
                 </div>
                 <button
@@ -168,7 +168,7 @@ const AdminWalletRequests = () => {
                                     fetchRequests(event.currentTarget.value);
                                 }
                             }}
-                            placeholder="Member ID, name, bank name ya remark search karo"
+                            placeholder="Search Member ID, name, bank name or remark"
                             className="w-full rounded-xl border border-[#C8A96A]/20 bg-[#0D0D0D] py-3 pl-11 pr-4 text-sm text-[#F5E6C8] outline-none transition placeholder:text-[#C8A96A]/20 focus:border-[#C8A96A]"
                         />
                     </div>
@@ -228,7 +228,7 @@ const AdminWalletRequests = () => {
                                     <td colSpan="7" className="px-5 py-14">
                                         <div className="flex items-center justify-center gap-3 text-[#C8A96A]">
                                             <Loader2 className="h-5 w-5 animate-spin" />
-                                            <span className="text-sm font-medium">Wallet requests load ho rahi hain...</span>
+                                            <span className="text-sm font-medium">Loading wallet requests...</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -237,7 +237,7 @@ const AdminWalletRequests = () => {
                                     <td colSpan="7" className="px-5 py-16 text-center">
                                         <div className="flex flex-col items-center gap-3 text-[#F5E6C8]/35">
                                             <FileText className="h-10 w-10 text-[#C8A96A]/40" />
-                                            <p className="text-sm font-semibold">Abhi koi wallet request nahi mili.</p>
+                                            <p className="text-sm font-semibold">No wallet requests found yet.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -362,7 +362,7 @@ const AdminWalletRequests = () => {
                             <div className="rounded-2xl border border-[#C8A96A]/10 bg-[#121212] p-5">
                                 <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#C8A96A]/45">Bank Details</p>
                                 <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#F5E6C8]/75">
-                                    {selectedRequest.bankDetails || 'Bank details nahi diye gaye.'}
+                                    {selectedRequest.bankDetails || 'Bank details not provided.'}
                                 </p>
                             </div>
 
@@ -393,7 +393,7 @@ const AdminWalletRequests = () => {
                                 <textarea
                                     value={adminNote}
                                     onChange={(event) => setAdminNote(event.target.value)}
-                                    placeholder="Approval ya rejection ka note yahan likho"
+                                    placeholder="Enter approval or rejection note here"
                                     className="mt-3 h-28 w-full resize-none rounded-2xl border border-[#C8A96A]/20 bg-[#0D0D0D] p-4 text-sm text-[#F5E6C8] outline-none transition placeholder:text-[#C8A96A]/20 focus:border-[#C8A96A]"
                                 />
                             </div>
@@ -433,7 +433,7 @@ const AdminWalletRequests = () => {
                                     </>
                                 ) : (
                                     <div className="rounded-xl border border-[#C8A96A]/15 bg-[#121212] px-4 py-3 text-sm text-[#F5E6C8]/70">
-                                        Ye request already {selectedRequest.status.toLowerCase()} ho chuki hai.
+                                        This request has already been {selectedRequest.status.toLowerCase()}.
                                     </div>
                                 )}
                             </div>

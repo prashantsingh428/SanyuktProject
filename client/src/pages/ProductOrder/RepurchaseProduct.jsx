@@ -50,7 +50,7 @@ export default function RepurchaseProductPage() {
                 setProductsList(Array.isArray(response.data) ? response.data : []);
             } catch (error) {
                 console.error('Error fetching products:', error);
-                setFeedback({ type: 'error', message: 'Products load nahi ho pa rahe.' });
+                setFeedback({ type: 'error', message: 'Failed to load products.' });
             } finally {
                 setProductsLoading(false);
             }
@@ -119,13 +119,13 @@ export default function RepurchaseProductPage() {
             setName('');
             setFeedback({
                 type: 'success',
-                message: data?.message || 'Repurchase order place ho gaya.',
+                message: data?.message || 'Repurchase order placed successfully.',
             });
         } catch (error) {
             console.error('Repurchase order error:', error);
             setFeedback({
                 type: 'error',
-                message: error?.response?.data?.message || error?.message || 'Repurchase order place nahi ho paaya.',
+                message: error?.response?.data?.message || error?.message || 'Failed to place repurchase order.',
             });
         } finally {
             setSubmitting(false);

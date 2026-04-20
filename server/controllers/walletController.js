@@ -759,6 +759,7 @@ exports.updateWithdrawalStatus = async (req, res) => {
 
 exports.getWalletSummary = async (req, res) => {
     try {
+        console.log(`[DEBUG] WalletSummary request: user=${req.user?._id}, query=`, req.query);
         const walletType = normalizeWalletType(req.query.walletType || 'e-wallet');
         const { balance } = await getWalletBalance(req.user._id, walletType);
 

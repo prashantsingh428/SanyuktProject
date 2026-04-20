@@ -63,7 +63,7 @@ export default function ProductWalletRequest() {
             setSubmittedData(historyRes.data?.requests || []);
         } catch (error) {
             console.error('Wallet request load error:', error);
-            setFeedback({ type: 'error', message: 'Wallet request data load nahi ho pa raha.' });
+            setFeedback({ type: 'error', message: 'Failed to load wallet request data.' });
         } finally {
             setLoading(false);
         }
@@ -113,7 +113,7 @@ export default function ProductWalletRequest() {
 
             setFeedback({
                 type: 'success',
-                message: data?.message || 'Wallet request submit ho gayi.',
+                message: data?.message || 'Wallet request submitted successfully.',
             });
 
             setFormData((prev) => ({
@@ -131,7 +131,7 @@ export default function ProductWalletRequest() {
             console.error('Wallet request submit error:', error);
             setFeedback({
                 type: 'error',
-                message: error?.response?.data?.message || error?.message || 'Wallet request submit nahi ho paayi.',
+                message: error?.response?.data?.message || error?.message || 'Failed to submit wallet request.',
             });
         } finally {
             setSubmitting(false);
