@@ -758,6 +758,11 @@ exports.updateWithdrawalStatus = async (req, res) => {
 };
 
 exports.getWalletSummary = async (req, res) => {
+    console.log("-----------------------------------------");
+    console.log("[DEBUG] getWalletSummary called");
+    console.log("[DEBUG] Query params:", req.query);
+    console.log("[DEBUG] User ID:", req.user?._id);
+    console.log("-----------------------------------------");
     try {
         console.log(`[DEBUG] WalletSummary request: user=${req.user?._id}, query=`, req.query);
         const walletType = normalizeWalletType(req.query.walletType || 'e-wallet');

@@ -45,9 +45,15 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
 
 app.use((req, res, next) => {
     if (process.env.NODE_ENV !== 'test') {
-        console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+        console.log(`\n>>> [HIT] ${req.method} ${req.originalUrl}`);
+        console.log(`>>> [QUERIES] ${JSON.stringify(req.query)}`);
     }
     next();
+});
+
+// Diagnostic route
+app.get("/api/wallet-direct-test", (req, res) => {
+    res.json({ message: "Wallet direct test reached", path: req.path });
 });
 
 // Health Check
