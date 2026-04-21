@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const slugify = (value = '') =>
+    String(value)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+
 const newsSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -38,8 +46,8 @@ const newsSchema = new mongoose.Schema({
 
 // Pre-save hook to generate slug
 newsSchema.pre('save', async function() {
-    if (this.title && !this.slug) {
-        this.slug = this.title.toLowerCase().split(' ').join('-');
+    if (this.title && (!this.slug || this.isModified('title'))) {
+        this.slug = `${slugify(this.title)}-${Date.now()}`;
     }
 });
 

@@ -3,12 +3,25 @@ const User = require("../models/User");
 // GET all users
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find()
-            .select("-password")
-            .sort({ createdAt: -1 }); // Latest first
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const [users, total] = await Promise.all([
+            User.find()
+                .select("-password")
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            User.countDocuments()
+        ]);
 
         res.json({
             success: true,
+            total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit,
             count: users.length,
             users: users
         });

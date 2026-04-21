@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import api, { API_URL } from "../../api"
+import Pagination from "../../components/admin/Pagination"
 
 const STYLES = `
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -69,9 +70,9 @@ function Toast({ msg, type, onClose }) {
     const isSuccess = type === "success"
     return (
         <div className="toast" style={{ background: "#121212", color: isSuccess ? "#C8A96A" : "#ef4444", border: `1px solid ${isSuccess ? "rgba(200,169,106,0.4)" : "rgba(239,68,68,0.4)"}` }}>
-            {isSuccess ? 
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> : 
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>} 
+            {isSuccess ?
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> :
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>}
             {msg}
         </div>
     )
@@ -98,6 +99,8 @@ function ConfirmModal({ msg, onConfirm, onCancel }) {
 
 export default function AdminGallery() {
     const [gallery, setGallery] = useState([])
+    const [currentPage, setCurrentPage] = useState(1)
+    const [limit, setLimit] = useState(12)
     const [loading, setLoading] = useState(true)
     const [showAddModal, setShowAddModal] = useState(false)
     const [editItem, setEditItem] = useState(null)
@@ -126,11 +129,20 @@ export default function AdminGallery() {
     }
 
     const getImgUrl = (filename) => `${API_URL}/uploads/gallery/${filename}`
+    const totalItems = gallery.length
+    const totalPages = Math.max(1, Math.ceil(totalItems / limit))
+    const paginatedGallery = gallery.slice((currentPage - 1) * limit, currentPage * limit)
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages])
 
     return (
         <div style={{ minHeight: "100vh", background: "#0D0D0D", fontFamily: "sans-serif", position: "relative", overflow: "hidden" }}>
             <style>{STYLES}</style>
-            
+
             {/* Elegant Background Elements */}
             <div style={{ position: "absolute", top: -100, right: -100, width: 600, height: 600, background: "rgba(200,169,106,0.03)", borderRadius: "50%", filter: "blur(120px)", pointerEvents: "none", zIndex: 0 }} />
 
@@ -180,15 +192,19 @@ export default function AdminGallery() {
                         </div>
                     ) : (
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 24 }}>
-                            {gallery.map((item, i) => (
+                            {paginatedGallery.map((item, i) => (
                                 <div key={item._id} className="g-card" style={{ animationDelay: `${i * 60}ms` }}>
                                     <div className="img-wrap">
-                                        <img src={getImgUrl(item.image)} alt={`Gallery ${i + 1}`}
+                                        <img src={getImgUrl(item.image)} alt={item.heading || `Gallery ${i + 1}`}
                                             onError={e => { e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200'%3E%3Crect width='280' height='200' fill='%230D0D0D'/%3E%3Ctext x='50%25' y='50%25' fill='%23C8A96A' font-size='11' font-weight='800' letter-spacing='1px' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' opacity='0.5'%3EIMAGE NOT FOUND%3C/text%3E%3C/svg%3E` }} />
                                     </div>
-                                    <div style={{ padding: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#121212" }}>
-                                        <span style={{ fontSize: 11, color: "rgba(245,230,200,0.5)", fontWeight: 600, letterSpacing: "0.5px" }}>
-                                            <span style={{ color: "#C8A96A", marginRight: 4 }}>#{i + 1}</span> · {new Date(item.createdAt).toLocaleDateString('en-IN')}
+                                    <div style={{ padding: "16px", background: "#121212", borderBottom: "1px solid rgba(200,169,106,0.1)" }}>
+                                        <h4 style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: "#C8A96A", fontFamily: "serif" }}>{item.heading || "No Heading"}</h4>
+                                        <p style={{ margin: 0, fontSize: 12, color: "rgba(245,230,200,0.6)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{item.content || "No content provided."}</p>
+                                    </div>
+                                    <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0D0D0D" }}>
+                                        <span style={{ fontSize: 10, color: "rgba(245,230,200,0.4)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>
+                                            {new Date(item.createdAt).toLocaleDateString('en-IN')}
                                         </span>
                                         <div style={{ display: "flex", gap: 8 }}>
                                             <button className="action-btn btn-edit" title="Replace Image" onClick={() => setEditItem(item)}>
@@ -205,6 +221,21 @@ export default function AdminGallery() {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+                    {!loading && gallery.length > 0 && (
+                        <div style={{ marginTop: 28 }}>
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalItems={totalItems}
+                                limit={limit}
+                                onPageChange={setCurrentPage}
+                                onLimitChange={(newLimit) => {
+                                    setLimit(newLimit);
+                                    setCurrentPage(1);
+                                }}
+                            />
                         </div>
                     )}
                 </div>
@@ -227,14 +258,16 @@ export default function AdminGallery() {
             {/* Edit Modal */}
             {editItem && (
                 <ImageModal
-                    title="Replace Image"
+                    title="Edit Gallery Item"
                     editId={editItem._id}
                     currentImage={getImgUrl(editItem.image)}
+                    initialHeading={editItem.heading}
+                    initialContent={editItem.content}
                     onClose={() => setEditItem(null)}
                     onSuccess={(updated) => {
                         setGallery(prev => prev.map(g => g._id === updated._id ? updated : g))
                         setEditItem(null)
-                        showToast("Image updated successfully!")
+                        showToast("Gallery item updated successfully!")
                     }}
                     showToast={showToast}
                 />
@@ -243,9 +276,11 @@ export default function AdminGallery() {
     )
 }
 
-function ImageModal({ title, editId, currentImage, onClose, onSuccess, showToast }) {
+function ImageModal({ title, editId, currentImage, initialHeading, initialContent, onClose, onSuccess, showToast }) {
     const [file, setFile] = useState(null)
     const [preview, setPreview] = useState(currentImage || null)
+    const [heading, setHeading] = useState(initialHeading || "")
+    const [content, setContent] = useState(initialContent || "")
     const [loading, setLoading] = useState(false)
     const [drag, setDrag] = useState(false)
 
@@ -264,12 +299,21 @@ function ImageModal({ title, editId, currentImage, onClose, onSuccess, showToast
     }
 
     const submit = async () => {
-        if (!file && !editId) return showToast("Please select an image", "error")
-        if (!file && editId) return showToast("Please select a new image to replace", "error")
+        // If adding: file is required. If editing: file is optional.
+        if (!editId && !file) return showToast("Please select an image", "error")
 
         setLoading(true)
         const form = new FormData()
-        form.append("image", file)
+
+        // Append text fields FIRST (best practice for multer)
+        form.append("heading", heading)
+        form.append("content", content)
+        if (file) form.append("image", file)
+
+        console.log("[GALLERY FRONTEND DEBUG] Submitting data:");
+        console.log("- Heading:", heading);
+        console.log("- Content:", content);
+        console.log("- File:", file ? file.name : "No new file (retaining existing)");
 
         try {
             let res
@@ -293,7 +337,7 @@ function ImageModal({ title, editId, currentImage, onClose, onSuccess, showToast
                 {/* Header */}
                 <div style={{ padding: "24px 28px", borderBottom: "1px solid rgba(200,169,106,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#121212" }}>
                     <h3 style={{ margin: 0, fontSize: 18, fontFamily: "serif", fontWeight: 700, color: "#F5E6C8" }}>{title}</h3>
-                    <button onClick={onClose} style={{ background: "rgba(200,169,106,0.1)", border: "none", cursor: "pointer", color: "#C8A96A", padding: 6, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }} onMouseOver={e=>e.currentTarget.style.background="rgba(200,169,106,0.2)"} onMouseOut={e=>e.currentTarget.style.background="rgba(200,169,106,0.1)"}>
+                    <button onClick={onClose} style={{ background: "rgba(200,169,106,0.1)", border: "none", cursor: "pointer", color: "#C8A96A", padding: 6, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }} onMouseOver={e => e.currentTarget.style.background = "rgba(200,169,106,0.2)"} onMouseOut={e => e.currentTarget.style.background = "rgba(200,169,106,0.1)"}>
                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -328,6 +372,30 @@ function ImageModal({ title, editId, currentImage, onClose, onSuccess, showToast
                                 <p style={{ margin: "6px 0 0", fontSize: 10, color: "rgba(245,230,200,0.3)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700 }}>PNG, JPG, GIF up to 10MB</p>
                             </div>
                         )}
+                    </div>
+
+                    {/* Inputs */}
+                    <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+                        <div>
+                            <label style={{ display: "block", fontSize: 10, fontWeight: 800, color: "#C8A96A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 8 }}>Image Heading</label>
+                            <input
+                                className="form-input"
+                                placeholder="Enter a catchy heading..."
+                                value={heading}
+                                onChange={e => setHeading(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: "block", fontSize: 10, fontWeight: 800, color: "#C8A96A", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 8 }}>Content / Description</label>
+                            <textarea
+                                className="form-input"
+                                placeholder="Describe this moment..."
+                                rows={3}
+                                style={{ resize: "none", height: "auto" }}
+                                value={content}
+                                onChange={e => setContent(e.target.value)}
+                            />
+                        </div>
                     </div>
 
                     {/* Actions */}

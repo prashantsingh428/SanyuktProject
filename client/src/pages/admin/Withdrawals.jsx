@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Search, Filter, CheckCircle, XCircle, Clock, 
-    FileText, User, IndianRupee, ArrowUpRight, 
+import {
+    Search, Filter, CheckCircle, XCircle, Clock,
+    FileText, User, IndianRupee, ArrowUpRight,
     MoreVertical, Download, AlertCircle, Loader2,
     Building2, Smartphone, Shield, Calendar, RefreshCw
 } from 'lucide-react';
 import api from '../../api';
 import toast from 'react-hot-toast';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import Pagination from '../../components/admin/Pagination';
 
 const AdminWithdrawals = () => {
     const [withdrawals, setWithdrawals] = useState([]);
@@ -19,17 +20,32 @@ const AdminWithdrawals = () => {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [adminNote, setAdminNote] = useState('');
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit, setLimit] = useState(12);
+    const [totalItems, setTotalItems] = useState(0);
+
     const fetchWithdrawals = async () => {
         try {
             setLoading(true);
             const res = await api.get('/wallet/admin/all-withdrawals', {
                 params: {
                     status: filterStatus,
-                    search: searchTerm
+                    search: searchTerm,
+                    page: currentPage,
+                    limit: limit
                 }
             });
             if (res.data.success) {
-                setWithdrawals(res.data.withdrawals);
+                const nextWithdrawals = res.data.withdrawals || [];
+                setWithdrawals(nextWithdrawals);
+                setTotalPages(res.data.totalPages || 1);
+                setTotalItems(res.data.total || nextWithdrawals.length);
+            } else if (Array.isArray(res.data)) {
+                setWithdrawals(res.data);
+                setTotalPages(1);
+                setTotalItems(res.data.length);
             }
         } catch (err) {
             toast.error('Failed to fetch withdrawal requests');
@@ -41,7 +57,7 @@ const AdminWithdrawals = () => {
 
     useEffect(() => {
         fetchWithdrawals();
-    }, [filterStatus]);
+    }, [filterStatus, currentPage, limit]);
 
     const handleStatusUpdate = async (id, status) => {
         try {
@@ -89,6 +105,12 @@ const AdminWithdrawals = () => {
         });
     };
 
+    const isClientSidePagination = totalPages <= 1 && totalItems === withdrawals.length && withdrawals.length > limit;
+    const effectiveTotalPages = isClientSidePagination ? Math.ceil(withdrawals.length / limit) : totalPages;
+    const displayedWithdrawals = isClientSidePagination
+        ? withdrawals.slice((currentPage - 1) * limit, currentPage * limit)
+        : withdrawals;
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header Section */}
@@ -98,7 +120,7 @@ const AdminWithdrawals = () => {
                     <p className="text-sm text-[#C8A96A]/60 mt-1 font-medium italic">Process and oversee liquidity exits across the platform</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button 
+                    <button
                         onClick={fetchWithdrawals}
                         className="p-3 bg-[#1A1A1A] border border-[#C8A96A]/20 text-[#C8A96A] rounded-xl hover:bg-[#C8A96A]/10 transition-all shadow-lg"
                     >
@@ -136,8 +158,8 @@ const AdminWithdrawals = () => {
                 <div className="flex flex-col md:flex-row gap-6">
                     <div className="flex-1 relative group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C8A96A]/40 group-focus-within:text-[#C8A96A] transition-colors" />
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             placeholder="Search by Member ID, Name, Reference No..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -169,7 +191,7 @@ const AdminWithdrawals = () => {
                         </div>
                     </div>
                 )}
-                
+
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -192,7 +214,7 @@ const AdminWithdrawals = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                withdrawals.map((w) => (
+                                displayedWithdrawals.map((w) => (
                                     <tr key={w._id} className="hover:bg-[#C8A96A]/[0.02] transition-colors group">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
@@ -231,7 +253,7 @@ const AdminWithdrawals = () => {
                                         </td>
                                         <td className="px-6 py-5 text-right">
                                             <div className="flex justify-end gap-2">
-                                                <button 
+                                                <button
                                                     onClick={() => {
                                                         setSelectedWithdrawal(w);
                                                         setShowDetailModal(true);
@@ -241,7 +263,7 @@ const AdminWithdrawals = () => {
                                                     <FileText className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                                                 </button>
                                                 {w.status === 'Pending' && (
-                                                    <button 
+                                                    <button
                                                         onClick={() => handleStatusUpdate(w._id, 'Completed')}
                                                         className="p-2.5 bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all shadow-md"
                                                     >
@@ -256,20 +278,35 @@ const AdminWithdrawals = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                {!loading && withdrawals.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={effectiveTotalPages}
+                        totalItems={totalItems}
+                        limit={limit}
+                        onPageChange={setCurrentPage}
+                        onLimitChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setCurrentPage(1);
+                        }}
+                    />
+                )}
             </div>
 
             {/* Detail & Action Modal */}
             <AnimatePresence>
                 {showDetailModal && selectedWithdrawal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <Motion.div 
+                        <Motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setShowDetailModal(false)}
                             className="absolute inset-0 bg-black/80 backdrop-blur-md"
                         />
-                        <Motion.div 
+                        <Motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -297,24 +334,24 @@ const AdminWithdrawals = () => {
                                     {/* User Block */}
                                     <div className="space-y-4">
                                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C8A96A]/40 border-l-2 border-[#C8A96A] pl-3">Beneficiary Account</h4>
-                                            <div className="p-5 bg-[#121212] border border-[#C8A96A]/10 rounded-2xl space-y-3">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Name</span>
-                                                    <span className="text-sm font-bold text-[#F5E6C8]">{selectedWithdrawal.userId?.userName}</span>
-                                                </div>
+                                        <div className="p-5 bg-[#121212] border border-[#C8A96A]/10 rounded-2xl space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Name</span>
+                                                <span className="text-sm font-bold text-[#F5E6C8]">{selectedWithdrawal.userId?.userName}</span>
+                                            </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Member ID</span>
                                                 <span className="text-sm font-mono text-[#C8A96A] font-bold">{selectedWithdrawal.userId?.memberId}</span>
                                             </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Contact</span>
-                                                    <span className="text-sm font-bold text-[#F5E6C8]">{selectedWithdrawal.userId?.mobile}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Wallet</span>
-                                                    <span className="text-sm font-bold uppercase text-[#C8A96A]">{selectedWithdrawal.walletType || 'e-wallet'}</span>
-                                                </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Contact</span>
+                                                <span className="text-sm font-bold text-[#F5E6C8]">{selectedWithdrawal.userId?.mobile}</span>
                                             </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Wallet</span>
+                                                <span className="text-sm font-bold uppercase text-[#C8A96A]">{selectedWithdrawal.walletType || 'e-wallet'}</span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* Bank/UPI Block */}
@@ -368,7 +405,7 @@ const AdminWithdrawals = () => {
                                     <div className="space-y-4 pt-4 border-t border-[#C8A96A]/10">
                                         <div>
                                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C8A96A]/40 mb-3 block">Internal Review Note (Shared with User)</label>
-                                            <textarea 
+                                            <textarea
                                                 value={adminNote}
                                                 onChange={(e) => setAdminNote(e.target.value)}
                                                 placeholder="Provide reason for approval/rejection or transaction reference..."
@@ -376,7 +413,7 @@ const AdminWithdrawals = () => {
                                             />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <button 
+                                            <button
                                                 onClick={() => handleStatusUpdate(selectedWithdrawal._id, 'Rejected')}
                                                 disabled={processingId}
                                                 className="py-4 rounded-2xl border border-red-500/20 text-red-500 font-bold uppercase tracking-[0.2em] text-xs hover:bg-red-500/10 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
@@ -384,7 +421,7 @@ const AdminWithdrawals = () => {
                                                 {processingId === selectedWithdrawal._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                                                 Manifest Rejection
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => handleStatusUpdate(selectedWithdrawal._id, 'Completed')}
                                                 disabled={processingId}
                                                 className="py-4 rounded-2xl bg-[#C8A96A] text-[#0D0D0D] font-black uppercase tracking-[0.2em] text-xs hover:shadow-[0_0_30px_rgba(200,169,106,0.4)] transition-all flex items-center justify-center gap-3 disabled:opacity-50"

@@ -103,10 +103,10 @@ const CheckoutPage = () => {
     if (!product) return null;
 
     // Calculate totals
-    const subtotal = product.price || 0;
+    const subtotal = Number(product.price) || 0;
     const shipping = subtotal > 500 ? 0 : 40;
     const tax = subtotal * 0.18; // 18% GST
-    const total = subtotal + shipping + tax - discount;
+    const total = Number((subtotal + shipping + tax - discount).toFixed(2));
 
     const handleInputChange = (e) => {
         setShippingInfo({

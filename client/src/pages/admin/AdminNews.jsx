@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import api, { API_URL } from "../../api";
-import { 
+import {
     Newspaper, Plus, Trash2, Calendar, User, 
     Tag, Image as ImageIcon, X, Loader2, Search,
     Filter, MoreVertical, Edit, Clock
 } from "lucide-react";
 import toast from "react-hot-toast";
+import Pagination from "../../components/admin/Pagination";
 
 const AdminNews = () => {
     const [newsList, setNewsList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(12);
     
     // Form State
     const [title, setTitle] = useState("");
@@ -166,6 +169,19 @@ const AdminNews = () => {
         news.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         news.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    const totalItems = filteredNews.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+    const displayedNews = filteredNews.slice((currentPage - 1) * limit, currentPage * limit);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
 
     return (
         <div className="space-y-8 animate-fadeIn">
@@ -369,7 +385,7 @@ const AdminNews = () => {
                             <div key={i} className="h-96 bg-gray-100 rounded-3xl animate-pulse" />
                         ))
                     ) : filteredNews.length > 0 ? (
-                        filteredNews.map((news) => (
+                        displayedNews.map((news) => (
                             <div key={news._id} className="group bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 border border-green-50 overflow-hidden flex flex-col">
                                 {/* Card Image */}
                                 <div className="relative h-56 overflow-hidden">
@@ -458,6 +474,21 @@ const AdminNews = () => {
                             )}
                         </div>
                     )}
+                </div>
+            )}
+            {!isAdding && !loading && filteredNews.length > 0 && (
+                <div className="mt-6">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalItems={totalItems}
+                        limit={limit}
+                        onPageChange={setCurrentPage}
+                        onLimitChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setCurrentPage(1);
+                        }}
+                    />
                 </div>
             )}
         </div>

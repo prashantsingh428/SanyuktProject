@@ -6,6 +6,7 @@ import {
     Typography, Grid, Box, TextField, Divider, Paper
 } from '@mui/material';
 import { RefreshCw, Trash2, Edit2, ShieldAlert, CheckCircle, User as UserIcon, Lock, Save, X, Activity } from 'lucide-react';
+import Pagination from "../../components/admin/Pagination";
 
 const AdminUsers = () => {
     const navigate = useNavigate();
@@ -27,15 +28,30 @@ const AdminUsers = () => {
     const [kycRejectReason, setKycRejectReason] = useState("");
     const [isRejecting, setIsRejecting] = useState(false);
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalItems, setTotalItems] = useState(0);
+
     // ================= FETCH USERS =================
     const fetchUsers = async () => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await api.get("/admin/users");
+            const response = await api.get("/admin/users", {
+                params: {
+                    page: currentPage,
+                    limit: limit
+                }
+            });
 
-            if (response.data.users) {
+            if (response.data.success) {
+                setUsers(response.data.users);
+                setTotalPages(response.data.totalPages);
+                setTotalItems(response.data.total);
+            } else if (response.data.users) {
                 setUsers(response.data.users);
             } else if (Array.isArray(response.data)) {
                 setUsers(response.data);
@@ -63,7 +79,7 @@ const AdminUsers = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [currentPage, limit]);
 
     // ================= DELETE USER =================
     const handleDelete = async (id) => {
@@ -404,6 +420,21 @@ const AdminUsers = () => {
                             </table>
                         </div>
                     )}
+
+                    {/* Pagination Component */}
+                    {!loading && users.length > 0 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalItems={totalItems}
+                            limit={limit}
+                            onPageChange={setCurrentPage}
+                            onLimitChange={(newLimit) => {
+                                setLimit(newLimit);
+                                setCurrentPage(1);
+                            }}
+                        />
+                    )}
                 </div>
 
                 {/* Footer */}
@@ -415,10 +446,10 @@ const AdminUsers = () => {
             </div>
 
             {/* KYC Dialog heavily customized for Dark Theme */}
-            <Dialog 
-                open={kycDialogOpen} 
-                onClose={handleCloseKyc} 
-                maxWidth="md" 
+            <Dialog
+                open={kycDialogOpen}
+                onClose={handleCloseKyc}
+                maxWidth="md"
                 fullWidth
                 PaperProps={{
                     sx: {
@@ -431,8 +462,8 @@ const AdminUsers = () => {
                     }
                 }}
             >
-                <DialogTitle sx={{ 
-                    borderBottom: '1px solid rgba(200, 169, 106, 0.1)', 
+                <DialogTitle sx={{
+                    borderBottom: '1px solid rgba(200, 169, 106, 0.1)',
                     pb: 3, pt: 4, px: 4,
                     display: 'flex', alignItems: 'center', gap: 2
                 }}>
@@ -484,7 +515,7 @@ const AdminUsers = () => {
                                     <div className="h-px bg-gradient-to-r from-[#C8A96A]/30 via-[#C8A96A]/30 to-transparent flex-1"></div>
                                 </div>
                             </Grid>
-                            
+
                             <Grid item xs={12} sm={4}>
                                 <Typography variant="subtitle2" sx={{ color: 'rgba(200,169,106,0.6)', textTransform: 'uppercase', fontSize: '9px', fontWeight: 900, letterSpacing: '1px' }}>Account Number</Typography>
                                 <Typography variant="body1" sx={{ color: '#F5E6C8', fontWeight: 500 }}>{selectedUserForKyc.bankDetails?.accountNumber || 'N/A'}</Typography>
@@ -559,7 +590,7 @@ const AdminUsers = () => {
                         </Grid>
                     )}
                 </DialogContent>
-                
+
                 <DialogActions sx={{ p: 3, px: 4, borderTop: '1px solid rgba(200, 169, 106, 0.1)', backgroundColor: '#0A0A0A' }}>
                     <button onClick={handleCloseKyc} className="px-5 py-2 text-[10px] uppercase tracking-widest font-black text-[#F5E6C8]/40 hover:text-[#F5E6C8] transition-colors">
                         Cancel

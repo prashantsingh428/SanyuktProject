@@ -23,19 +23,24 @@ exports.getGallery = exports.getAllImages;
 exports.addImage = async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "Please upload an image" });
+            console.warn("[GALLERY] Attempted to add image without file");
+            return res.status(400).json({
+                success: false,
+                message: "Please upload an image file (PNG, JPG, or GIF)"
+            });
         }
 
         const newImage = new Gallery({
             image: req.file.filename,
-            title: req.body.title || "",
-            description: req.body.description || ""
+            heading: req.body.heading || "",
+            content: req.body.content || ""
         });
 
         await newImage.save();
-        res.status(201).json({ success: true, message: "Image Added", image: newImage });
+        res.status(201).json({ success: true, message: "Image Added Successfully", image: newImage });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Server error: " + error.message });
+        console.error("[GALLERY] Error adding image:", error);
+        res.status(500).json({ success: false, message: "Server error while saving gallery item: " + error.message });
     }
 };
 
@@ -75,12 +80,13 @@ exports.updateImage = async (req, res) => {
             item.image = req.file.filename;
         }
 
-        if (req.body.title) item.title = req.body.title;
-        if (req.body.description) item.description = req.body.description;
+        if (req.body.heading !== undefined) item.heading = req.body.heading;
+        if (req.body.content !== undefined) item.content = req.body.content;
 
         await item.save();
-        res.json({ success: true, message: "Image updated", image: item });
+        res.json({ success: true, message: "Image updated successfully", image: item });
     } catch (error) {
-        res.status(500).json({ message: "Server error: " + error.message });
+        console.error("[GALLERY] Error updating image:", error);
+        res.status(500).json({ message: "Server error while updating gallery item: " + error.message });
     }
 };

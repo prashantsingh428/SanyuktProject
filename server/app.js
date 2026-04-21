@@ -34,6 +34,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ✅ Static file serving - serves ALL subfolders under uploads with caching
 app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
@@ -82,9 +83,21 @@ app.use("/api", (req, res, next) => {
 });
 
 // Routes
+// Auth Aliases & Direct Routes
+const authController = require("./controllers/authController");
+const { protect } = require("./middleware/authMiddleware");
+
 app.use("/api/auth", require("./routes/authRoutes"));
-app.post("/api/login", require("./controllers/authController").login);
-app.post("/api/register", require("./controllers/authController").register);
+app.post("/api/login", authController.login);
+app.post("/api/register", authController.register);
+app.post("/api/verify-otp", authController.verifyOtp);
+app.post("/api/resend-otp", authController.resendOtp);
+app.post("/api/forgot-password", authController.forgotPassword);
+app.post("/api/reset-password", authController.resetPassword);
+app.get("/api/profile", protect, authController.profile);
+app.put("/api/profile", protect, authController.updateProfile);
+app.put("/api/kyc", protect, authController.submitKyc);
+app.get("/api/sponsor/:id", authController.getSponsorName);
 app.use("/api/mlm", require("./routes/mlmRoutes"));
 app.use("/api/wallet", require("./routes/walletRoutes"));
 app.use("/api", require("./routes/contactRoutes"));

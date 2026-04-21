@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api, { API_URL } from '../../api';
+import Pagination from '../../components/admin/Pagination';
 
 const STATUS_OPTIONS = ['All', 'Pending', 'Approved', 'Rejected'];
 const WALLET_OPTIONS = [
@@ -56,6 +57,12 @@ const AdminWalletRequests = () => {
     const [adminNote, setAdminNote] = useState('');
     const [processing, setProcessing] = useState(false);
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit, setLimit] = useState(12);
+    const [totalItems, setTotalItems] = useState(0);
+
     const fetchRequests = async (nextSearch = search) => {
         try {
             setLoading(true);
@@ -64,11 +71,20 @@ const AdminWalletRequests = () => {
                     status,
                     walletType,
                     search: nextSearch,
+                    page: currentPage,
+                    limit,
                 },
             });
 
             if (response.data.success) {
-                setRequests(response.data.requests || []);
+                const nextRequests = response.data.requests || [];
+                setRequests(nextRequests);
+                setTotalPages(response.data.totalPages || 1);
+                setTotalItems(response.data.total || nextRequests.length);
+            } else if (Array.isArray(response.data)) {
+                setRequests(response.data);
+                setTotalPages(1);
+                setTotalItems(response.data.length);
             }
         } catch (error) {
             toast.error(error.message || 'Failed to load wallet requests');
@@ -79,7 +95,7 @@ const AdminWalletRequests = () => {
 
     useEffect(() => {
         fetchRequests();
-    }, [status, walletType]);
+    }, [status, walletType, currentPage, limit]);
 
     const stats = useMemo(() => {
         const totalAmount = requests.reduce((sum, item) => sum + Number(item.requestAmount || 0), 0);
@@ -113,6 +129,12 @@ const AdminWalletRequests = () => {
             setProcessing(false);
         }
     };
+
+    const isClientSidePagination = totalPages <= 1 && totalItems === requests.length && requests.length > limit;
+    const effectiveTotalPages = isClientSidePagination ? Math.ceil(requests.length / limit) : totalPages;
+    const displayedRequests = isClientSidePagination
+        ? requests.slice((currentPage - 1) * limit, currentPage * limit)
+        : requests;
 
     return (
         <div className="space-y-8">
@@ -242,7 +264,7 @@ const AdminWalletRequests = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                requests.map((request) => (
+                                displayedRequests.map((request) => (
                                     <tr key={request._id} className="hover:bg-[#C8A96A]/[0.03]">
                                         <td className="px-5 py-4 align-top">
                                             <p className="text-sm font-bold text-[#F5E6C8]">
@@ -271,9 +293,8 @@ const AdminWalletRequests = () => {
                                         </td>
                                         <td className="px-5 py-4 align-top">
                                             <span
-                                                className={`inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.15em] ${
-                                                    statusStyles[request.status] || statusStyles.Pending
-                                                }`}
+                                                className={`inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.15em] ${statusStyles[request.status] || statusStyles.Pending
+                                                    }`}
                                             >
                                                 {request.status}
                                             </span>
@@ -298,6 +319,21 @@ const AdminWalletRequests = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                {!loading && requests.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={effectiveTotalPages}
+                        totalItems={totalItems}
+                        limit={limit}
+                        onPageChange={setCurrentPage}
+                        onLimitChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setCurrentPage(1);
+                        }}
+                    />
+                )}
             </div>
 
             {selectedRequest && (

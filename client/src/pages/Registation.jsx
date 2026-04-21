@@ -6,15 +6,7 @@ import { registerUser } from '../services/api/auth';
 import { ButtonLoader } from '../components/Loader';
 import toast from 'react-hot-toast';
 
-const loadRazorpay = () => {
-    return new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
-        document.body.appendChild(script);
-    });
-};
+
 
 const RegistrationForm = () => {
     const navigate = useNavigate();
@@ -190,78 +182,7 @@ const RegistrationForm = () => {
         setSuccess('');
 
         try {
-            const isPaidPlan = formData.packageType !== 'none';
-            let paymentDetails = {};
-
-            if (isPaidPlan) {
-                const resScript = await loadRazorpay();
-                if (!resScript) {
-                    setError('Razorpay SDK failed to load. Please check your internet connection.');
-                    setLoading(false);
-                    return;
-                }
-
-                // 1. Create order on backend
-                const planPrices = { '599': 599, '1299': 1299, '2699': 2699 };
-                const amount = planPrices[formData.packageType];
-
-                const { data: orderData } = await api.post('/orders/razorpay-order', {
-                    amount,
-                    isPackage: true,
-                    packageType: formData.packageType
-                });
-
-                if (!orderData || !orderData.id) {
-                    throw new Error('Failed to create payment order');
-                }
-
-                const razorpayKeyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
-                
-                // 2. Open Razorpay
-                const options = {
-                    key: razorpayKeyId,
-                    amount: orderData.amount,
-                    currency: "INR",
-                    name: "Sanyukt Parivaar",
-                    description: `Package Registration - ${formData.packageType}`,
-                    order_id: orderData.id,
-                    handler: async (response) => {
-                        try {
-                            const payload = { 
-                                ...formData,
-                                paymentId: response.razorpay_payment_id,
-                                razorpayOrderId: response.razorpay_order_id,
-                                razorpaySignature: response.razorpay_signature,
-                                paymentMethod: 'razorpay'
-                            };
-                            await completeRegistration(payload);
-                        } catch (err) {
-                            setError(err.message || 'Payment verification failed');
-                            setLoading(false);
-                        }
-                    },
-                    prefill: {
-                        name: formData.userName,
-                        email: formData.email,
-                        contact: formData.mobile
-                    },
-                    theme: { color: "#C8A96A" },
-                    modal: {
-                        ondismiss: () => {
-                            setLoading(false);
-                            setError('Payment cancelled by user');
-                        }
-                    }
-                };
-
-                const paymentObject = new window.Razorpay(options);
-                paymentObject.open();
-                return; // Wait for handler
-            }
-
-            // If free plan, just register
             await completeRegistration(formData);
-
         } catch (submitError) {
             setError(submitError.message || 'Registration failed. Please try again.');
             setLoading(false);
@@ -340,46 +261,7 @@ const RegistrationForm = () => {
                             />
                         </div>
 
-                        <div className="flex flex-col gap-2 relative group/input md:col-span-2">
-                            <label className="text-[11px] md:text-xs font-black uppercase tracking-widest text-[#C8A96A]">Select Your Plan <span className="text-red-500">*</span></label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {[
-                                    { id: 'none', name: 'No Plan', price: '₹0', pv: '0 PV', bv: '0 BV', isFree: true },
-                                    { id: '599', name: 'Plan A', price: '₹599', pv: '0.25 PV', bv: '250 BV' },
-                                    { id: '1299', name: 'Plan B', price: '₹1299', pv: '0.5 PV', bv: '500 BV' },
-                                    { id: '2699', name: 'Plan C', price: '₹2699', pv: '1 PV', bv: '1000 BV' },
-                                ].map((plan) => (
-                                    <div
-                                        key={plan.id}
-                                        onClick={() => setFormData(prev => ({ ...prev, packageType: plan.id }))}
-                                        className={`cursor-pointer rounded-2xl border-2 p-4 transition-all hover:scale-[1.02] active:scale-95 ${
-                                            formData.packageType === plan.id
-                                                ? 'border-[#C8A96A] bg-[#C8A96A]/10 shadow-[0_0_20px_rgba(200,169,106,0.15)]'
-                                                : 'border-[#C8A96A]/20 bg-[#1A1A1A]/50 hover:border-[#C8A96A]/40'
-                                        }`}
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <span className={`text-[10px] font-black uppercase tracking-widest ${formData.packageType === plan.id ? 'text-[#C8A96A]' : 'text-[#F5E6C8]/40'}`}>
-                                                {plan.name}
-                                            </span>
-                                            {formData.packageType === plan.id && (
-                                                <div className="w-4 h-4 rounded-full bg-[#C8A96A] flex items-center justify-center">
-                                                    <svg className="w-2.5 h-2.5 text-[#0D0D0D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="text-xl font-serif font-black text-[#F5E6C8]">{plan.price}</div>
-                                        <div className="mt-2 flex gap-3 text-[10px] font-bold text-[#C8A96A]/80 uppercase tracking-tighter">
-                                            <span>{plan.pv}</span>
-                                            <span className="opacity-30">|</span>
-                                            <span>{plan.bv}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+
 
                         <div className="flex flex-col gap-2 relative group/input">
                             <label className="text-[11px] md:text-xs font-black uppercase tracking-widest text-[#C8A96A]">Sponsor Name</label>

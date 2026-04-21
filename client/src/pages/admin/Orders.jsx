@@ -7,6 +7,7 @@ import {
     IconButton, TextField, MenuItem, Dialog, DialogTitle,
     DialogContent, DialogActions, Select, InputLabel, FormControl
 } from '@mui/material';
+import Pagination from '../../components/admin/Pagination';
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -22,18 +23,45 @@ const AdminOrders = () => {
     const [newStatus, setNewStatus] = useState('');
     const [statusMessage, setStatusMessage] = useState('');
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit, setLimit] = useState(12);
+    const [totalItems, setTotalItems] = useState(0);
+    const [loading, setLoading] = useState(false);
+
     async function fetchOrders() {
         try {
-            const res = await api.get('/orders/admin/all');
-            setOrders(res.data);
+            setLoading(true);
+            const res = await api.get('/orders/admin/all', {
+                params: {
+                    page: currentPage,
+                    limit: limit,
+                    search: searchQuery,
+                    status: statusFilter
+                }
+            });
+
+            if (res.data.success) {
+                setOrders(res.data.orders);
+                setTotalPages(res.data.totalPages);
+                setTotalItems(res.data.total);
+            } else {
+                const fallbackOrders = Array.isArray(res.data) ? res.data : [];
+                setOrders(fallbackOrders);
+                setTotalItems(fallbackOrders.length);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error('Error fetching orders:', error);
+        } finally {
+            setLoading(false);
         }
     }
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [currentPage, limit, statusFilter]);
 
     const handleUpdateStatus = async () => {
         try {
@@ -65,12 +93,11 @@ const AdminOrders = () => {
         return <Chip label={config.label} sx={{ bgcolor: config.bg, color: config.color, fontWeight: 700, fontFamily: 'sans-serif', border: `1px solid ${config.color}40`, padding: '0 4px', fontSize: '0.75rem', height: '24px' }} />;
     };
 
-    const filteredOrders = orders.filter(order => {
-        const matchesSearch = order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (order.user?.name || '').toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
+    const isClientSidePagination = totalPages <= 1 && totalItems === orders.length && orders.length > limit;
+    const effectiveTotalPages = isClientSidePagination ? Math.ceil(orders.length / limit) : totalPages;
+    const filteredOrders = isClientSidePagination
+        ? orders.slice((currentPage - 1) * limit, currentPage * limit)
+        : orders;
 
     return (
         <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: '#0D0D0D', minHeight: '100vh', fontFamily: 'sans-serif' }}>
@@ -93,8 +120,9 @@ const AdminOrders = () => {
                     size="small"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    sx={{ 
-                        flexGrow: 1, 
+                    onKeyDown={(e) => e.key === 'Enter' && fetchOrders()}
+                    sx={{
+                        flexGrow: 1,
                         minWidth: '250px',
                         '& .MuiOutlinedInput-root': {
                             color: '#F5E6C8',
@@ -115,7 +143,7 @@ const AdminOrders = () => {
                         value={statusFilter}
                         label="Status"
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        sx={{ 
+                        sx={{
                             color: '#F5E6C8',
                             bgcolor: '#0D0D0D',
                             borderRadius: '10px',
@@ -186,11 +214,28 @@ const AdminOrders = () => {
                 </Table>
             </TableContainer>
 
+            {/* Pagination */}
+            {!loading && orders.length > 0 && (
+                <Box sx={{ mt: 3 }}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={effectiveTotalPages}
+                        totalItems={totalItems}
+                        limit={limit}
+                        onPageChange={setCurrentPage}
+                        onLimitChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setCurrentPage(1);
+                        }}
+                    />
+                </Box>
+            )}
+
             {/* Order Details Dialog */}
-            <Dialog 
-                open={openDetail} 
-                onClose={() => setOpenDetail(false)} 
-                maxWidth="md" 
+            <Dialog
+                open={openDetail}
+                onClose={() => setOpenDetail(false)}
+                maxWidth="md"
                 fullWidth
                 PaperProps={{
                     sx: { bgcolor: '#121212', borderRadius: '16px', border: '1px solid rgba(200,169,106,0.3)', color: '#F5E6C8', backgroundImage: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.9)' }
@@ -256,8 +301,8 @@ const AdminOrders = () => {
             </Dialog>
 
             {/* Status Update Dialog */}
-            <Dialog 
-                open={openStatusUpdate} 
+            <Dialog
+                open={openStatusUpdate}
                 onClose={() => setOpenStatusUpdate(false)}
                 PaperProps={{
                     sx: { borderRadius: '20px', p: 1, minWidth: { xs: 300, sm: 450 }, bgcolor: '#121212', border: '1px solid rgba(200,169,106,0.3)', color: '#F5E6C8', backgroundImage: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.9)' }
@@ -278,7 +323,7 @@ const AdminOrders = () => {
                                 value={newStatus}
                                 label="New Status"
                                 onChange={(e) => setNewStatus(e.target.value)}
-                                sx={{ 
+                                sx={{
                                     borderRadius: '12px', fontWeight: 600, color: '#F5E6C8', bgcolor: '#0D0D0D',
                                     '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(200,169,106,0.3)' },
                                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(200,169,106,0.6)' },
@@ -306,7 +351,7 @@ const AdminOrders = () => {
                             onChange={(e) => setStatusMessage(e.target.value)}
                             placeholder="e.g., Package has arrived at local hub..."
                             InputProps={{
-                                sx: { 
+                                sx: {
                                     borderRadius: '12px', color: '#F5E6C8', bgcolor: '#0D0D0D',
                                     '& fieldset': { borderColor: 'rgba(200,169,106,0.3)' },
                                     '&:hover fieldset': { borderColor: 'rgba(200,169,106,0.6)' },
@@ -318,16 +363,16 @@ const AdminOrders = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 3 }}>
-                    <Button 
+                    <Button
                         onClick={() => setOpenStatusUpdate(false)}
                         sx={{ color: '#C8A96A', fontWeight: 700, textTransform: 'uppercase', px: 3, fontSize: '11px', letterSpacing: '1px' }}
                     >
                         Cancel
                     </Button>
-                    <Button 
-                        onClick={handleUpdateStatus} 
-                        variant="outlined" 
-                        sx={{ 
+                    <Button
+                        onClick={handleUpdateStatus}
+                        variant="outlined"
+                        sx={{
                             color: '#C8A96A', borderColor: 'rgba(200,169,106,0.5)',
                             borderRadius: '8px',
                             fontWeight: 700,

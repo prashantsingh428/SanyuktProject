@@ -342,12 +342,29 @@ exports.getOrder = async (req, res) => {
 // ================= ADMIN: GET ALL ORDERS =================
 exports.getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find()
-            .populate("product", "name image price")
-            .populate("user", "name email")
-            .sort("-createdAt");
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-        res.json(orders);
+        const [orders, total] = await Promise.all([
+            Order.find()
+                .populate("product", "name image price")
+                .populate("user", "name email")
+                .sort("-createdAt")
+                .skip(skip)
+                .limit(limit),
+            Order.countDocuments()
+        ]);
+
+        res.json({
+            success: true,
+            total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit,
+            count: orders.length,
+            orders
+        });
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }

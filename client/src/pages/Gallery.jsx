@@ -112,7 +112,7 @@ function Gallery() {
                                 <div className="aspect-[4/3] bg-[#0D0D0D] overflow-hidden relative">
                                     <img
                                         src={getImageUrl(item)}
-                                        alt={item.title || `Gallery ${index + 1}`}
+                                        alt={item.heading || `Gallery ${index + 1}`}
                                         loading="lazy"
                                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                                         onError={(e) => {
@@ -120,17 +120,20 @@ function Gallery() {
                                             e.target.src = "https://via.placeholder.com/400x300/121212/C8A96A?text=Missing+Image"
                                         }}
                                     />
-                                    
+
                                     {/* Overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                                         <span className="text-[#F5E6C8] font-bold text-sm mb-1 font-serif line-clamp-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                            {item.title}
+                                            {item.heading}
                                         </span>
-                                        <span className="text-[#C8A96A] text-[10px] font-black uppercase tracking-widest translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                                            Click to view full size
+                                        <p className="text-[#F5E6C8]/70 text-[10px] line-clamp-2 mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                                            {item.content}
+                                        </p>
+                                        <span className="text-[#C8A96A] text-[9px] font-black uppercase tracking-[0.2em] translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+                                            Expand View
                                         </span>
                                     </div>
-                                    
+
                                     {/* Number Badge */}
                                     <div className="absolute top-3 right-3 bg-[#0D0D0D]/80 backdrop-blur-md border border-[#C8A96A]/30 text-[#C8A96A] text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-lg">
                                         #{index + 1}
@@ -160,24 +163,25 @@ function Gallery() {
                                 className="w-full max-h-[85vh] object-contain block mx-auto py-4"
                             />
                         </div>
-                        
+
                         {/* Title and Counter */}
-                        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-center w-full">
-                            <h3 className="text-[#F5E6C8] font-serif font-bold text-lg md:text-xl mb-1">{selectedImage.title}</h3>
-                            <p className="text-[#C8A96A]/60 font-mono text-sm">{selectedIndex + 1} / {gallery.length}</p>
+                        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 text-center w-full px-4">
+                            <h3 className="text-[#F5E6C8] font-serif font-bold text-lg md:text-2xl mb-1">{selectedImage.heading}</h3>
+                            <p className="text-[#F5E6C8]/60 text-sm md:text-base max-w-2xl mx-auto mb-2 line-clamp-2 md:line-clamp-none">{selectedImage.content}</p>
+                            <p className="text-[#C8A96A]/60 font-mono text-xs tracking-widest uppercase">{selectedIndex + 1} / {gallery.length}</p>
                         </div>
                     </div>
 
                     {/* Navigation Buttons */}
-                    <button 
-                        onClick={prevImage} 
+                    <button
+                        onClick={prevImage}
                         className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#121212]/80 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center hover:bg-[#C8A96A] hover:text-[#0D0D0D] transition-all duration-300 backdrop-blur-md"
                     >
                         <ChevronLeft size={24} strokeWidth={2.5} />
                     </button>
 
-                    <button 
-                        onClick={nextImage} 
+                    <button
+                        onClick={nextImage}
                         className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#121212]/80 border border-[#C8A96A]/30 text-[#C8A96A] flex items-center justify-center hover:bg-[#C8A96A] hover:text-[#0D0D0D] transition-all duration-300 backdrop-blur-md"
                     >
                         <ChevronRight size={24} strokeWidth={2.5} />

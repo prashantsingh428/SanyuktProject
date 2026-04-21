@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import api, { API_URL } from "../../api"
+import Pagination from "../../components/admin/Pagination"
 
 const STYLES = `
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -124,6 +125,8 @@ function ConfirmModal({ msg, onConfirm, onCancel }) {
 
 export default function AdminEvents() {
     const [events, setEvents] = useState([])
+    const [currentPage, setCurrentPage] = useState(1)
+    const [limit, setLimit] = useState(12)
     const [loading, setLoading] = useState(true)
     const [showAddModal, setShowAddModal] = useState(false)
     const [editItem, setEditItem] = useState(null)
@@ -158,6 +161,15 @@ export default function AdminEvents() {
         try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) }
         catch { return d }
     }
+    const totalItems = events.length
+    const totalPages = Math.max(1, Math.ceil(totalItems / limit))
+    const paginatedEvents = events.slice((currentPage - 1) * limit, currentPage * limit)
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages])
 
     return (
         <div style={{ minHeight: "100vh", background: "#0D0D0D", fontFamily: "sans-serif", position: "relative", overflow: "hidden" }}>
@@ -212,7 +224,7 @@ export default function AdminEvents() {
                         </div>
                     ) : (
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: 24 }}>
-                            {events.map((item, i) => {
+                            {paginatedEvents.map((item, i) => {
                                 const cat = CAT_COLORS[item.category] || CAT_COLORS.Other
                                 return (
                                     <div key={item._id} className="ev-card" style={{ animationDelay: `${i * 60}ms` }}>
@@ -258,6 +270,21 @@ export default function AdminEvents() {
                                     </div>
                                 )
                             })}
+                        </div>
+                    )}
+                    {!loading && events.length > 0 && (
+                        <div style={{ marginTop: 28 }}>
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalItems={totalItems}
+                                limit={limit}
+                                onPageChange={setCurrentPage}
+                                onLimitChange={(newLimit) => {
+                                    setLimit(newLimit);
+                                    setCurrentPage(1);
+                                }}
+                            />
                         </div>
                     )}
                 </div>

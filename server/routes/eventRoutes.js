@@ -1,11 +1,18 @@
 const express = require("express")
 const router = express.Router()
 const multer = require("multer")
+const fs = require("fs")
 const eventController = require("../controllers/eventController")
 
 const storage = multer.diskStorage({
-    destination: "uploads/events",
-    filename: (req, file, cb) => { cb(null, Date.now() + "-" + file.originalname) }
+    destination: (req, file, cb) => {
+        const dir = "uploads/events";
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => { cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "-")) }
 })
 const upload = multer({ storage })
 

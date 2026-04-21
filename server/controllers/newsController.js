@@ -1,4 +1,11 @@
 const News = require('../models/News');
+const slugify = (value = '') =>
+    String(value)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
 
 // @desc    Get all news
 // @route   GET /api/news
@@ -136,7 +143,7 @@ exports.updateNews = async (req, res, next) => {
 
         // Update slug if title changed
         if (req.body.title && req.body.title !== oldTitle) {
-            news.slug = req.body.title.toLowerCase().split(' ').join('-');
+            news.slug = `${slugify(req.body.title)}-${Date.now()}`;
         }
 
 
@@ -169,5 +176,4 @@ exports.updateNews = async (req, res, next) => {
         });
     }
 };
-
 

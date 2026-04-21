@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api, { API_URL } from "../../api";
 import { Package, Search, Filter, Plus, X, Edit2, Trash2, CheckCircle, Image as ImageIcon, Star, AlertCircle, Save } from 'lucide-react';
+import Pagination from "../../components/admin/Pagination";
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -9,6 +10,12 @@ const AdminProducts = () => {
     const [showForm, setShowForm] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit, setLimit] = useState(12);
+    const [totalItems, setTotalItems] = useState(0);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -46,8 +53,21 @@ const AdminProducts = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const res = await api.get("/products");
-            setProducts(res.data);
+            const res = await api.get("/products", {
+                params: {
+                    page: currentPage,
+                    limit: limit
+                }
+            });
+            if (res.data.success) {
+                setProducts(res.data.products);
+                setTotalPages(res.data.totalPages);
+                setTotalItems(res.data.total);
+            } else if (Array.isArray(res.data)) {
+                setProducts(res.data);
+                setTotalItems(res.data.length);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error("Error fetching products:", error);
         } finally {
@@ -57,7 +77,7 @@ const AdminProducts = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [currentPage, limit]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -182,12 +202,18 @@ const AdminProducts = () => {
         }
     };
 
+    const isClientSidePagination = totalPages <= 1 && totalItems === products.length && products.length > limit;
+    const effectiveTotalPages = isClientSidePagination ? Math.ceil(products.length / limit) : totalPages;
+    const displayedProducts = isClientSidePagination
+        ? products.slice((currentPage - 1) * limit, currentPage * limit)
+        : products;
+
     return (
         <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] selection:bg-[#C8A96A]/30 p-4 md:p-8">
             {/* Header section matches overall Elite Luxury style */}
             <div className="bg-[#121212] rounded-2xl shadow-2xl p-6 md:p-8 mb-8 border border-[#C8A96A]/20 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#C8A96A]/5 rounded-full blur-[100px] pointer-events-none"></div>
-                
+
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-[#0D0D0D] rounded-xl border border-[#C8A96A]/30 text-[#C8A96A] shadow-[0_0_15px_rgba(200,169,106,0.1)]">
@@ -198,7 +224,7 @@ const AdminProducts = () => {
                             <p className="text-[#C8A96A]/60 text-[10px] uppercase font-black tracking-widest mt-1">Manage global inventory inventory</p>
                         </div>
                     </div>
-                    
+
                     <button
                         className={`px-6 py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-2 transform transition-all duration-300 border shadow-lg ${showForm
                             ? "bg-red-900/20 text-red-400 border-red-500/30 hover:bg-red-900/40"
@@ -225,7 +251,7 @@ const AdminProducts = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            
+
                             {/* Form Input fields */}
                             <div className="space-y-2 lg:col-span-2">
                                 <label className="text-[10px] uppercase font-black tracking-widest text-[#C8A96A]/80">Product Name <span className="text-red-500">*</span></label>
@@ -342,7 +368,7 @@ const AdminProducts = () => {
                                             type="checkbox"
                                             name="isFeatured"
                                             checked={formData.isFeatured}
-                                            onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
+                                            onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
                                             className="sr-only"
                                         />
                                         <div className={`w-14 h-7 rounded-full transition-colors duration-300 border-2 ${formData.isFeatured ? 'bg-[#C8A96A] border-[#C8A96A]' : 'bg-[#121212] border-[#C8A96A]/30'}`}></div>
@@ -371,10 +397,10 @@ const AdminProducts = () => {
                                                 type="checkbox"
                                                 checked={formData.paymentMethods?.includes(method.id)}
                                                 onChange={(e) => {
-                                                    const newMethods = e.target.checked 
+                                                    const newMethods = e.target.checked
                                                         ? [...(formData.paymentMethods || []), method.id]
                                                         : (formData.paymentMethods || []).filter(m => m !== method.id);
-                                                    setFormData({...formData, paymentMethods: newMethods});
+                                                    setFormData({ ...formData, paymentMethods: newMethods });
                                                 }}
                                                 className="w-5 h-5 rounded bg-[#121212] border border-[#C8A96A]/50 checked:bg-[#C8A96A] checked:border-[#C8A96A] appearance-none relative flex items-center justify-center before:content-['✓'] before:text-[#121212] before:text-xs before:font-black before:opacity-0 checked:before:opacity-100 transition-all cursor-pointer"
                                             />
@@ -383,7 +409,7 @@ const AdminProducts = () => {
                                     ))}
                                 </div>
                                 {(formData.paymentMethods?.length === 0 || !formData.paymentMethods) && (
-                                    <p className="text-[10px] text-red-500 font-bold tracking-widest flex items-center gap-1"><AlertCircle size={12}/> At least one payment method is required</p>
+                                    <p className="text-[10px] text-red-500 font-bold tracking-widest flex items-center gap-1"><AlertCircle size={12} /> At least one payment method is required</p>
                                 )}
                             </div>
 
@@ -447,7 +473,7 @@ const AdminProducts = () => {
                                                 }}
                                                 className="absolute top-2 right-2 w-8 h-8 bg-[#0D0D0D]/80 backdrop-blur-sm border border-[#C8A96A]/30 text-[#F5E6C8] rounded-full hover:bg-red-900/50 hover:text-red-400 hover:border-red-500/50 flex items-center justify-center transition-all"
                                             >
-                                                <X size={14} strokeWidth={2.5}/>
+                                                <X size={14} strokeWidth={2.5} />
                                             </button>
                                         </div>
                                     )}
@@ -511,7 +537,7 @@ const AdminProducts = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {products.map((product) => (
+                        {displayedProducts.map((product) => (
                             <div
                                 key={product._id}
                                 className="group relative bg-[#0D0D0D] rounded-xl border border-[#C8A96A]/20 overflow-hidden hover:border-[#C8A96A]/50 transition-all duration-500 hover:shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
@@ -615,8 +641,25 @@ const AdminProducts = () => {
                         ))}
                     </div>
                 )}
+
+                {/* Pagination */}
+                {!loading && products.length > 0 && (
+                    <div className="mt-8">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={effectiveTotalPages}
+                        totalItems={totalItems}
+                        limit={limit}
+                        onPageChange={setCurrentPage}
+                        onLimitChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setCurrentPage(1);
+                        }}
+                        />
+                    </div>
+                )}
             </div>
-            
+
             {/* Footer */}
             <div className="mt-12 text-center pb-8 opacity-50">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#F5E6C8]/40">

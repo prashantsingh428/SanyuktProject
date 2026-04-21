@@ -102,9 +102,28 @@ exports.createGrievance = async (req, res) => {
 // ✅ GET ALL GRIEVANCES (ADMIN)
 exports.getAllGrievances = async (req, res) => {
     try {
-        const data = await Grievance.find().sort({ createdAt: -1 });
-        console.log(`📊 Admin: Found ${data.length} grievances`);
-        res.json(data);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await Promise.all([
+            Grievance.find()
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            Grievance.countDocuments()
+        ]);
+
+        console.log(`📊 Admin: Found ${data.length} grievances on page ${page}`);
+        
+        res.json({
+            success: true,
+            total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit,
+            data
+        });
     } catch (err) {
         console.error("❌ Error fetching grievances:", err);
         res.status(500).json({ error: err.message });

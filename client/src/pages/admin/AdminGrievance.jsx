@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import api from "../../api";
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { 
-    ShieldAlert, Search, RefreshCw, CheckCircle, Clock, 
-    Activity, LayoutList, Fingerprint, Phone, Mail, 
+import {
+    ShieldAlert, Search, RefreshCw, CheckCircle, Clock,
+    Activity, LayoutList, Fingerprint, Phone, Mail,
     Tag, MessageSquare, Shield, AlertTriangle
 } from "lucide-react";
+import Pagination from "../../components/admin/Pagination";
 
 const AdminGrievance = () => {
     const [data, setData] = useState([]);
@@ -15,23 +16,37 @@ const AdminGrievance = () => {
     const [statusFilter, setStatusFilter] = useState('All');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit, setLimit] = useState(12);
+    const [totalItems, setTotalItems] = useState(0);
+
     const fetchData = async () => {
         setLoading(true);
         try {
             console.log("Fetching grievances...");
-            const res = await api.get("/grievance/all");
+            const res = await api.get("/grievance/all", {
+                params: {
+                    page: currentPage,
+                    limit: limit,
+                    search: searchTerm,
+                    status: statusFilter
+                }
+            });
             console.log("✅ API Response:", res);
-            console.log("✅ Data received:", res.data);
-            console.log("✅ Number of items:", res.data.length);
 
-            if (res.data.length > 0) {
-                console.log("✅ First item sample:", res.data[0]);
-            } else {
-                console.log("⚠️ No data received from API");
+            if (res.data.success) {
+                setData(res.data.data);
+                setFilteredData(res.data.data);
+                setTotalPages(res.data.totalPages);
+                setTotalItems(res.data.total);
+            } else if (Array.isArray(res.data)) {
+                setData(res.data);
+                setFilteredData(res.data);
+                setTotalPages(1);
+                setTotalItems(res.data.length);
             }
-
-            setData(res.data);
-            setFilteredData(res.data);
         } catch (error) {
             console.error("❌ Error fetching grievances:", error);
             console.error("❌ Error response:", error.response);
@@ -69,27 +84,10 @@ const AdminGrievance = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [currentPage, limit, statusFilter]);
 
     useEffect(() => {
-        let filtered = data;
-
-        if (searchTerm) {
-            filtered = filtered.filter(item =>
-                item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.ticket?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.sellerId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.mobile?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.email?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        if (statusFilter !== 'All') {
-            filtered = filtered.filter(item => item.status === statusFilter);
-        }
-
-        setFilteredData(filtered);
+        // Debounce search if needed, but for now just fetch on Enter or filter change
     }, [searchTerm, statusFilter, data]);
 
     const handleRefresh = () => {
@@ -103,6 +101,12 @@ const AdminGrievance = () => {
         inProgress: data.filter(item => item.status === 'In Progress').length,
         resolved: data.filter(item => item.status === 'Resolved').length
     };
+
+    const isClientSidePagination = totalPages <= 1 && totalItems === filteredData.length && filteredData.length > limit;
+    const effectiveTotalPages = isClientSidePagination ? Math.ceil(filteredData.length / limit) : totalPages;
+    const displayedGrievances = isClientSidePagination
+        ? filteredData.slice((currentPage - 1) * limit, currentPage * limit)
+        : filteredData;
 
     if (loading) {
         return (
@@ -119,10 +123,10 @@ const AdminGrievance = () => {
         <div className="min-h-screen bg-[#0D0D0D] font-sans text-[#F5E6C8] selection:bg-[#C8A96A]/30 pb-12 relative overflow-hidden">
             {/* Elegant Background Elements */}
             <div className="absolute top-0 right-[-10%] w-[500px] h-[500px] bg-[#C8A96A]/5 rounded-full blur-[120px] pointer-events-none"></div>
-            
+
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-10 relative z-10">
                 {/* Header Section */}
-                <Motion.div 
+                <Motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
@@ -151,7 +155,7 @@ const AdminGrievance = () => {
                 </Motion.div>
 
                 {/* Stats Cards */}
-                <Motion.div 
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.1 }}
@@ -176,7 +180,7 @@ const AdminGrievance = () => {
                 </Motion.div>
 
                 {/* Search and Filters */}
-                <Motion.div 
+                <Motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
@@ -189,10 +193,11 @@ const AdminGrievance = () => {
                             placeholder="Search by name, ticket, seller ID, mobile, email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && fetchData()}
                             className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-xl pl-12 pr-4 py-3 text-[#F5E6C8] placeholder:text-[#F5E6C8]/30 focus:border-[#C8A96A] outline-none text-sm transition-colors"
                         />
                     </div>
-                    
+
                     <div className="w-full md:w-3/12 relative">
                         <select
                             value={statusFilter}
@@ -214,7 +219,7 @@ const AdminGrievance = () => {
 
                 {/* Debug Info */}
                 {data.length === 0 && !loading && (
-                    <Motion.div 
+                    <Motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="p-6 mb-8 border border-red-500/30 bg-red-900/10 rounded-2xl shadow-xl"
                     >
@@ -236,7 +241,7 @@ const AdminGrievance = () => {
 
                 {/* Grievance List */}
                 {filteredData.length === 0 && data.length > 0 ? (
-                    <Motion.div 
+                    <Motion.div
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="luxury-box p-16 text-center shadow-2xl"
                     >
@@ -246,7 +251,7 @@ const AdminGrievance = () => {
                     </Motion.div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredData.map((item, index) => (
+                        {displayedGrievances.map((item, index) => (
                             <Motion.div
                                 key={item._id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -265,12 +270,11 @@ const AdminGrievance = () => {
                                             <p className="text-[#C8A96A]/80 text-xs font-mono mt-0.5">{item.ticket || 'No ticket'}</p>
                                         </div>
                                     </div>
-                                    
-                                    <div className={`px-2.5 py-1 text-[9px] uppercase tracking-widest border rounded border-[#C8A96A]/30 flex items-center gap-1.5 font-bold ${
-                                        item.status === 'Resolved' ? 'bg-green-500/10 text-green-500 border-green-500/30' :
-                                        item.status === 'In Progress' ? 'bg-[#C8A96A]/10 text-[#C8A96A] border-[#C8A96A]/30' :
-                                        'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30'
-                                    }`}>
+
+                                    <div className={`px-2.5 py-1 text-[9px] uppercase tracking-widest border rounded border-[#C8A96A]/30 flex items-center gap-1.5 font-bold ${item.status === 'Resolved' ? 'bg-green-500/10 text-green-500 border-green-500/30' :
+                                            item.status === 'In Progress' ? 'bg-[#C8A96A]/10 text-[#C8A96A] border-[#C8A96A]/30' :
+                                                'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30'
+                                        }`}>
                                         {item.status === 'Resolved' && <CheckCircle className="w-3 h-3" />}
                                         {item.status === 'In Progress' && <Activity className="w-3 h-3 animate-pulse" />}
                                         {item.status === 'Pending' && <Clock className="w-3 h-3" />}
@@ -344,6 +348,23 @@ const AdminGrievance = () => {
                         ))}
                     </div>
                 )}
+
+                {/* Pagination */}
+                {!loading && data.length > 0 && (
+                    <div className="mt-8">
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={effectiveTotalPages}
+                    totalItems={totalItems}
+                    limit={limit}
+                    onPageChange={setCurrentPage}
+                    onLimitChange={(newLimit) => {
+                        setLimit(newLimit);
+                        setCurrentPage(1);
+                    }}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Custom Snackbar Notification */}
@@ -353,9 +374,8 @@ const AdminGrievance = () => {
                         initial={{ opacity: 0, y: 50, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                        className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border ${
-                            snackbar.severity === 'error' ? 'bg-red-900 border-red-500/50 text-red-100' : 'bg-[#121212] border-[#C8A96A]/40 text-[#F5E6C8]'
-                        }`}
+                        className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl border ${snackbar.severity === 'error' ? 'bg-red-900 border-red-500/50 text-red-100' : 'bg-[#121212] border-[#C8A96A]/40 text-[#F5E6C8]'
+                            }`}
                     >
                         {snackbar.severity === 'error' ? <AlertTriangle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5 text-[#C8A96A]" />}
                         <span className="font-medium text-sm">{snackbar.message}</span>

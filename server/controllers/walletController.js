@@ -85,6 +85,10 @@ const getDeductionWalletQuery = async (userId, walletType = 'e-wallet') => {
 exports.getAllWithdrawals = async (req, res) => {
     try {
         const { status, method, search, walletType = 'All' } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
         let query = {};
 
         if (status && status !== 'All') query.status = status;
@@ -106,12 +110,21 @@ exports.getAllWithdrawals = async (req, res) => {
             ];
         }
 
-        const withdrawals = await Withdrawal.find(query)
-            .populate('userId', 'userName memberId mobile')
-            .sort({ createdAt: -1 });
+        const [withdrawals, total] = await Promise.all([
+            Withdrawal.find(query)
+                .populate('userId', 'userName memberId mobile')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            Withdrawal.countDocuments(query)
+        ]);
 
         res.json({
             success: true,
+            total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit,
             withdrawals
         });
     } catch (err) {
@@ -926,6 +939,10 @@ exports.getWalletRequestHistory = async (req, res) => {
 exports.getAllWalletRequests = async (req, res) => {
     try {
         const { status = 'All', walletType = 'All', search = '' } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        
         const query = {};
 
         if (status && status !== 'All') {
@@ -956,13 +973,22 @@ exports.getAllWalletRequests = async (req, res) => {
             ];
         }
 
-        const requests = await WalletRequest.find(query)
-            .populate('userId', 'userName memberId mobile email')
-            .populate('approvedBy', 'userName memberId')
-            .sort({ createdAt: -1 });
+        const [requests, total] = await Promise.all([
+            WalletRequest.find(query)
+                .populate('userId', 'userName memberId mobile email')
+                .populate('approvedBy', 'userName memberId')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            WalletRequest.countDocuments(query)
+        ]);
 
         res.json({
             success: true,
+            total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit,
             requests,
         });
     } catch (err) {
