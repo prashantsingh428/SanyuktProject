@@ -56,8 +56,9 @@ export default function PlaceOrderPage() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await api.get('/products');
-                setProductsList(Array.isArray(response.data) ? response.data : []);
+                const response = await api.get('/products', { params: { limit: 1000 } });
+                const productsArray = Array.isArray(response.data) ? response.data : (response.data?.products || []);
+                setProductsList(productsArray);
             } catch (error) {
                 console.error('Error fetching products:', error);
                 setFeedback({ type: 'error', message: 'Failed to load products.' });

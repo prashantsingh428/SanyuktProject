@@ -200,13 +200,15 @@ const HomePage = () => {
                     },
                     4000
                 );
+                const productsArray = Array.isArray(data) ? data : (data?.products || []);
                 // Only show featured products on the homepage carousel,
                 // fallback to first 8 products if no featured products found
-                const featured = data.filter(p => p.isFeatured);
-                setProducts(featured.length > 0 ? featured : data.slice(0, 8));
+                const featured = productsArray.filter(p => p && p.isFeatured);
+                setProducts(featured.length > 0 ? featured : productsArray.slice(0, 8));
             } catch (error) {
                 console.error("Error fetching products:", error);
             } finally {
+
                 setLoadingProducts(false);
             }
         };

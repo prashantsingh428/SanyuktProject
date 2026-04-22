@@ -52,9 +52,11 @@ const ProductsPage = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/products');
+            // Increase limit to 1000 to ensure all products are available for client-side filtering
+            const response = await api.get('/products', { params: { limit: 1000 } });
             console.log('Products fetched:', response.data);
-            setProducts(response.data);
+            const productsArray = Array.isArray(response.data) ? response.data : (response.data?.products || []);
+            setProducts(productsArray);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
