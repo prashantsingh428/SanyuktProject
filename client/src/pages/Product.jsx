@@ -10,6 +10,7 @@ import {
 import { X as CloseIcon } from 'lucide-react';
 import ProductDetailsModal from '../components/ProductDetailsModal';
 import { SectionLoader } from '../components/Loader';
+import Pagination from '../components/admin/Pagination';
 
 const ProductsPage = () => {
     const navigate = useNavigate();
@@ -20,6 +21,12 @@ const ProductsPage = () => {
     const [loading, setLoading] = useState(true);
     const [imageErrors, setImageErrors] = useState({});
     const [selectedCategory, setSelectedCategory] = useState("All");
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const limit = 12;
 
     const categories = [
         "All",
@@ -52,21 +59,45 @@ const ProductsPage = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            // Increase limit to 1000 to ensure all products are available for client-side filtering
-            const response = await api.get('/products', { params: { limit: 1000 } });
-            console.log('Products fetched:', response.data);
-            const productsArray = Array.isArray(response.data) ? response.data : (response.data?.products || []);
-            setProducts(productsArray);
+            const response = await api.get('/products', {
+                params: {
+                    page: currentPage,
+                    limit,
+                    search: searchTerm,
+                    category: selectedCategory
+                }
+            });
+            
+            if (response.data.success) {
+                setProducts(response.data.products || []);
+                setTotalPages(response.data.totalPages || 1);
+                setTotalItems(response.data.total || 0);
+            } else {
+                const legacyData = Array.isArray(response.data) ? response.data : [];
+                setProducts(legacyData);
+                setTotalPages(1);
+                setTotalItems(legacyData.length);
+            }
         } catch (error) {
             console.error('Error fetching products:', error);
+            setProducts([]);
         } finally {
             setLoading(false);
         }
     };
 
+    // Trigger fetch on filter change (reset to page 1)
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        setCurrentPage(1);
+    }, [searchTerm, selectedCategory]);
+
+    // Trigger fetch on page or debounced filter change
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchProducts();
+        }, 400); // 400ms debounce
+        return () => clearTimeout(timer);
+    }, [currentPage, searchTerm, selectedCategory]);
 
     const location = useLocation();
     useEffect(() => {
@@ -81,21 +112,7 @@ const ProductsPage = () => {
         }
     }, [products, location.state]);
 
-    const filteredProducts = products.filter(product => {
-        const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.description?.toLowerCase().includes(searchTerm.toLowerCase());
-
-        let matchesCategory = selectedCategory === "All";
-        if (!matchesCategory) {
-            if (selectedCategory === "Beauty & Cosmetics") {
-                matchesCategory = product.category === "Beauty & Cosmetics" || product.category === "Beauty and cosmetic home based products";
-            } else {
-                matchesCategory = product.category === selectedCategory;
-            }
-        }
-
-        return matchesSearch && matchesCategory;
-    });
+    const filteredProducts = products; // Server side filtering active
 
     // Helper: check if user is logged in
     const isLoggedIn = () => {
@@ -395,6 +412,21 @@ const ProductsPage = () => {
                                 </div>
                             );
                         })}
+                    </div>
+                )}
+
+                {/* Pagination Controls */}
+                {!loading && products.length > 0 && (
+                    <div className="mt-10 mb-6">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalItems={totalItems}
+                            limit={limit}
+                            onPageChange={setCurrentPage}
+                            onLimitChange={() => {}} // Limit fixed at 12 for user frontend
+                            showLimit={false}
+                        />
                     </div>
                 )}
             </div>

@@ -10,6 +10,7 @@ const Pagination = ({
     totalItems,
     simpleLoadMore = false,
     loadStep = 12,
+    showLimit = true,
 }) => {
     if (simpleLoadMore) {
         const shownItems = Math.min(limit, totalItems);
@@ -69,20 +70,23 @@ const Pagination = ({
                     Showing <span className="text-[#C8A96A]">{Math.min((currentPage - 1) * limit + 1, totalItems)}</span> to <span className="text-[#C8A96A]">{Math.min(currentPage * limit, totalItems)}</span> of <span className="text-[#C8A96A]">{totalItems}</span>
                 </span>
                 
-                <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#F5E6C8]/20">Per Page:</span>
-                    <select
-                        value={limit}
-                        onChange={(e) => onLimitChange(Number(e.target.value))}
-                        className="bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest text-[#C8A96A] focus:border-[#C8A96A] outline-none transition-colors cursor-pointer appearance-none pr-6 relative"
-                        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 \
+                {showLimit && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#F5E6C8]/20">Per Page:</span>
+                        <select
+                            value={limit}
+                            onChange={(e) => onLimitChange(Number(e.target.value))}
+                            className="bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest text-[#C8A96A] focus:border-[#C8A96A] outline-none transition-colors cursor-pointer appearance-none pr-6 relative"
+                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 \
 0 24 24\' stroke=\'%23C8A96A\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '0.75rem' }}
-                    >
-                        {[5, 10, 20, 50, 100].map(val => (
-                            <option key={val} value={val}>{val}</option>
-                        ))}
-                    </select>
-                </div>
+                        >
+                            {[5, 10, 20, 50, 100].map(val => (
+                                <option key={val} value={val}>{val}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
             </div>
 
             {/* Right: Navigation Controls */}

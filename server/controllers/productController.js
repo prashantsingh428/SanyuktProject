@@ -21,13 +21,31 @@ exports.getProducts = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+        const { search, category } = req.query;
+
+        // Build query
+        let query = {};
+        if (search) {
+            query.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        if (category && category !== 'All') {
+            if (category === "Beauty & Cosmetics") {
+                query.category = { $in: ["Beauty & Cosmetics", "Beauty and cosmetic home based products"] };
+            } else {
+                query.category = category;
+            }
+        }
 
         const [products, total] = await Promise.all([
-            Product.find()
+            Product.find(query)
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit),
-            Product.countDocuments()
+            Product.countDocuments(query)
         ]);
 
         res.json({
