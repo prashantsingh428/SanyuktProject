@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import MainRoutes from "./routes/MainRoutes";
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from "@vercel/analytics/react";
 
 const PUBLIC_HEADER_OFFSET = {
   xs: '88px', // Matches mobile header height precisely
@@ -52,6 +53,7 @@ const App = () => {
 
   return (
     <>
+      <Analytics />
       <Toaster position="top-center" reverseOrder={false} />
       {!isAdminRoute && (
         <Box sx={{ displayPrint: 'none' }}>
