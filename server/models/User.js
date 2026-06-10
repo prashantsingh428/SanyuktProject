@@ -38,6 +38,16 @@ const userSchema = new mongoose.Schema(
             type: String,
             trim: true,
         },
+        category: {
+            type: String,
+            enum: ["General", "OBC", "SC", "ST", null],
+            default: null,
+        },
+        caste: {
+            type: String,
+            trim: true,
+            default: null,
+        },
         position: {
             type: String,
             enum: ["Left", "Right", "left", "right"],
