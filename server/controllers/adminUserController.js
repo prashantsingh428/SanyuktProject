@@ -97,7 +97,7 @@ exports.deleteUser = async (req, res) => {
 // UPDATE user
 exports.updateUser = async (req, res) => {
     try {
-        const { name, email, role, status, phone, kycStatus, kycMessage } = req.body;
+        const { name, userName, email, role, status, phone, kycStatus, kycMessage } = req.body;
 
         // Check if user exists
         const user = await User.findById(req.params.id);
@@ -120,7 +120,7 @@ exports.updateUser = async (req, res) => {
         }
 
         // Update fields
-        user.name = name || user.name;
+        user.userName = userName || name || user.userName || user.name;
         user.email = email || user.email;
         user.role = role || user.role;
         user.status = status || user.status;
