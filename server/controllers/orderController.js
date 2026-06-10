@@ -325,7 +325,7 @@ exports.getOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
             .populate("product", "name image price")
-            .populate("user", "name email");
+            .populate("user", "userName email name");
 
         if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -349,7 +349,7 @@ exports.getAllOrders = async (req, res) => {
         const [orders, total] = await Promise.all([
             Order.find()
                 .populate("product", "name image price")
-                .populate("user", "name email")
+                .populate("user", "userName email name")
                 .sort("-createdAt")
                 .skip(skip)
                 .limit(limit),
