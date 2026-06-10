@@ -8,6 +8,7 @@ const AdminFranchise = () => {
         franchiseId: "",
         name: "",
         mobile: "",
+        email: "",
         address: "",
         password: "",
     });
@@ -44,14 +45,22 @@ const AdminFranchise = () => {
         setLoading(true);
 
         try {
-            // Validate form
-            if (!form.franchiseId || !form.name || !form.mobile || !form.address || !form.password) {
+            const payload = {
+                franchiseId: form.franchiseId.trim(),
+                name: form.name.trim(),
+                mobile: form.mobile.trim(),
+                email: form.email.trim(),
+                address: form.address.trim(),
+                password: form.password,
+            };
+
+            if (!payload.franchiseId || !payload.name || !payload.mobile || !payload.address || !payload.password) {
                 alert("Please fill all fields");
                 setLoading(false);
                 return;
             }
 
-            await api.post("/franchises/add", form); // Note: franchises vs franchise
+            await api.post("/franchises/add", payload);
 
             alert("Franchise Added Successfully ✅");
 
@@ -59,6 +68,7 @@ const AdminFranchise = () => {
                 franchiseId: "",
                 name: "",
                 mobile: "",
+                email: "",
                 address: "",
                 password: "",
             });
@@ -143,7 +153,7 @@ const AdminFranchise = () => {
                                 value={form.franchiseId}
                                 onChange={handleChange}
                                 className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-xl px-4 py-3 text-[#F5E6C8] placeholder:text-[#F5E6C8]/20 focus:border-[#C8A96A] outline-none transition-all font-medium text-sm"
-                                placeholder="Enter Franchise ID"
+                                placeholder="Enter Franchise ID (e.g. FR001)"
                                 required
                             />
                         </div>
@@ -177,6 +187,20 @@ const AdminFranchise = () => {
                                 className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-xl px-4 py-3 text-[#F5E6C8] placeholder:text-[#F5E6C8]/20 focus:border-[#C8A96A] outline-none transition-all font-medium text-sm"
                                 placeholder="Enter Mobile"
                                 required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-[#C8A96A] mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={form.email}
+                                onChange={handleChange}
+                                className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-xl px-4 py-3 text-[#F5E6C8] placeholder:text-[#F5E6C8]/20 focus:border-[#C8A96A] outline-none transition-all font-medium text-sm"
+                                placeholder="Enter Email (optional)"
                             />
                         </div>
 
