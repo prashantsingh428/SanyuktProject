@@ -63,23 +63,40 @@ const sendEmail = require("../utils/sendEmail");
 // ================= ADD =================
 exports.addFranchise = async (req, res) => {
     try {
-        const { franchiseId, name, mobile, email, address, password } = req.body;
+        const franchiseId = String(req.body.franchiseId || "").trim();
+        const name = String(req.body.name || "").trim();
+        const mobile = String(req.body.mobile || "").trim();
+        const email = String(req.body.email || "").trim().toLowerCase();
+        const address = String(req.body.address || "").trim();
+        const password = String(req.body.password || "");
 
-        // Check if franchise exists
-        const exist = await Franchise.findOne({ $or: [{ franchiseId }, { email }] });
-
-        if (exist) {
+        if (!franchiseId || !name || !mobile || !address || !password) {
             return res.status(400).json({
-                message: "Franchise or Email already exists"
+                message: "Please fill all required fields",
             });
         }
 
-        // Password direct save
+        const duplicateFilters = [{ franchiseId }];
+        if (email) {
+            duplicateFilters.push({ email });
+        }
+
+        const exist = await Franchise.findOne({ $or: duplicateFilters });
+
+        if (exist) {
+            return res.status(400).json({
+                message:
+                    exist.franchiseId === franchiseId
+                        ? "Franchise ID already exists"
+                        : "Email already exists",
+            });
+        }
+
         const franchise = await Franchise.create({
             franchiseId,
             name,
             mobile,
-            email,
+            email: email || undefined,
             address,
             password
         });
