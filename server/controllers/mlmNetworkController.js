@@ -54,7 +54,7 @@ exports.register = async (req, res) => {
                 data: {
                     userId: String(user._id),
                     memberId: user.memberId,
-                    sponsorId: sponsor.memberId,
+                    sponsorId: sponsor?.memberId || user.sponsorId || null,
                     parentId: placement.parentId ? String(placement.parentId) : null,
                     position: placement.position
                 }
@@ -67,8 +67,8 @@ exports.register = async (req, res) => {
             data: {
                 userId: String(user._id),
                 memberId: user.memberId,
-                sponsorId: sponsor.memberId,
-                sponsorName: sponsor.userName || "",
+                sponsorId: sponsor?.memberId || user.sponsorId || null,
+                sponsorName: sponsor?.userName || user.sponsorName || "",
                 parentId: placement.parentId ? String(placement.parentId) : null,
                 position: placement.position
             }
