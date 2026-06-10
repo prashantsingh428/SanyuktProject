@@ -6,6 +6,8 @@ import { registerUser } from '../services/api/auth';
 import { ButtonLoader } from '../components/Loader';
 import toast from 'react-hot-toast';
 
+const CATEGORY_OPTIONS = ['General', 'OBC', 'SC', 'ST'];
+
 
 
 const RegistrationForm = () => {
@@ -17,6 +19,8 @@ const RegistrationForm = () => {
         sponsorName: '',
         userName: '',
         fatherName: '',
+        category: '',
+        caste: '',
         position: '',
         gender: '',
         mobile: '',
@@ -75,23 +79,16 @@ const RegistrationForm = () => {
     }, [referralPosition, referralSponsorId]);
 
     useEffect(() => {
-        const fetchSponsorName = async () => {
-            if (formData.sponsorId.length >= 3) {
-                try {
-                    const res = await api.get(`/sponsor/${formData.sponsorId}`);
-                    if (res.data.name) {
-                        setFormData((prev) => ({ ...prev, sponsorName: res.data.name }));
-                    }
-                } catch {
-                    setFormData((prev) => ({ ...prev, sponsorName: '' }));
-                }
-            } else {
-                setFormData((prev) => ({ ...prev, sponsorName: '' }));
+        setFormData((prev) => {
+            if (prev.sponsorName === '') {
+                return prev;
             }
-        };
 
-        const timeoutId = setTimeout(fetchSponsorName, 500);
-        return () => clearTimeout(timeoutId);
+            return {
+                ...prev,
+                sponsorName: '',
+            };
+        });
     }, [formData.sponsorId]);
 
     const handleChange = (e) => {
@@ -124,9 +121,10 @@ const RegistrationForm = () => {
         }
 
         const requiredFields = [
-            { field: 'sponsorId', message: 'Sponsor Id' },
             { field: 'userName', message: 'Name' },
             { field: 'fatherName', message: 'Father Name' },
+            { field: 'category', message: 'Category' },
+            { field: 'caste', message: 'Caste' },
             { field: 'position', message: 'Position' },
             { field: 'gender', message: 'Gender' },
             { field: 'mobile', message: 'Mobile Number' },
@@ -159,6 +157,11 @@ const RegistrationForm = () => {
         const mobileRegex = /^\d{10}$/;
         if (!mobileRegex.test(formData.mobile)) {
             setError('Please enter a valid 10-digit mobile number');
+            return false;
+        }
+
+        if (!formData.caste || formData.caste.trim() === '') {
+            setError('Please enter Caste');
             return false;
         }
 
@@ -195,7 +198,13 @@ const RegistrationForm = () => {
             const data = await registerUser(payload);
 
             if (data) {
-                setSuccess('Registration successful! Redirecting to verification...');
+                localStorage.removeItem('registrationDebugOtp');
+
+                if (data?.emailSent === false) {
+                    throw new Error(data?.warning || data?.message || 'OTP email could not be sent. Please try again.');
+                }
+
+                setSuccess(data.message || 'Registration successful! Redirecting to verification...');
                 localStorage.setItem('registrationEmail', formData.email);
                 localStorage.setItem('registrationMobile', formData.mobile);
 
@@ -249,7 +258,7 @@ const RegistrationForm = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="flex flex-col gap-2 relative group/input">
-                            <label className="text-[11px] md:text-xs font-black uppercase tracking-widest text-[#C8A96A]">Sponsor Id <span className="text-red-500">*</span></label>
+                            <label className="text-[11px] md:text-xs font-black uppercase tracking-widest text-[#C8A96A]">Sponsor Id</label>
                             <input
                                 type="text"
                                 name="sponsorId"
@@ -327,6 +336,33 @@ const RegistrationForm = () => {
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                             </select>
+                        </div>
+
+                        <div className="flex flex-col gap-2 relative group/input">
+                            <label className="text-[11px] md:text-xs font-black uppercase tracking-widest text-[#C8A96A]">Category <span className="text-red-500">*</span></label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl px-5 py-4 text-[15px] text-[#F5E6C8] placeholder:text-[#F5E6C8]/35 focus:border-[#C8A96A] outline-none transition-all font-bold appearance-none"
+                            >
+                                <option value="">- Select Category -</option>
+                                {CATEGORY_OPTIONS.map((category) => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex flex-col gap-2 relative group/input">
+                            <label className="text-[11px] md:text-xs font-black uppercase tracking-widest text-[#C8A96A]">Caste <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="caste"
+                                value={formData.caste}
+                                onChange={handleChange}
+                                placeholder="Enter Caste"
+                                className="w-full bg-[#0D0D0D] border border-[#C8A96A]/20 rounded-2xl px-5 py-4 text-[15px] text-[#F5E6C8] placeholder:text-[#F5E6C8]/35 focus:border-[#C8A96A] outline-none transition-all font-bold"
+                            />
                         </div>
 
                         <div className="flex flex-col gap-2 relative group/input">
