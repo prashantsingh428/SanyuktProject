@@ -105,6 +105,26 @@ const AdminWithdrawals = () => {
         });
     };
 
+    const getDisplayUserName = (user, { preferMemberIdForGeneric = false } = {}) => {
+        const memberId = String(user?.memberId || '').trim();
+        const rawUserName = String(user?.userName || '').trim();
+
+        if (!rawUserName) {
+            return memberId || 'Member';
+        }
+
+        if (memberId) {
+            const normalizedUserName = rawUserName.toLowerCase();
+            const normalizedMemberId = memberId.toLowerCase();
+
+            if (preferMemberIdForGeneric && normalizedUserName === `${normalizedMemberId} user`) {
+                return memberId;
+            }
+        }
+
+        return rawUserName;
+    };
+
     const isClientSidePagination = totalPages <= 1 && totalItems === withdrawals.length && withdrawals.length > limit;
     const effectiveTotalPages = isClientSidePagination ? Math.ceil(withdrawals.length / limit) : totalPages;
     const displayedWithdrawals = isClientSidePagination
@@ -222,7 +242,7 @@ const AdminWithdrawals = () => {
                                                     <User className="w-5 h-5 text-[#C8A96A]" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-[#F5E6C8]">{w.userId?.userName || 'Undefined User'}</p>
+                                                    <p className="text-sm font-bold text-[#F5E6C8]">{getDisplayUserName(w.userId, { preferMemberIdForGeneric: true })}</p>
                                                     <p className="text-[10px] font-black text-[#C8A96A]/40 uppercase tracking-widest mt-1">ID: {w.userId?.memberId || 'N/A'}</p>
                                                     <p className="text-[10px] font-black text-[#C8A96A]/35 uppercase tracking-widest mt-1">{w.walletType || 'e-wallet'}</p>
                                                 </div>
@@ -334,10 +354,10 @@ const AdminWithdrawals = () => {
                                     {/* User Block */}
                                     <div className="space-y-4">
                                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C8A96A]/40 border-l-2 border-[#C8A96A] pl-3">Beneficiary Account</h4>
-                                        <div className="p-5 bg-[#121212] border border-[#C8A96A]/10 rounded-2xl space-y-3">
+                                            <div className="p-5 bg-[#121212] border border-[#C8A96A]/10 rounded-2xl space-y-3">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Name</span>
-                                                <span className="text-sm font-bold text-[#F5E6C8]">{selectedWithdrawal.userId?.userName}</span>
+                                                <span className="text-sm font-bold text-[#F5E6C8]">{getDisplayUserName(selectedWithdrawal.userId)}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs font-black text-[#F5E6C8]/30 uppercase tracking-widest">Member ID</span>
