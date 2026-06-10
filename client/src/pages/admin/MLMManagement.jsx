@@ -180,13 +180,29 @@ const MLMManagement = () => {
     };
 
     const handleUserSearch = async () => {
-        if (!searchId) return;
+        const normalizedSearch = searchId.trim().toLowerCase();
+        if (!normalizedSearch) {
+            setSelectedUser(null);
+            return;
+        }
+
         setLoading(true);
         try {
-            // Check if searchId is an ID or try to find user by ID first
-            const res = await api.get(`admin/users`);
+            const res = await api.get("mlm/admin/users");
             const users = res.data;
-            const user = users.find(u => u.memberId === searchId || u.userName === searchId || u._id === searchId);
+
+            const user = users.find((u) => {
+                const memberId = String(u.memberId || "").trim().toLowerCase();
+                const userName = String(u.userName || "").trim().toLowerCase();
+                const databaseId = String(u._id || "").trim().toLowerCase();
+
+                return (
+                    memberId === normalizedSearch ||
+                    userName === normalizedSearch ||
+                    databaseId === normalizedSearch
+                );
+            });
+
             if (user) {
                 setSelectedUser(user);
                 toast.success(`Found User: ${user.userName}`);
@@ -194,8 +210,9 @@ const MLMManagement = () => {
                 toast.error("User not found");
                 setSelectedUser(null);
             }
-        } catch {
-            toast.error("Search failed");
+        } catch (err) {
+            console.error("MLM user search failed:", err);
+            toast.error(err.response?.data?.message || "Search failed");
         } finally {
             setLoading(false);
         }
@@ -298,7 +315,7 @@ const MLMManagement = () => {
                         placeholder="Search by Member ID, Username, or Database ID..." 
                         value={searchId}
                         onChange={(e) => setSearchId(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleUserSearch()}
+                        onKeyDown={(e) => e.key === 'Enter' && handleUserSearch()}
                         sx={{ 
                             '& .MuiOutlinedInput-root': { color: 'white', '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' }, '&:hover fieldset': { borderColor: '#C8A96A' } },
                             '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.3)', opacity: 1 }
