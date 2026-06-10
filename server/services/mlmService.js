@@ -42,6 +42,20 @@ const normalizePosition = (value) => {
     return normalized === "right" ? "right" : "left";
 };
 
+const normalizeCategory = (value) => {
+    const normalized = String(value || "").trim().toUpperCase();
+    const categoryMap = {
+        GENERAL: "General",
+        OBC: "OBC",
+        SC: "SC",
+        ST: "ST"
+    };
+
+    return categoryMap[normalized] || "";
+};
+
+const normalizeCaste = (value) => String(value || "").trim();
+
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 const getChildId = (user, side) => {
@@ -284,10 +298,8 @@ async function registerUserUnderSponsor(payload) {
     const sponsorId = normalizeMemberId(payload?.sponsorId);
     const email = String(payload?.email || "").trim().toLowerCase();
     const password = String(payload?.password || "");
-
-    if (!sponsorId) {
-        throw createError(400, "sponsorId is required.");
-    }
+    const category = normalizeCategory(payload?.category);
+    const caste = normalizeCaste(payload?.caste);
 
     if (!email) {
         throw createError(400, "Email is required.");
@@ -299,6 +311,14 @@ async function registerUserUnderSponsor(payload) {
 
     if (!PASSWORD_REGEX.test(password)) {
         throw createError(400, "Password must be at least 8 characters and contain at least one letter, one number, and one special symbol.");
+    }
+
+    if (!category) {
+        throw createError(400, "Category is required.");
+    }
+
+    if (!caste) {
+        throw createError(400, "Caste is required.");
     }
 
     const session = await mongoose.startSession();
@@ -344,7 +364,16 @@ async function registerUserUnderSponsor(payload) {
         }
 
         await session.withTransaction(async () => {
-            const sponsor = await validateSponsorId(sponsorId, { session });
+            let sponsor = null;
+            if (sponsorId) {
+                try {
+                    sponsor = await validateSponsorId(sponsorId, { session });
+                } catch (error) {
+                    if (!(error instanceof MlmServiceError) || error.statusCode !== 404) {
+                        throw error;
+                    }
+                }
+            }
             const existingUser = await applySession(
                 User.findOne({ email }),
                 session
@@ -354,11 +383,16 @@ async function registerUserUnderSponsor(payload) {
                 throw createError(409, "Email already exists.");
             }
 
-            if (existingUser?.memberId && normalizeMemberId(existingUser.memberId) === sponsor.memberId) {
+            if (sponsor && existingUser?.memberId && normalizeMemberId(existingUser.memberId) === sponsor.memberId) {
                 throw createError(400, "User cannot be their own sponsor.");
             }
 
-            if (existingUser?.sponsorId && normalizeMemberId(existingUser.sponsorId) && normalizeMemberId(existingUser.sponsorId) !== sponsor.memberId) {
+            if (
+                sponsor &&
+                existingUser?.sponsorId &&
+                normalizeMemberId(existingUser.sponsorId) &&
+                normalizeMemberId(existingUser.sponsorId) !== sponsor.memberId
+            ) {
                 throw createError(409, "A pending registration already exists for this email. Verify or resend OTP for the existing account.");
             }
 
@@ -369,20 +403,24 @@ async function registerUserUnderSponsor(payload) {
             let placement = null;
 
             if (!user) {
-                placement = await resolvePlacementForSponsor(sponsor.memberId, {
-                    session,
-                    preferredPosition: payload?.position
-                });
+                if (sponsor) {
+                    placement = await resolvePlacementForSponsor(sponsor.memberId, {
+                        session,
+                        preferredPosition: payload?.position
+                    });
+                }
 
                 user = new User({
                     ...payload,
                     email,
+                    category,
+                    caste,
                     memberId: await generateUniqueMemberId(session),
-                    sponsorId: sponsor.memberId,
-                    sponsorName: sponsor.userName,
-                    parent: sponsor._id,
-                    parentId: placement.parentId,
-                    position: placement.position,
+                    sponsorId: sponsor?.memberId || sponsorId || "",
+                    sponsorName: sponsor?.userName || "",
+                    parent: sponsor?._id || null,
+                    parentId: placement?.parentId || null,
+                    position: placement?.position || payload?.position || "",
                     password: hashedPassword,
                     activeStatus: payload?.packageType !== 'none',
                     bv: packageDetails.bv,
@@ -393,14 +431,14 @@ async function registerUserUnderSponsor(payload) {
                 });
 
                 await user.save({ session });
-                await ensurePlacementLinked(user, { sponsorObjectId: sponsor._id, session });
+                await ensurePlacementLinked(user, { sponsorObjectId: sponsor?._id || null, session });
 
                 // Distribute Direct Income if active
-                if (user.activeStatus) {
+                if (user.activeStatus && sponsor?._id) {
                     await distributeDirectIncome({ userId: user._id, session });
                 }
             } else {
-                if (!user.parentId) {
+                if (!user.parentId && sponsor) {
                     placement = await resolvePlacementForSponsor(sponsor.memberId, {
                         session,
                         preferredPosition: payload?.position
@@ -419,9 +457,11 @@ async function registerUserUnderSponsor(payload) {
                 Object.assign(user, {
                     ...payload,
                     email,
-                    sponsorId: sponsor.memberId,
-                    sponsorName: sponsor.userName,
-                    parent: sponsor._id,
+                    category,
+                    caste,
+                    sponsorId: sponsor?.memberId || sponsorId || user.sponsorId || "",
+                    sponsorName: sponsor?.userName || user.sponsorName || "",
+                    parent: sponsor?._id || user.parent || null,
                     password: hashedPassword,
                     activeStatus: payload?.packageType !== 'none',
                     bv: packageDetails.bv,
@@ -436,10 +476,10 @@ async function registerUserUnderSponsor(payload) {
                 }
 
                 await user.save({ session });
-                await ensurePlacementLinked(user, { sponsorObjectId: sponsor._id, session });
+                await ensurePlacementLinked(user, { sponsorObjectId: sponsor?._id || null, session });
 
                 // Distribute Direct Income if active
-                if (user.activeStatus) {
+                if (user.activeStatus && sponsor?._id) {
                     await distributeDirectIncome({ userId: user._id, session });
                 }
             }
@@ -448,8 +488,8 @@ async function registerUserUnderSponsor(payload) {
                 user,
                 sponsor,
                 placement: {
-                    parentId: placement.parentId,
-                    position: placement.position
+                    parentId: placement?.parentId || null,
+                    position: placement?.position || user.position || null
                 },
                 otp
             };
