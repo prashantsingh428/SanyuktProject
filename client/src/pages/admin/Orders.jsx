@@ -194,7 +194,7 @@ const AdminOrders = () => {
                             filteredOrders.map((order) => (
                                 <TableRow key={order._id} hover sx={{ '&:hover': { bgcolor: 'rgba(200,169,106,0.03) !important' }, transition: 'background-color 0.2s' }}>
                                     <TableCell sx={{ fontWeight: 700, color: '#F5E6C8', borderBottom: '1px solid rgba(200,169,106,0.1)' }}>#{order._id.slice(-8).toUpperCase()}</TableCell>
-                                    <TableCell sx={{ color: 'rgba(245,230,200,0.8)', borderBottom: '1px solid rgba(200,169,106,0.1)' }}>{order.user?.name || 'Customer'}</TableCell>
+                                    <TableCell sx={{ color: 'rgba(245,230,200,0.8)', borderBottom: '1px solid rgba(200,169,106,0.1)' }}>{order.user?.userName || order.user?.name || 'Customer'}</TableCell>
                                     <TableCell sx={{ color: 'rgba(245,230,200,0.8)', borderBottom: '1px solid rgba(200,169,106,0.1)', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{order.product?.name || 'Product'}</TableCell>
                                     <TableCell sx={{ fontWeight: 700, color: '#10b981', borderBottom: '1px solid rgba(200,169,106,0.1)' }}>₹{order.total?.toFixed(2)}</TableCell>
                                     <TableCell sx={{ borderBottom: '1px solid rgba(200,169,106,0.1)' }}>{getStatusChip(order.status)}</TableCell>
@@ -253,7 +253,7 @@ const AdminOrders = () => {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '32px' }}>
                                 <div>
                                     <Typography variant="subtitle2" sx={{ color: '#C8A96A', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '11px', mb: 2 }}>Customer Info</Typography>
-                                    <Typography variant="body2" sx={{ color: '#F5E6C8', mb: 1 }}><strong>Name:</strong> <span style={{ color: 'rgba(245,230,200,0.7)' }}>{selectedOrder.user?.name}</span></Typography>
+                                    <Typography variant="body2" sx={{ color: '#F5E6C8', mb: 1 }}><strong>Name:</strong> <span style={{ color: 'rgba(245,230,200,0.7)' }}>{selectedOrder.user?.userName || selectedOrder.user?.name}</span></Typography>
                                     <Typography variant="body2" sx={{ color: '#F5E6C8', mb: 1 }}><strong>Email:</strong> <span style={{ color: 'rgba(245,230,200,0.7)' }}>{selectedOrder.user?.email}</span></Typography>
                                     <Typography variant="body2" sx={{ color: '#F5E6C8', mb: 1 }}><strong>Phone:</strong> <span style={{ color: 'rgba(245,230,200,0.7)' }}>{selectedOrder.shippingInfo?.phone}</span></Typography>
                                 </div>
