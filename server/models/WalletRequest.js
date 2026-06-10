@@ -8,6 +8,26 @@ const walletRequestSchema = new mongoose.Schema(
             required: true,
             index: true,
         },
+        requesterName: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        requesterMemberId: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        requesterMobile: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        requesterEmail: {
+            type: String,
+            trim: true,
+            default: "",
+        },
         walletType: {
             type: String,
             enum: ["product-wallet", "repurchase-wallet"],
