@@ -14,6 +14,10 @@ const {
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
+const logOtpToConsole = (label, email, otp) => {
+    console.log(`[OTP][${label}] ${String(email || "").trim().toLowerCase()} -> ${otp}`);
+};
+
 const handleServiceError = (res, error, fallbackMessage) => {
     if (error instanceof MlmServiceError) {
         return res.status(error.statusCode).json({
@@ -36,7 +40,7 @@ exports.register = async (req, res) => {
         const { user, otp } = await registerUserUnderSponsor(req.body);
 
         console.log(`[AUTH] User saved, sending OTP to ${user.email}`);
-
+        logOtpToConsole("register", user.email, otp);
         try {
             await sendEmail(user.email, "Registration OTP", `Your OTP is ${otp}`);
         } catch (err) {
@@ -49,7 +53,8 @@ exports.register = async (req, res) => {
 
         return res.json({
             success: true,
-            message: "OTP Sent to Email. Please check your inbox (and spam folder)."
+            emailSent: true,
+            message: "OTP sent to email. Please check your inbox (and spam folder)."
         });
     } catch (error) {
         return handleServiceError(res, error, "Registration error:");
@@ -174,6 +179,7 @@ exports.forgotPassword = async (req, res) => {
         user.otpExpire = Date.now() + 5 * 60 * 1000;
 
         await user.save();
+        logOtpToConsole("forgot-password", normalizedEmail, otp);
 
         console.log(`[AUTH] Password reset OTP generated for ${normalizedEmail}`);
         try {
@@ -241,9 +247,23 @@ exports.resendOtp = async (req, res) => {
         user.otpExpire = Date.now() + 5 * 60 * 1000;
 
         await user.save();
-        await sendEmail(normalizedEmail, "Resend OTP", `Your new OTP is ${otp}`);
+        logOtpToConsole("resend", normalizedEmail, otp);
 
-        return res.json({ message: "New OTP Sent Successfully" });
+        try {
+            await sendEmail(normalizedEmail, "Resend OTP", `Your new OTP is ${otp}`);
+        } catch (err) {
+            console.error("[AUTH] Resend OTP Email Failed:", err.message);
+            return res.status(502).json({
+                success: false,
+                message: `OTP could not be sent: ${err.message}`
+            });
+        }
+
+        return res.json({
+            success: true,
+            emailSent: true,
+            message: "New OTP sent successfully."
+        });
     } catch (error) {
         console.error("[AUTH] Resend OTP Failed:", error.message);
         return res.status(500).json({ message: error.message || "Server Error" });
@@ -343,7 +363,7 @@ exports.profile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const allowedFields = [
-            "userName", "fatherName", "mobile", "gender", "position", "dob", "qualification",
+            "userName", "fatherName", "mobile", "gender", "category", "caste", "position", "dob", "qualification",
             "shippingAddress", "state", "district", "assemblyArea",
             "block", "villageCouncil", "village", "profileImage", "bankDetails"
         ];
