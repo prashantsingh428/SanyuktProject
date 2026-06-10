@@ -16,7 +16,7 @@ const AdminUsers = () => {
 
     const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({
-        name: "",
+        userName: "",
         email: "",
         role: "",
         status: ""
@@ -104,10 +104,10 @@ const AdminUsers = () => {
     const handleEditClick = (user) => {
         setEditingUser(user._id);
         setFormData({
-            name: user.name || "",
+            userName: user.userName || user.name || "",
             email: user.email || "",
             role: user.role || "user",
-            status: user.status || "active"
+            status: user.status || (user.activeStatus ? "active" : "inactive")
         });
     };
 
@@ -133,7 +133,7 @@ const AdminUsers = () => {
     // ================= CANCEL EDIT =================
     const handleCancelEdit = () => {
         setEditingUser(null);
-        setFormData({ name: "", email: "", role: "", status: "" });
+        setFormData({ userName: "", email: "", role: "", status: "" });
     };
 
     // ================= HANDLE INPUT CHANGE =================
@@ -223,7 +223,7 @@ const AdminUsers = () => {
                     <div>
                         <h1 className="m-0 text-2xl font-serif text-[#F5E6C8] tracking-tight">Sanyukt <span className="text-[#C8A96A]">Parivar</span></h1>
                         <p className="m-0 mt-1 text-[#C8A96A]/60 text-[10px] uppercase font-black tracking-widest">
-                            Logged in as: {currentUser.name || 'Admin'}
+                            Logged in as: {currentUser.userName || currentUser.name || 'Admin'}
                         </p>
                     </div>
                 </div>
@@ -274,8 +274,8 @@ const AdminUsers = () => {
                         {[
                             { label: 'Total Users', value: users.length, icon: Activity },
                             { label: 'Admins', value: users.filter(u => u.role === 'admin').length, icon: Lock },
-                            { label: 'Active Users', value: users.filter(u => u.status === 'active').length, icon: CheckCircle },
-                            { label: 'Pending KYC', value: users.filter(u => u.status === 'pending').length, icon: RefreshCw }
+                            { label: 'Active Users', value: users.filter(u => (u.status || (u.activeStatus ? 'active' : 'inactive')) === 'active').length, icon: CheckCircle },
+                            { label: 'Pending KYC', value: users.filter(u => u.kycStatus === 'Pending').length, icon: RefreshCw }
                         ].map((stat, i) => (
                             <div key={i} className="luxury-box p-6 flex items-center gap-5 group hover:border-[#C8A96A]/60 transition-all duration-500">
                                 <div className="p-4 bg-[#0D0D0D] rounded-xl border border-[#C8A96A]/10 text-[#C8A96A] group-hover:bg-[#C8A96A] group-hover:text-[#0D0D0D] transition-colors">
@@ -323,13 +323,13 @@ const AdminUsers = () => {
                                                     {editingUser === user._id ? (
                                                         <input
                                                             type="text"
-                                                            name="name"
-                                                            value={formData.name}
+                                                            name="userName"
+                                                            value={formData.userName}
                                                             onChange={handleInputChange}
                                                             className="w-full bg-[#0D0D0D] border border-[#C8A96A]/30 rounded-lg px-3 py-2 text-[#F5E6C8] focus:border-[#C8A96A] outline-none text-sm transition-colors"
                                                         />
                                                     ) : (
-                                                        <span className="font-bold text-[#F5E6C8]">{user.name || "Unknown"}</span>
+                                                        <span className="font-bold text-[#F5E6C8]">{user.userName || user.name || "Unknown"}</span>
                                                     )}
                                                 </td>
                                                 <td className="p-5">
@@ -377,9 +377,9 @@ const AdminUsers = () => {
                                                         </select>
                                                     ) : (
                                                         <div className="flex items-center gap-2">
-                                                            <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-[#C8A96A] animate-pulse' : 'bg-red-500'}`}></div>
-                                                            <span className={`px-2 py-0.5 text-[9px] uppercase tracking-widest border rounded-full ${getStatusBadge(user.status)}`}>
-                                                                {user.status || "active"}
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${(user.status || (user.activeStatus ? 'active' : 'inactive')) === 'active' ? 'bg-[#C8A96A] animate-pulse' : 'bg-red-500'}`}></div>
+                                                            <span className={`px-2 py-0.5 text-[9px] uppercase tracking-widest border rounded-full ${getStatusBadge(user.status || (user.activeStatus ? 'active' : 'inactive'))}`}>
+                                                                {user.status || (user.activeStatus ? "active" : "inactive")}
                                                             </span>
                                                         </div>
                                                     )}
@@ -475,7 +475,7 @@ const AdminUsers = () => {
                             KYC Details
                         </Typography>
                         <Typography variant="caption" sx={{ color: 'rgba(200,169,106,0.6)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 900, fontSize: '10px' }}>
-                            User: {selectedUserForKyc?.name}
+                            User: {selectedUserForKyc?.userName || selectedUserForKyc?.name}
                         </Typography>
                     </div>
                 </DialogTitle>
