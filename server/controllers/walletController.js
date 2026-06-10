@@ -879,7 +879,7 @@ exports.createWalletRequest = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Valid request amount enter karo' });
         }
 
-        const user = await User.findById(req.user._id).select('+password userName memberId email walletBalance productWalletBalance repurchaseWalletBalance');
+        const user = await User.findById(req.user._id).select('+password userName memberId mobile email walletBalance productWalletBalance repurchaseWalletBalance');
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -895,6 +895,10 @@ exports.createWalletRequest = async (req, res) => {
 
         const walletRequest = await WalletRequest.create({
             userId: user._id,
+            requesterName: user.userName || '',
+            requesterMemberId: user.memberId || '',
+            requesterMobile: user.mobile || '',
+            requesterEmail: user.email || '',
             walletType,
             bankName,
             bankDetails,
