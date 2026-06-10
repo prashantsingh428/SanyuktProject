@@ -95,6 +95,7 @@ const VerifyOTP = () => {
             // Clear OTP from storage
             localStorage.removeItem('registrationEmail');
             localStorage.removeItem('registrationMobile');
+            localStorage.removeItem('registrationDebugOtp');
 
             // Redirect to login after 2 seconds
             setTimeout(() => {
@@ -118,8 +119,8 @@ const VerifyOTP = () => {
         setError('');
 
         try {
-            await api.post('/resend-otp', { email });
-            setSuccess('New OTP sent successfully!');
+            const response = await api.post('/resend-otp', { email });
+            setSuccess(response?.data?.message || 'New OTP sent successfully!');
             setTimer(60);
             setCanResend(false);
             // Clear OTP inputs
