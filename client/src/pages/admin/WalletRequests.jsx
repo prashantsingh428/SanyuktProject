@@ -41,6 +41,41 @@ const formatDate = (value) => {
 const getWalletLabel = (walletType) =>
     walletType === 'repurchase-wallet' ? 'Repurchase Wallet' : 'Product Wallet';
 
+const normalizeGenericUserName = (rawName, memberId) => {
+    const name = String(rawName || '').trim();
+    const id = String(memberId || '').trim();
+
+    if (!name) return '';
+    if (!id) return name;
+
+    return name.toLowerCase() === `${id.toLowerCase()} user` ? id : name;
+};
+
+const getRequestUserName = (request) => {
+    const memberId = request?.userId?.memberId || request?.requesterMemberId || '';
+    const rawName = request?.userId?.userName || request?.requesterName || '';
+    const normalizedName = normalizeGenericUserName(rawName, memberId);
+
+    if (normalizedName) return normalizedName;
+    if (memberId) return memberId;
+
+    return 'Unknown User';
+};
+
+const getRequestMemberId = (request) =>
+    request?.userId?.memberId ||
+    request?.requesterMemberId ||
+    'N/A';
+
+const getRequestContact = (request) =>
+    request?.userId?.mobile ||
+    request?.requesterMobile ||
+    request?.userId?.email ||
+    request?.requesterEmail ||
+    'No contact';
+
+const isMissingLinkedUser = (request) => Boolean(!request?.userId && !request?.requesterMemberId);
+
 const statusStyles = {
     Pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
     Approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -268,14 +303,19 @@ const AdminWalletRequests = () => {
                                     <tr key={request._id} className="hover:bg-[#C8A96A]/[0.03]">
                                         <td className="px-5 py-4 align-top">
                                             <p className="text-sm font-bold text-[#F5E6C8]">
-                                                {request.userId?.userName || 'Unknown User'}
+                                                {getRequestUserName(request)}
                                             </p>
                                             <p className="mt-1 text-[11px] font-black uppercase tracking-[0.15em] text-[#C8A96A]/45">
-                                                {request.userId?.memberId || 'N/A'}
+                                                {getRequestMemberId(request)}
                                             </p>
                                             <p className="mt-1 text-xs text-[#F5E6C8]/45">
-                                                {request.userId?.mobile || request.userId?.email || 'No contact'}
+                                                {getRequestContact(request)}
                                             </p>
+                                            {isMissingLinkedUser(request) && (
+                                                <p className="mt-1 text-[10px] font-black uppercase tracking-[0.12em] text-red-400/70">
+                                                    User record missing
+                                                </p>
+                                            )}
                                         </td>
                                         <td className="px-5 py-4 align-top">
                                             <span className="inline-flex rounded-full border border-[#C8A96A]/20 bg-[#C8A96A]/5 px-3 py-1 text-xs font-bold text-[#C8A96A]">
@@ -343,7 +383,7 @@ const AdminWalletRequests = () => {
                             <div>
                                 <h3 className="text-2xl font-serif font-bold text-[#F5E6C8]">Wallet Request Detail</h3>
                                 <p className="mt-1 text-xs uppercase tracking-[0.2em] text-[#C8A96A]/45">
-                                    {selectedRequest.userId?.memberId || 'N/A'} • {getWalletLabel(selectedRequest.walletType)}
+                                    {getRequestMemberId(selectedRequest)} • {getWalletLabel(selectedRequest.walletType)}
                                 </p>
                             </div>
                             <button
@@ -361,11 +401,16 @@ const AdminWalletRequests = () => {
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="rounded-2xl border border-[#C8A96A]/10 bg-[#121212] p-5">
                                     <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#C8A96A]/45">User</p>
-                                    <p className="mt-3 text-lg font-bold text-[#F5E6C8]">{selectedRequest.userId?.userName || 'Unknown User'}</p>
-                                    <p className="mt-1 text-sm text-[#F5E6C8]/60">{selectedRequest.userId?.memberId || 'N/A'}</p>
+                                    <p className="mt-3 text-lg font-bold text-[#F5E6C8]">{getRequestUserName(selectedRequest)}</p>
+                                    <p className="mt-1 text-sm text-[#F5E6C8]/60">{getRequestMemberId(selectedRequest)}</p>
                                     <p className="mt-1 text-sm text-[#F5E6C8]/45">
-                                        {selectedRequest.userId?.mobile || selectedRequest.userId?.email || 'No contact'}
+                                        {getRequestContact(selectedRequest)}
                                     </p>
+                                    {isMissingLinkedUser(selectedRequest) && (
+                                        <p className="mt-2 text-xs font-bold uppercase tracking-[0.15em] text-red-400/70">
+                                            Original user record is no longer available
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="rounded-2xl border border-[#C8A96A]/10 bg-[#121212] p-5">
