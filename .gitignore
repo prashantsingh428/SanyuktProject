@@ -1,5 +1,5 @@
 node_modules/
-.env
+**/.env
 # .env.production
 dist/
 dist-ssr
@@ -13,3 +13,4 @@ yarn-error.log*
 *.log
 # server/uploads/ (Removed to allow pushing existing images to Render)
 client/dist/
+/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/PROJECT_EXPLANATION.md

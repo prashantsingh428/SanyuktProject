@@ -1,6 +1,7 @@
 const axios = require('axios');
 const qs = require('querystring');
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const credentials = {
     username: process.env.INSPAY_USERNAME || "IP9628145157",
@@ -10,7 +11,7 @@ const credentials = {
 const test = async (idKey, idValue, amount = "15") => {
     const url = "https://www.connect.inspay.in/v3/recharge/api";
     const rawUsername = credentials.username.replace(/^IP/, '');
-    
+
     const payload = {
         username: rawUsername,
         token: credentials.token,
@@ -21,7 +22,7 @@ const test = async (idKey, idValue, amount = "15") => {
     payload[idKey] = idValue;
 
     console.log(`\nTesting: Request Key=${idKey}, Value=${idValue}, Amount=${amount}`);
-    
+
     try {
         const res = await axios.post(url, qs.stringify(payload), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -38,7 +39,7 @@ const runTests = async () => {
 
     // Test txn_id
     await test("txn_id", ord);
-    
+
     // Test requestId
     await test("requestId", ord);
 
