@@ -13,4 +13,11 @@ yarn-error.log*
 *.log
 # server/uploads/ (Removed to allow pushing existing images to Render)
 client/dist/
-/Users/prashantsingh/Downloads/SanyuktProject-main 2 copy 4/PROJECT_EXPLANATION.md
+
+# Files requested to be hidden
+check_withdrawals.js
+deployment_guide.md
+DEPLOYMENT.md
+PROJECT_EXPLANATION.md
+RAZORPAY_GUIDE.md
+start.sh
